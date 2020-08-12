@@ -73,16 +73,6 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/posts/dmp-read-1/</loc>
-    <lastmod>2020-04-11T12:10:58+08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/posts/</loc>
-    <lastmod>2020-04-11T12:10:58+08:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://kinnylee.github.io/archives/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url>
@@ -93,7 +83,15 @@
   </url>
   
   <url>
+    <loc>https://kinnylee.github.io/posts/_about/</loc>
+  </url>
+  
+  <url>
     <loc>https://kinnylee.github.io/tags/index/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/posts/</loc>
   </url>
   
 </urlset>
