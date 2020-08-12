@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>go on kinnylee</title>
+    <link>https://kinnylee.github.io/tags/go/</link>
+    <description>Recent content in go on kinnylee</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
+    <lastBuildDate>Fri, 10 Jul 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://kinnylee.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>go入门</title>
+      <link>https://kinnylee.github.io/post/go/go%E5%85%A5%E9%97%A8/</link>
+      <pubDate>Fri, 10 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/go%E5%85%A5%E9%97%A8/</guid>
+      <description>go语言入门介绍
+安装 基本语法 </description>
+    </item>
+    
+  </channel>
+</rss>

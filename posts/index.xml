@@ -2,22 +2,25 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on kinnylee</title>
-    <link>http://kinnylee.github.io/posts/</link>
+    <link>https://kinnylee.github.io/posts/</link>
     <description>Recent content in Posts on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
     <lastBuildDate>Sat, 11 Apr 2020 12:10:58 +0800</lastBuildDate>
     
-	<atom:link href="http://kinnylee.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://kinnylee.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Dmp读取（一）</title>
-      <link>http://kinnylee.github.io/posts/dmp-read-1/</link>
+      <link>https://kinnylee.github.io/posts/dmp-read-1/</link>
       <pubDate>Sat, 11 Apr 2020 12:10:58 +0800</pubDate>
       
-      <guid>http://kinnylee.github.io/posts/dmp-read-1/</guid>
-      <description>dmp读取源码分析（一） dmp读取核心源码 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数 int main(int argc, char **argv) { ... // 解析参数 ... // dmp分析的核心函数 PrintMinidumpProcess(...) ... } 2. 总体流程： M</description>
+      <guid>https://kinnylee.github.io/posts/dmp-read-1/</guid>
+      <description>dmp读取源码分析（一）  dmp读取核心源码
+ 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数
+1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体流程： Minidump对象用于保存dmp文件流内容，核心代码
+1PrintMinidumpProcess(...) { 2 ... 3 // 第一步：读取dmp文件内容 4 Minidump dump(minidump_file); 5 if (!dump.Read()) { 6 BPLOG(ERROR) &amp;lt;&amp;lt; &amp;#34;Minidump &amp;#34; &amp;lt;&amp;lt; dump.path() &amp;lt;&amp;lt; &amp;#34; could not be read&amp;#34;; 7 return false; 8 } 9 10 // 第二步：开始分析dmp 11 minidump_processor.</description>
     </item>
     
   </channel>
