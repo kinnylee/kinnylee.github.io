@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C&#43;&#43; on kinnylee</title>
+    <link>https://kinnylee.github.io/tags/c&#43;&#43;/</link>
+    <description>Recent content in C&#43;&#43; on kinnylee</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
+    <lastBuildDate>Sat, 15 Aug 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://kinnylee.github.io/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>breakpad概述</title>
+      <link>https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/</link>
+      <pubDate>Sat, 15 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/</guid>
+      <description>breakpad是什么  google开源的一套实现崩溃报告系统的客户端和服务端组件 C++语言实现 现在已经被广泛运用在google的一系列产品及其它公司的桌面程序上，如chrome，piscal，firefox等。 github地址 官方网站  功能特性  崩溃转储 崩溃分析 跨平台：windows、mac、linux 可以运行于一系列架构的cpu上  主要组件  client：集成到应用程序源码中，用于抓取崩溃信息，并生成minidmp文件 symbol dumper：读取编译器生成的调试信息（pdb），生成symbol文件 processor：读取minidump文件，并结合symbol文件，生成可读的堆栈调用信息  各组件关系示意图 工作原理图 崩溃转储文件 coredump文件  Coredump叫做核心转储，它是进程运行时在突然崩溃的那一刻的一个内存快照。 linux内核提供的功能 操作系统在程序发生异常而异常在进程内部又没有被捕获的情况下，会把进程此刻内存、寄存器状态、运行堆栈等信息转储保存在一个文件里  coredump生成的条件  条件一：需要有信号产生：进程中止前肯定有信号产生，内核根据信号类型来决定是否产生core文件 条件二：需要编译器支持：需要把当前进程镜像以某种格式dump到文件中，比如：gcc/g++的-g选型 条件三：环境参数支持：  通过 ulimit –a 查看 core file size 是否为 0 ，如果为 0 则不能产生 core 文件。 通过 ulimit –c unlimited 可以系统能支持的产生足够大的 core 文件，也可以设置为具体值    coredump的局限性  文件巨大，不利于保存和传输 有些情况崩溃导致堆栈被破坏，堆栈信息不准确 一些信号导致崩溃，不会产生core文件 不能实时产生崩溃文件，必须进程终止时  minidump文件  minidump文件格式是由微软开发的用于崩溃上传  各个组件详解 client  client模块作为一个静态库将会与使用者的程序编译在一块 它的主要作用是在程序崩溃后，接管程序的异常处理 主要做了两方面的事情:  响应程序崩溃时接收到的signal 获取程序崩溃那一刻的运行时信息，保存为一个minidump格式的文件   内部原理：  崩溃时线程可以异常了，通过克隆子进程，并通过ptrace与父进程交互，读取相关信息 有两种异常处理模式：进程内、进程外    symbole dumper  从可执行程序中提取与符号相关的信息，并保存为一种特定格式的文件 symbol file中全部内容都是ascii文本。 symbol file的内容以行单位，每一行称作一条记录，每条记录中有多个字段，每个字段以空格分开 每条记录的开头是一个串字符，这个字符标记这条记录是什么类型的记录。（Line record除外，这种类型的记录，默认省略掉标记符） 记录中有些字段是10进制或16进制的字符串，16进制也没有以0x开头，要分清某个数字具体是哪种进制，就要看这些数字是在哪种记录里，属于哪个字段，这些都是规定死了的  symbole文件格式 官方文档</description>
+    </item>
+    
+    <item>
+      <title>动态链接库与静态链接库</title>
+      <link>https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/</link>
+      <pubDate>Sat, 15 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/</guid>
+      <description>概述 静态链接库  windows: .lib文件 linux：.a文件  动态链接库  windows：.dll文件 linux：.so文件  </description>
+    </item>
+    
+  </channel>
+</rss>

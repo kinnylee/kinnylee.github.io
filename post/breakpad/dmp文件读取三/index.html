@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>dmp文件读取（三） | kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.74.3" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+  
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="dmp文件读取">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "dmp文件读取（三）" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/" />
+<meta property = "og:title" content = "dmp文件读取（三）" />
+<meta property = "og:description" content = "dmp文件读取" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/google.jpg" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/'>
+
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css" integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ==' as="style">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js" as="script">
+
+    
+    <link rel = 'stylesheet' href = 'https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css' integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ=='>
+	  
+  </head>
+  
+  
+    
+  
+  <body data-code="7" data-lines="false" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <svg class="icon">
+          <use xlink:href="#open-menu"></use>
+        </svg>
+        <svg class="icon">
+          <use xlink:href="#closeme"></use>
+        </svg>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://twitter.com/' class = 'nav_child nav_item'>中间件</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>dmp文件读取（三）</h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 14, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=dmp%e6%96%87%e4%bb%b6%e8%af%bb%e5%8f%96%ef%bc%88%e4%b8%89%ef%bc%89&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E8%25AF%25BB%25E5%258F%2596%25E4%25B8%2589%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
+  </a>
+  
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E8%25AF%25BB%25E5%258F%2596%25E4%25B8%2589%2f&t=dmp%e6%96%87%e4%bb%b6%e8%af%bb%e5%8f%96%ef%bc%88%e4%b8%89%ef%bc%89" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#dmp文件读取三">dmp文件读取（三）</a>
+      <ul>
+        <li><a href="#module-stream概述">module stream概述</a></li>
+        <li><a href="#module流读取入口">module流读取入口</a></li>
+        <li><a href="#module-stream读取核心代码">module stream读取核心代码</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <h2 id="dmp文件读取三">dmp文件读取（三）</h2>
+<p>第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。</p>
+<h3 id="module-stream概述">module stream概述</h3>
+<ul>
+<li>module信息记录了应用程序（exe）在运行时，加载了哪些dll</li>
+<li>每个dll相关的信息，在dmp中称为module</li>
+<li>dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4</li>
+<li>每个module使用<code>MinidumpModule</code>对象表示</li>
+<li>每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址，匹配响应的模块内存地址</li>
+</ul>
+<h3 id="module流读取入口">module流读取入口</h3>
+<ul>
+<li>dump的GetModuleList方法，获取dmp文件中的模块列表</li>
+<li>读取的模块列表信息保存在<code>MinidumpModuleList</code>中</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln">1</span><span class="n">ProcessResult</span> <span class="n">MinidumpProcessor</span><span class="o">::</span><span class="n">Process</span><span class="p">(</span>
+<span class="ln">2</span>    <span class="n">Minidump</span> <span class="o">*</span><span class="n">dump</span><span class="p">,</span> <span class="n">ProcessState</span> <span class="o">*</span><span class="n">process_state</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">3</span> 
+<span class="ln">4</span>    <span class="p">...</span>
+<span class="ln">5</span>    <span class="c1">// 读取模块信息
+</span><span class="ln">6</span><span class="c1"></span>    <span class="n">MinidumpModuleList</span> <span class="o">*</span><span class="n">module_list</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetModuleList</span><span class="p">();</span>
+<span class="ln">7</span>    <span class="p">...</span>
+<span class="ln">8</span><span class="p">}</span>
+</code></pre></div><h4 id="minidumpmodulelist">MinidumpModuleList</h4>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="k">class</span> <span class="nc">MinidumpModuleList</span> <span class="o">:</span> <span class="k">public</span> <span class="n">MinidumpStream</span><span class="p">,</span>
+<span class="ln"> 2</span>                           <span class="k">public</span> <span class="n">CodeModules</span> <span class="p">{</span>
+<span class="ln"> 3</span> <span class="k">public</span><span class="o">:</span>
+<span class="ln"> 4</span>    <span class="p">...</span>
+<span class="ln"> 5</span> <span class="k">private</span><span class="o">:</span>
+<span class="ln"> 6</span>  <span class="k">friend</span> <span class="k">class</span> <span class="nc">Minidump</span><span class="p">;</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span>  <span class="c1">// 存放所有的module列表
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="c1">// 每个module使用MinidumpModule对象表示
+</span><span class="ln">10</span><span class="c1"></span>  <span class="k">typedef</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">MinidumpModule</span><span class="o">&gt;</span> <span class="n">MinidumpModules</span><span class="p">;</span>
+<span class="ln">11</span>
+<span class="ln">12</span>  <span class="c1">// module的stream类型为MD_MODULE_LIST_STREAM
+</span><span class="ln">13</span><span class="c1"></span>  <span class="k">static</span> <span class="k">const</span> <span class="kt">uint32_t</span> <span class="n">kStreamType</span> <span class="o">=</span> <span class="n">MD_MODULE_LIST_STREAM</span><span class="p">;</span>
+<span class="ln">14</span>
+<span class="ln">15</span>  <span class="c1">// 重新read方法，读取module信息
+</span><span class="ln">16</span><span class="c1"></span>  <span class="kt">bool</span> <span class="nf">Read</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">expected_size</span><span class="p">);</span>
+<span class="ln">17</span>
+<span class="ln">18</span>  <span class="c1">// 最大模块数1024
+</span><span class="ln">19</span><span class="c1"></span>  <span class="c1">// The largest number of modules that will be read from a minidump.  The
+</span><span class="ln">20</span><span class="c1"></span>  <span class="c1">// default is 1024.
+</span><span class="ln">21</span><span class="c1"></span>  <span class="k">static</span> <span class="kt">uint32_t</span> <span class="n">max_modules_</span><span class="p">;</span>
+<span class="ln">22</span>
+<span class="ln">23</span>  <span class="c1">// 每个module在内存中有一段偏移地址
+</span><span class="ln">24</span><span class="c1"></span>  <span class="c1">// 这个字段用来根据内存的段，索引这段内存被哪个module占用着
+</span><span class="ln">25</span><span class="c1"></span>  <span class="c1">// Access to modules using addresses as the key.
+</span><span class="ln">26</span><span class="c1"></span>  <span class="n">RangeMap</span><span class="o">&lt;</span><span class="kt">uint64_t</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span><span class="o">&gt;</span> <span class="o">*</span><span class="n">range_map_</span><span class="p">;</span>
+<span class="ln">27</span>
+<span class="ln">28</span>  <span class="n">MinidumpModules</span> <span class="o">*</span><span class="n">modules_</span><span class="p">;</span>
+<span class="ln">29</span>  <span class="kt">uint32_t</span> <span class="n">module_count_</span><span class="p">;</span>
+<span class="ln">30</span>
+<span class="ln">31</span>  <span class="n">DISALLOW_COPY_AND_ASSIGN</span><span class="p">(</span><span class="n">MinidumpModuleList</span><span class="p">);</span>
+<span class="ln">32</span><span class="p">};</span>
+</code></pre></div><h4 id="minidumpmodule">MinidumpModule</h4>
+<ul>
+<li>每个module的核心对象</li>
+<li>数据信息保存在MDRawModule中</li>
+<li>通过MDRawModule解析出模块名、xx等信息</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="k">class</span> <span class="nc">MinidumpModule</span> <span class="o">:</span> <span class="k">public</span> <span class="n">MinidumpObject</span><span class="p">,</span>
+<span class="ln"> 2</span>                       <span class="k">public</span> <span class="n">CodeModule</span> <span class="p">{</span>
+<span class="ln"> 3</span> <span class="k">public</span><span class="o">:</span>
+<span class="ln"> 4</span>  <span class="p">...</span>
+<span class="ln"> 5</span>  <span class="c1">// 重新read方法，读取模块相关数据信息
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="kt">bool</span> <span class="n">Read</span><span class="p">();</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span>  <span class="c1">// 该module是否是合法的module
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="kt">bool</span>              <span class="n">module_valid_</span><span class="p">;</span>
+<span class="ln">10</span>
+<span class="ln">11</span>  <span class="c1">// 该module是否有debug信息，pdb文件是否匹配
+</span><span class="ln">12</span><span class="c1"></span>  <span class="kt">bool</span>              <span class="n">has_debug_info_</span><span class="p">;</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="c1">// dmp中存放的module核心数据结构，保存到这个对象
+</span><span class="ln">15</span><span class="c1"></span>  <span class="n">MDRawModule</span>       <span class="n">module_</span><span class="p">;</span>
+<span class="ln">16</span>
+<span class="ln">17</span>  <span class="c1">// 模块名称，是通过MDRawModule中存放的文件名索引计算得到的（name在dmp文件中的偏移位置和大小）
+</span><span class="ln">18</span><span class="c1"></span>  <span class="k">const</span> <span class="n">string</span><span class="o">*</span>     <span class="n">name_</span><span class="p">;</span>
+<span class="ln">19</span>
+<span class="ln">20</span>  <span class="c1">// Cached CodeView record - this is MDCVInfoPDB20 or (likely)
+</span><span class="ln">21</span><span class="c1"></span>  <span class="c1">// MDCVInfoPDB70, or possibly something else entirely.  Stored as a uint8_t
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">// because the structure contains a variable-sized string and its exact
+</span><span class="ln">23</span><span class="c1"></span>  <span class="c1">// size cannot be known until it is processed.
+</span><span class="ln">24</span><span class="c1"></span>  <span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;*</span> <span class="n">cv_record_</span><span class="p">;</span>
+<span class="ln">25</span>
+<span class="ln">26</span>  <span class="c1">// If cv_record_ is present, cv_record_signature_ contains a copy of the
+</span><span class="ln">27</span><span class="c1"></span>  <span class="c1">// CodeView record&#39;s first four bytes, for ease of determinining the
+</span><span class="ln">28</span><span class="c1"></span>  <span class="c1">// type of structure that cv_record_ contains.
+</span><span class="ln">29</span><span class="c1"></span>  <span class="kt">uint32_t</span> <span class="n">cv_record_signature_</span><span class="p">;</span>
+<span class="ln">30</span>
+<span class="ln">31</span>  <span class="c1">// Cached MDImageDebugMisc (usually not present), stored as uint8_t
+</span><span class="ln">32</span><span class="c1"></span>  <span class="c1">// because the structure contains a variable-sized string and its exact
+</span><span class="ln">33</span><span class="c1"></span>  <span class="c1">// size cannot be known until it is processed.
+</span><span class="ln">34</span><span class="c1"></span>  <span class="n">vector</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;*</span> <span class="n">misc_record_</span><span class="p">;</span>
+<span class="ln">35</span><span class="p">};</span>
+</code></pre></div><h4 id="mdrawmodule">MDRawModule</h4>
+<ul>
+<li>存放某个模块的核心数据结构</li>
+<li>其实地址和大小，用于和线程当前在内存中位置做匹配，以分析线程崩溃在哪个模块了</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span>  <span class="c1">// 该模块在内存中的起始地址
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="kt">uint64_t</span>             <span class="n">base_of_image</span><span class="p">;</span>
+<span class="ln"> 5</span>  
+<span class="ln"> 6</span>  <span class="c1">// 该模块在内存中的占用大小
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="kt">uint32_t</span>             <span class="n">size_of_image</span><span class="p">;</span>
+<span class="ln"> 8</span>  
+<span class="ln"> 9</span>  <span class="c1">// 校验码
+</span><span class="ln">10</span><span class="c1"></span>  <span class="kt">uint32_t</span>             <span class="n">checksum</span><span class="p">;</span>         <span class="cm">/* 0 if unknown */</span>
+<span class="ln">11</span>  
+<span class="ln">12</span>  <span class="c1">// 时间戳
+</span><span class="ln">13</span><span class="c1"></span>  <span class="kt">uint32_t</span>             <span class="n">time_date_stamp</span><span class="p">;</span>  <span class="cm">/* time_t */</span>
+<span class="ln">14</span>  
+<span class="ln">15</span>  <span class="c1">// 模块名在dmp中的偏移地址和大小
+</span><span class="ln">16</span><span class="c1"></span>  <span class="n">MDRVA</span>                <span class="n">module_name_rva</span><span class="p">;</span>  <span class="cm">/* MDString, pathname or filename */</span>
+<span class="ln">17</span>  <span class="n">MDVSFixedFileInfo</span>    <span class="n">version_info</span><span class="p">;</span>
+<span class="ln">18</span>
+<span class="ln">19</span>  <span class="cm">/* The next field stores a CodeView record and is populated when a module&#39;s
+</span><span class="ln">20</span><span class="cm">   * debug information resides in a PDB file.  It identifies the PDB file. */</span>
+<span class="ln">21</span>  <span class="n">MDLocationDescriptor</span> <span class="n">cv_record</span><span class="p">;</span>
+<span class="ln">22</span>
+<span class="ln">23</span>  <span class="cm">/* The next field is populated when a module&#39;s debug information resides
+</span><span class="ln">24</span><span class="cm">   * in a DBG file.  It identifies the DBG file.  This field is effectively
+</span><span class="ln">25</span><span class="cm">   * obsolete with modules built by recent toolchains. */</span>
+<span class="ln">26</span>  <span class="n">MDLocationDescriptor</span> <span class="n">misc_record</span><span class="p">;</span>
+<span class="ln">27</span>
+<span class="ln">28</span>  <span class="cm">/* Alignment problem: reserved0 and reserved1 are defined by the platform
+</span><span class="ln">29</span><span class="cm">   * SDK as 64-bit quantities.  However, that results in a structure whose
+</span><span class="ln">30</span><span class="cm">   * alignment is unpredictable on different CPUs and ABIs.  If the ABI
+</span><span class="ln">31</span><span class="cm">   * specifies full alignment of 64-bit quantities in structures (as ppc
+</span><span class="ln">32</span><span class="cm">   * does), there will be padding between miscRecord and reserved0.  If
+</span><span class="ln">33</span><span class="cm">   * 64-bit quantities can be aligned on 32-bit boundaries (as on x86),
+</span><span class="ln">34</span><span class="cm">   * this padding will not exist.  (Note that the structure up to this point
+</span><span class="ln">35</span><span class="cm">   * contains 1 64-bit member followed by 21 32-bit members.)
+</span><span class="ln">36</span><span class="cm">   * As a workaround, reserved0 and reserved1 are instead defined here as
+</span><span class="ln">37</span><span class="cm">   * four 32-bit quantities.  This should be harmless, as there are
+</span><span class="ln">38</span><span class="cm">   * currently no known uses for these fields. */</span>
+<span class="ln">39</span>  <span class="kt">uint32_t</span>             <span class="n">reserved0</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="ln">40</span>  <span class="kt">uint32_t</span>             <span class="n">reserved1</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="ln">41</span><span class="p">}</span> <span class="n">MDRawModule</span><span class="p">;</span>  <span class="cm">/* MINIDUMP_MODULE */</span>
+<span class="ln">42</span>
+</code></pre></div><h3 id="module-stream读取核心代码">module stream读取核心代码</h3>
+<ul>
+<li>调用读取stream的通用方法，传入的参数为MinidumpModuleList</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln">1</span><span class="n">MinidumpModuleList</span><span class="o">*</span> <span class="n">Minidump</span><span class="o">::</span><span class="n">GetModuleList</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="n">MinidumpModuleList</span><span class="o">*</span> <span class="n">module_list</span><span class="p">;</span>
+<span class="ln">3</span>  <span class="k">return</span> <span class="nf">GetStream</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_list</span><span class="p">);</span>
+<span class="ln">4</span><span class="p">}</span>
+</code></pre></div><h4 id="读取stream的通用方法解析">读取stream的通用方法解析</h4>
+<ul>
+<li>入参为模板类</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="ln"> 2</span><span class="n">T</span><span class="o">*</span> <span class="n">Minidump</span><span class="o">::</span><span class="n">GetStream</span><span class="p">(</span><span class="n">T</span><span class="o">**</span> <span class="n">stream</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="c1">// stream is a garbage parameter that&#39;s present only to account for C++&#39;s
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="c1">// inability to overload a method based solely on its return type.
+</span><span class="ln"> 5</span><span class="c1"></span>
+<span class="ln"> 6</span>  <span class="c1">// 先获取入参的stream类型
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="k">const</span> <span class="kt">uint32_t</span> <span class="n">stream_type</span> <span class="o">=</span> <span class="n">T</span><span class="o">::</span><span class="n">kStreamType</span><span class="p">;</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="n">BPLOG_IF</span><span class="p">(</span><span class="n">ERROR</span><span class="p">,</span> <span class="o">!</span><span class="n">stream</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Minidump::GetStream type &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">stream_type</span> <span class="o">&lt;&lt;</span>
+<span class="ln">10</span>                              <span class="s">&#34; requires |stream|&#34;</span><span class="p">;</span>
+<span class="ln">11</span>  <span class="n">assert</span><span class="p">(</span><span class="n">stream</span><span class="p">);</span>
+<span class="ln">12</span>  <span class="o">*</span><span class="n">stream</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">valid_</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">15</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Invalid Minidump for GetStream type &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">stream_type</span><span class="p">;</span>
+<span class="ln">16</span>    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="ln">17</span>  <span class="p">}</span>
+<span class="ln">18</span>
+<span class="ln">19</span>  <span class="c1">// 前面的文章介绍过，读取stream索引信息后，所有的被存放在一个名为stream_map的map中
+</span><span class="ln">20</span><span class="c1"></span>  <span class="c1">// map的key为stream类型，value为stream对象
+</span><span class="ln">21</span><span class="c1"></span>  <span class="c1">// 如果传入的参数，不在索引列表中，报错返回
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">// 如果在索引列表中，取出value值，并进行后续操作
+</span><span class="ln">23</span><span class="c1"></span>  <span class="n">MinidumpStreamMap</span><span class="o">::</span><span class="n">iterator</span> <span class="n">iterator</span> <span class="o">=</span> <span class="n">stream_map_</span><span class="o">-&gt;</span><span class="n">find</span><span class="p">(</span><span class="n">stream_type</span><span class="p">);</span>
+<span class="ln">24</span>  <span class="k">if</span> <span class="p">(</span><span class="n">iterator</span> <span class="o">==</span> <span class="n">stream_map_</span><span class="o">-&gt;</span><span class="n">end</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln">25</span>    <span class="c1">// This stream type didn&#39;t exist in the directory.
+</span><span class="ln">26</span><span class="c1"></span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;GetStream: type &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">stream_type</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; not present&#34;</span><span class="p">;</span>
+<span class="ln">27</span>    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="ln">28</span>  <span class="p">}</span>
+<span class="ln">29</span>
+<span class="ln">30</span>  <span class="c1">// Get a pointer so that the stored stream field can be altered.
+</span><span class="ln">31</span><span class="c1"></span>  <span class="n">MinidumpStreamInfo</span><span class="o">*</span> <span class="n">info</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">iterator</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">;</span>
+<span class="ln">32</span>
+<span class="ln">33</span>  <span class="c1">// 如果map中根据streamType取出的value值中，stream不为空，说明已经取出过了，直接将上次读取的结果返回
+</span><span class="ln">34</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">stream</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">35</span>    <span class="c1">// This cast is safe because info.stream is only populated by this
+</span><span class="ln">36</span><span class="c1"></span>    <span class="c1">// method, and there is a direct correlation between T and stream_type.
+</span><span class="ln">37</span><span class="c1"></span>    <span class="o">*</span><span class="n">stream</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">info</span><span class="o">-&gt;</span><span class="n">stream</span><span class="p">);</span>
+<span class="ln">38</span>    <span class="k">return</span> <span class="o">*</span><span class="n">stream</span><span class="p">;</span>
+<span class="ln">39</span>  <span class="p">}</span>
+<span class="ln">40</span>  
+<span class="ln">41</span>  <span class="c1">// 如果map中根据streamType取出的value值中，stream为空
+</span><span class="ln">42</span><span class="c1"></span>  <span class="c1">// 调用SeekToStreamType函数，将dmp二进制文件流的指针跳转到该stream指定的数据在dmp文件中的偏移位置，并返回该stream的字节大小
+</span><span class="ln">43</span><span class="c1"></span>  <span class="kt">uint32_t</span> <span class="n">stream_length</span><span class="p">;</span>
+<span class="ln">44</span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">SeekToStreamType</span><span class="p">(</span><span class="n">stream_type</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">stream_length</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln">45</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;GetStream could not seek to stream type &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">stream_type</span><span class="p">;</span>
+<span class="ln">46</span>    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="ln">47</span>  <span class="p">}</span>
+<span class="ln">48</span>
+<span class="ln">49</span>  <span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">new_stream</span><span class="p">(</span><span class="k">new</span> <span class="n">T</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+<span class="ln">50</span>
+<span class="ln">51</span>  <span class="c1">// 前面的步骤已经将读取文件的指针指到指定的偏移位置
+</span><span class="ln">52</span><span class="c1"></span>  <span class="c1">// 这里在根据stream的大小，就能读取出该stream在dmp中的全部数据
+</span><span class="ln">53</span><span class="c1"></span>  <span class="c1">// 具体这样一段大小的字节，如何反序列化为stream对象，后面会详细介绍Read反复
+</span><span class="ln">54</span><span class="c1"></span>  <span class="c1">// 我们说过，Read是虚方法，每种stream有自己的实现方式
+</span><span class="ln">55</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">new_stream</span><span class="o">-&gt;</span><span class="n">Read</span><span class="p">(</span><span class="n">stream_length</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln">56</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;GetStream could not read stream type &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">stream_type</span><span class="p">;</span>
+<span class="ln">57</span>    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="ln">58</span>  <span class="p">}</span>
+<span class="ln">59</span>
+<span class="ln">60</span>  <span class="c1">// 得到的二进制数据就是该stream的所有数据
+</span><span class="ln">61</span><span class="c1"></span>  <span class="o">*</span><span class="n">stream</span> <span class="o">=</span> <span class="n">new_stream</span><span class="p">.</span><span class="n">release</span><span class="p">();</span>
+<span class="ln">62</span>  <span class="n">info</span><span class="o">-&gt;</span><span class="n">stream</span> <span class="o">=</span> <span class="o">*</span><span class="n">stream</span><span class="p">;</span>
+<span class="ln">63</span>  <span class="k">return</span> <span class="o">*</span><span class="n">stream</span><span class="p">;</span>
+<span class="ln">64</span><span class="p">}</span>
+</code></pre></div><h4 id="module-read方法详解">module Read方法详解</h4>
+<ul>
+<li>前面的方法，介绍了如何根据streamType将读取文件的指针指向某个偏移位置，并读取指定stream大小的数据，这里以module这种stream为例，介绍具体的Read方法实现</li>
+<li>只介绍核心方法，不重要的代码移除掉了</li>
+<li>这里主要是调用单个module的Read方法，然后建立内存地址和模块信息的map索引</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln">  1</span><span class="c1">// 该方法从dmp中stream的索引给定的线索，将读取dmp文件流的指针指到固定位置，
+</span><span class="ln">  2</span><span class="c1">// 并读取指定大小的一段二进制数据
+</span><span class="ln">  3</span><span class="c1"></span><span class="kt">bool</span> <span class="n">MinidumpModuleList</span><span class="o">::</span><span class="n">Read</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">expected_size</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">  4</span>  
+<span class="ln">  5</span>  <span class="c1">// 首先读取前4byte数据，这4byte指定了module stream共有多少个module
+</span><span class="ln">  6</span><span class="c1"></span>  <span class="kt">uint32_t</span> <span class="n">module_count</span><span class="p">;</span>
+<span class="ln">  7</span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">minidump_</span><span class="o">-&gt;</span><span class="n">ReadBytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_count</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">module_count</span><span class="p">)))</span> <span class="p">{</span>
+<span class="ln">  8</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpModuleList could not read module count&#34;</span><span class="p">;</span>
+<span class="ln">  9</span>    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 10</span>  <span class="p">}</span>
+<span class="ln"> 11</span>
+<span class="ln"> 12</span>  <span class="c1">// 同样的，根据大小端决定是否要字节交换
+</span><span class="ln"> 13</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">minidump_</span><span class="o">-&gt;</span><span class="n">swap</span><span class="p">())</span>
+<span class="ln"> 14</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_count</span><span class="p">);</span>
+<span class="ln"> 15</span>
+<span class="ln"> 16</span>
+<span class="ln"> 17</span>  <span class="k">if</span> <span class="p">(</span><span class="n">module_count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 18</span>    <span class="c1">// 根据module 的梳理，先创建一个列表对象来接受所有的module
+</span><span class="ln"> 19</span><span class="c1"></span>    <span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">MinidumpModules</span><span class="o">&gt;</span> <span class="n">modules</span><span class="p">(</span>
+<span class="ln"> 20</span>        <span class="k">new</span> <span class="n">MinidumpModules</span><span class="p">(</span><span class="n">module_count</span><span class="p">,</span> <span class="n">MinidumpModule</span><span class="p">(</span><span class="n">minidump_</span><span class="p">)));</span>
+<span class="ln"> 21</span>
+<span class="ln"> 22</span>    <span class="c1">// 遍历module的梳理，依次读取每个module
+</span><span class="ln"> 23</span><span class="c1"></span>    <span class="c1">// 每个module用 MinidumpModule 对象表示
+</span><span class="ln"> 24</span><span class="c1"></span>    <span class="c1">// MinidumpModule 的 Read 方法具体实现了每种module的读取逻辑
+</span><span class="ln"> 25</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">module_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln"> 26</span>         <span class="n">module_index</span> <span class="o">&lt;</span> <span class="n">module_count</span><span class="p">;</span>
+<span class="ln"> 27</span>         <span class="o">++</span><span class="n">module_index</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 28</span>      <span class="n">MinidumpModule</span><span class="o">*</span> <span class="n">module</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="o">*</span><span class="n">modules</span><span class="p">)[</span><span class="n">module_index</span><span class="p">];</span>
+<span class="ln"> 29</span>
+<span class="ln"> 30</span>      <span class="c1">// MinidumpModule 的 Read 方法具体实现了每种module的读取逻辑
+</span><span class="ln"> 31</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">Read</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln"> 32</span>        <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpModuleList could not read module &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 33</span>                        <span class="n">module_index</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;/&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">module_count</span><span class="p">;</span>
+<span class="ln"> 34</span>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 35</span>      <span class="p">}</span>
+<span class="ln"> 36</span>    <span class="p">}</span>
+<span class="ln"> 37</span>
+<span class="ln"> 38</span>    <span class="c1">// 遍历读取到的Module数据，并做一些数据初始化、建立数据索引等操作
+</span><span class="ln"> 39</span><span class="c1"></span>    <span class="kt">uint64_t</span> <span class="n">last_end_address</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln"> 40</span>    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">module_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln"> 41</span>         <span class="n">module_index</span> <span class="o">&lt;</span> <span class="n">module_count</span><span class="p">;</span>
+<span class="ln"> 42</span>         <span class="o">++</span><span class="n">module_index</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 43</span>      <span class="n">MinidumpModule</span><span class="o">*</span> <span class="n">module</span> <span class="o">=</span> <span class="o">&amp;</span><span class="p">(</span><span class="o">*</span><span class="n">modules</span><span class="p">)[</span><span class="n">module_index</span><span class="p">];</span>
+<span class="ln"> 44</span>
+<span class="ln"> 45</span>      <span class="c1">// 取出每个module在内存中的起始地址和大小
+</span><span class="ln"> 46</span><span class="c1"></span>      <span class="kt">uint64_t</span> <span class="n">base_address</span> <span class="o">=</span> <span class="n">module</span><span class="o">-&gt;</span><span class="n">base_address</span><span class="p">();</span>
+<span class="ln"> 47</span>      <span class="kt">uint64_t</span> <span class="n">module_size</span> <span class="o">=</span> <span class="n">module</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">();</span>
+<span class="ln"> 48</span>      <span class="k">if</span> <span class="p">(</span><span class="n">base_address</span> <span class="o">==</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uint64_t</span><span class="o">&gt;</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 49</span>        <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpModuleList found bad base address &#34;</span>
+<span class="ln"> 50</span>                        <span class="s">&#34;for module &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">module_index</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;/&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">module_count</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 51</span>                        <span class="s">&#34;, &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">();</span>
+<span class="ln"> 52</span>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 53</span>      <span class="p">}</span>
+<span class="ln"> 54</span>      
+<span class="ln"> 55</span>      <span class="c1">// 根据内存偏移地址，建立map索引，便于后续和线程崩溃时刻的内存地址快速匹配上
+</span><span class="ln"> 56</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">range_map_</span><span class="o">-&gt;</span><span class="n">StoreRange</span><span class="p">(</span><span class="n">base_address</span><span class="p">,</span> <span class="n">module_size</span><span class="p">,</span> <span class="n">module_index</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 57</span>        <span class="c1">// Android&#39;s shared memory implementation /dev/ashmem can contain
+</span><span class="ln"> 58</span><span class="c1"></span>        <span class="c1">// duplicate entries for JITted code, so ignore these.
+</span><span class="ln"> 59</span><span class="c1"></span>        <span class="c1">// TODO(wfh): Remove this code when Android is fixed.
+</span><span class="ln"> 60</span><span class="c1"></span>        <span class="c1">// See https://crbug.com/439531
+</span><span class="ln"> 61</span><span class="c1"></span>        <span class="k">const</span> <span class="n">string</span> <span class="nf">kDevAshmem</span><span class="p">(</span><span class="s">&#34;/dev/ashmem/&#34;</span><span class="p">);</span>
+<span class="ln"> 62</span>        <span class="k">if</span> <span class="p">(</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">().</span><span class="n">compare</span><span class="p">(</span>
+<span class="ln"> 63</span>            <span class="mi">0</span><span class="p">,</span> <span class="n">kDevAshmem</span><span class="p">.</span><span class="n">length</span><span class="p">(),</span> <span class="n">kDevAshmem</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 64</span>          <span class="k">if</span> <span class="p">(</span><span class="n">base_address</span> <span class="o">&lt;</span> <span class="n">last_end_address</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 65</span>            <span class="c1">// If failed due to apparent range overlap the cause may be
+</span><span class="ln"> 66</span><span class="c1"></span>            <span class="c1">// the client correction applied for Android packed relocations.
+</span><span class="ln"> 67</span><span class="c1"></span>            <span class="c1">// If this is the case, back out the client correction and retry.
+</span><span class="ln"> 68</span><span class="c1"></span>            <span class="n">module_size</span> <span class="o">-=</span> <span class="n">last_end_address</span> <span class="o">-</span> <span class="n">base_address</span><span class="p">;</span>
+<span class="ln"> 69</span>            <span class="n">base_address</span> <span class="o">=</span> <span class="n">last_end_address</span><span class="p">;</span>
+<span class="ln"> 70</span>            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">range_map_</span><span class="o">-&gt;</span><span class="n">StoreRange</span><span class="p">(</span><span class="n">base_address</span><span class="p">,</span>
+<span class="ln"> 71</span>                                        <span class="n">module_size</span><span class="p">,</span> <span class="n">module_index</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 72</span>              <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpModuleList could not store module &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 73</span>                              <span class="n">module_index</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;/&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">module_count</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;, &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 74</span>                              <span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;, &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 75</span>                              <span class="n">HexString</span><span class="p">(</span><span class="n">base_address</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;+&#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 76</span>                              <span class="n">HexString</span><span class="p">(</span><span class="n">module_size</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;, after adjusting&#34;</span><span class="p">;</span>
+<span class="ln"> 77</span>              <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 78</span>            <span class="p">}</span>
+<span class="ln"> 79</span>          <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 80</span>            <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpModuleList could not store module &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 81</span>                            <span class="n">module_index</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;/&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">module_count</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;, &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 82</span>                            <span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;, &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 83</span>                            <span class="n">HexString</span><span class="p">(</span><span class="n">base_address</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;+&#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 84</span>                            <span class="n">HexString</span><span class="p">(</span><span class="n">module_size</span><span class="p">);</span>
+<span class="ln"> 85</span>            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 86</span>          <span class="p">}</span>
+<span class="ln"> 87</span>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 88</span>          <span class="n">BPLOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpModuleList ignoring overlapping module &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 89</span>                          <span class="n">module_index</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;/&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">module_count</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;, &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 90</span>                          <span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;, &#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 91</span>                          <span class="n">HexString</span><span class="p">(</span><span class="n">base_address</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;+&#34;</span> <span class="o">&lt;&lt;</span>
+<span class="ln"> 92</span>                          <span class="n">HexString</span><span class="p">(</span><span class="n">module_size</span><span class="p">);</span>
+<span class="ln"> 93</span>        <span class="p">}</span>
+<span class="ln"> 94</span>      <span class="p">}</span>
+<span class="ln"> 95</span>      <span class="n">last_end_address</span> <span class="o">=</span> <span class="n">base_address</span> <span class="o">+</span> <span class="n">module_size</span><span class="p">;</span>
+<span class="ln"> 96</span>    <span class="p">}</span>
+<span class="ln"> 97</span>
+<span class="ln"> 98</span>    <span class="n">modules_</span> <span class="o">=</span> <span class="n">modules</span><span class="p">.</span><span class="n">release</span><span class="p">();</span>
+<span class="ln"> 99</span>  <span class="p">}</span>
+<span class="ln">100</span>
+<span class="ln">101</span>  <span class="n">module_count_</span> <span class="o">=</span> <span class="n">module_count</span><span class="p">;</span>
+<span class="ln">102</span>
+<span class="ln">103</span>  <span class="n">valid_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">104</span>  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">105</span><span class="p">}</span>
+</code></pre></div><h4 id="minidumpmodule的read方法">MinidumpModule的Read方法</h4>
+<ul>
+<li>MinidumpModule的Read方法，实现了一个module最基本的读取业务逻辑</li>
+<li>读取后的每个module保存在MinidumpModule的 MDRawModule 成员中</li>
+<li>MDRawModule前面介绍过</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="kt">bool</span> <span class="n">MinidumpModule</span><span class="o">::</span><span class="n">Read</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 2</span>  
+<span class="ln"> 3</span>  <span class="c1">// MDRawModule在dmp中的大小是固定了，为MD_MODULE_SIZE（108byte）
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="c1">// 也就是只要每108个byte读取一下，放入MDRawModule中，module就反序列化完成了
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">minidump_</span><span class="o">-&gt;</span><span class="n">ReadBytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">,</span> <span class="n">MD_MODULE_SIZE</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 6</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpModule cannot read module&#34;</span><span class="p">;</span>
+<span class="ln"> 7</span>    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 8</span>  <span class="p">}</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>  <span class="c1">// 大小端的情况，交换MDRawModule中的每一个字段的高低位
+</span><span class="ln">11</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">minidump_</span><span class="o">-&gt;</span><span class="n">swap</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln">12</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">base_of_image</span><span class="p">);</span>
+<span class="ln">13</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">size_of_image</span><span class="p">);</span>
+<span class="ln">14</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">checksum</span><span class="p">);</span>
+<span class="ln">15</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">time_date_stamp</span><span class="p">);</span>
+<span class="ln">16</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">module_name_rva</span><span class="p">);</span>
+<span class="ln">17</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">signature</span><span class="p">);</span>
+<span class="ln">18</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">struct_version</span><span class="p">);</span>
+<span class="ln">19</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_version_hi</span><span class="p">);</span>
+<span class="ln">20</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_version_lo</span><span class="p">);</span>
+<span class="ln">21</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">product_version_hi</span><span class="p">);</span>
+<span class="ln">22</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">product_version_lo</span><span class="p">);</span>
+<span class="ln">23</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_flags_mask</span><span class="p">);</span>
+<span class="ln">24</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_flags</span><span class="p">);</span>
+<span class="ln">25</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_os</span><span class="p">);</span>
+<span class="ln">26</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_type</span><span class="p">);</span>
+<span class="ln">27</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_subtype</span><span class="p">);</span>
+<span class="ln">28</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_date_hi</span><span class="p">);</span>
+<span class="ln">29</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">version_info</span><span class="p">.</span><span class="n">file_date_lo</span><span class="p">);</span>
+<span class="ln">30</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">cv_record</span><span class="p">);</span>
+<span class="ln">31</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">module_</span><span class="p">.</span><span class="n">misc_record</span><span class="p">);</span>
+<span class="ln">32</span>    <span class="c1">// Don&#39;t swap reserved fields because their contents are unknown (as
+</span><span class="ln">33</span><span class="c1"></span>    <span class="c1">// are their proper widths).
+</span><span class="ln">34</span><span class="c1"></span>  <span class="p">}</span>
+<span class="ln">35</span>
+<span class="ln">36</span>  <span class="n">module_valid_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">37</span>  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">38</span><span class="p">}</span>
+</code></pre></div>
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      Technologist, perpetual student, teacher, continual incremental improvement.
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">Read More</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94/" class="nav-link">dmp文件读取（五）</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/" class="nav-link">breakpad概述</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B/" class="nav-link">dmp文件读取（四）</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/" class="nav-link">代码是如何编译成可执行文件的</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/" class="nav-link">动态链接库与静态链接库</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C/" class="nav-link">dmp文件读取（二）</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80/" class="nav-link">dmp文件读取（一）</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script src = 'https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js'></script>
+  </body>
+</html>

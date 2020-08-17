@@ -66,13 +66,43 @@
         <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
       </div>
       <div class = 'nav_parent'>
-        <a href = 'https://kinnylee.github.io/post/rich-content/' class = 'nav_item'>Archives </a>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://twitter.com/' class = 'nav_child nav_item'>中间件</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
       </div>
       <div class = 'nav_parent'>
         <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
         <div class = 'nav_sub'>
-          <a href = 'https://www.linkedin.com/' class = 'nav_child nav_item'>java</a>
-          <a href = 'https://twitter.com/' class = 'nav_child nav_item'>中间件</a>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
         </div>
       </div>
       <div class = 'nav_parent'>
@@ -103,7 +133,173 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/breekpad-dmp-01/'>dmp文件读取（一）</a>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94/'>dmp文件读取（五）</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 16, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的stream：memory stream
+Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中memory列表的stream类型为MD_MEMORY_LIST_STREAM，枚举值是5 memory分为很多的区域（region），每个区域使用MinidumpMemoryRegion对象表示  Memory Stream读取入口  dump的GetMemoryList方法，获取dmp文件中的内存信息 读取的模块列表信息保存 …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/'>breakpad概述</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 15, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/c&#43;&#43;' class = 'post_tag button button_translucent'>C&#43;&#43;
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+</div>
+
+    </div>
+      <div class = 'excerpt_footer'>
+        <div>
+          <p class = 'pale'>breakpad是什么  google开源的一套实现崩溃报告系统的客户端和服务端组件 C++语言实现 现在已经被广泛运用在google的一系列产品及其它公司的桌面程序上，如chrome，piscal，firefox等。 github地址 官方网站  功能特性  崩溃转储 崩溃分析 跨平台：windows、mac、linux 可以运行于一系列架构的cpu上  主要组件  client：集成到应用程序源码中，用于抓取崩溃信息，并生成minidmp文件 symbol dumper：读取编译器生成的调试信息（pdb），生成symbol文件 processor：读取minidump文件，并结合symbol文件，生成可读的堆栈调用信息  各组件 …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B/'>dmp文件读取（四）</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 15, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取
+Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场的基本信息 崩溃信息包括：  崩溃时的线程id 异常状态码 异常标识 异常的内存地址 寄存器信息 其他信息   以上信息都保存在MDRawExceptionStream中  Exception Stream读取入口  dump的GetException方法，获取dmp文件中的崩溃信息 读取的模块列表信息保存在MinidumpException …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/'>dmp文件读取（三）</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 14, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。
+module stream概述  module信息记录了应用程序（exe）在运行时，加载了哪些dll 每个dll相关的信息，在dmp中称为module dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4 每个module使用MinidumpModule对象表示 每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址， …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C/'>dmp文件读取（二）</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 13, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信息、异常信息、模块信息等。
+breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位置：src/google_breakpad/common/minidump_format.h
+1typedef enum { 2 MD_UNUSED_STREAM = 0, 3 MD_RESERVED_STREAM_0 = 1, 4 MD_RESERVED_STREAM_1 = 2, 5 MD_THREAD_LIST_STREAM = 3, /* MDRawThreadList …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80/'>dmp文件读取（一）</a>
       </h3>
       <div class = 'post_meta'>
   <svg class="icon">
@@ -127,42 +323,7 @@
           <p class = 'pale'>dmp文件解析 dmp读取源码分析（一） 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数
 1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体流程： Minidump对象用于保存dmp文件流内容，核心代码
 1PrintMinidumpProcess(...) { 2 ... 3 // 第一步：读取dmp文件内容 4 Minidump dump(minidump_file); 5 if …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/breekpad-dmp-01/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/breekpad-dmp-02/'>dmp文件读取（二）</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 10, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信息、异常信息、模块信息等。
-breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位置：src/google_breakpad/common/minidump_format.h
-1typedef enum { 2 MD_UNUSED_STREAM = 0, 3 MD_RESERVED_STREAM_0 = 1, 4 MD_RESERVED_STREAM_1 = 2, 5 MD_THREAD_LIST_STREAM = 3, /* MDRawThreadList …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/breekpad-dmp-02/' class='excerpt_more button'>Read More</a>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
     </div>
@@ -188,22 +349,39 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/breakpad/breekpad-dmp-01/" class="nav-link">dmp文件读取（一）</a>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94/" class="nav-link">dmp文件读取（五）</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/breakpad/breekpad-dmp-02/" class="nav-link">dmp文件读取（二）</a>
+        <a href="https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/" class="nav-link">breakpad概述</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/java/jvm/" class="nav-link">jvm</a>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B/" class="nav-link">dmp文件读取（四）</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/go/go%E5%85%A5%E9%97%A8/" class="nav-link">go入门</a>
+        <a href="https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/" class="nav-link">代码是如何编译成可执行文件的</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/" class="nav-link">动态链接库与静态链接库</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/" class="nav-link">dmp文件读取（三）</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C/" class="nav-link">dmp文件读取（二）</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80/" class="nav-link">dmp文件读取（一）</a>
       </li>
     </ul> 
     
     <div>
       <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
       <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
           GO
           <span class='button_tally'>1</span>
@@ -211,6 +389,16 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
         
         <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
           JAVA
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
           <span class='button_tally'>1</span>
         </a>
         
@@ -223,11 +411,16 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
           BREAKPAD
-          <span class='button_tally'>2</span>
+          <span class='button_tally'>6</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
           <span class='button_tally'>2</span>
         </a>
         
@@ -243,6 +436,11 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
         
         <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
           JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
           <span class='button_tally'>1</span>
         </a>
         
