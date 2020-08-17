@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>dmp文件读取（五）</title>
-      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94/</link>
+      <title>dmp文件读取（五）- Memory</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/</link>
       <pubDate>Sun, 16 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94/</guid>
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/</guid>
       <description>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的stream：memory stream
 Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中memory列表的stream类型为MD_MEMORY_LIST_STREAM，枚举值是5 memory分为很多的区域（region），每个区域使用MinidumpMemoryRegion对象表示  Memory Stream读取入口  dump的GetMemoryList方法，获取dmp文件中的内存信息 读取的模块列表信息保存在MinidumpMemoryList中 所有内存信息会建立索引，保存在range_map_中 range_map_是一个范围map类型，breakpad中定义的，后续查询时，只要给定一个内存地址，能快速定位到属于哪个内存region  1ProcessResult MinidumpProcessor::Process( 2 Minidump *dump, ProcessState *process_state) { 3 ... 4 // 内存信息读取入口 5 MinidumpMemoryList *memory_list = dump-&amp;gt;GetMemoryList(); 6 ... 7} MinidumpMemoryList 1class MinidumpMemoryList : public MinidumpStream { 2 public: 3 // Sequential access to memory regions. 4 MinidumpMemoryRegion* GetMemoryRegionAtIndex(unsigned int index); 5 6 // Random access to memory regions. Returns the region encompassing 7 // the address identified by address.</description>
     </item>
@@ -31,11 +31,11 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
     </item>
     
     <item>
-      <title>dmp文件读取（四）</title>
-      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B/</link>
+      <title>dmp文件读取（四）- Exception</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/</link>
       <pubDate>Sat, 15 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B/</guid>
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/</guid>
       <description>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取
 Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场的基本信息 崩溃信息包括：  崩溃时的线程id 异常状态码 异常标识 异常的内存地址 寄存器信息 其他信息   以上信息都保存在MDRawExceptionStream中  Exception Stream读取入口  dump的GetException方法，获取dmp文件中的崩溃信息 读取的模块列表信息保存在MinidumpException中  1ProcessResult MinidumpProcessor::Process( 2 Minidump *dump, ProcessState *process_state) { 3 ... 4 // 异常信息读取入口 5 MinidumpException *exception = dump-&amp;gt;GetException(); 6 ... 7} MinidumpException  Exception Stream的类型为MD_EXCEPTION_STREAM 存储在dmp文件中的exectpion信息，反序列化之后保存为MDRawExceptionStream对象  1class MinidumpException : public MinidumpStream { 2 public: 3 virtual ~MinidumpException(); 4 5 const MDRawExceptionStream* exception() const { 6 return valid_ ?</description>
     </item>
@@ -59,32 +59,32 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
     </item>
     
     <item>
-      <title>dmp文件读取（三）</title>
-      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/</link>
+      <title>dmp文件读取（三）- Moduel</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/</link>
       <pubDate>Fri, 14 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89/</guid>
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/</guid>
       <description>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。
 module stream概述  module信息记录了应用程序（exe）在运行时，加载了哪些dll 每个dll相关的信息，在dmp中称为module dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4 每个module使用MinidumpModule对象表示 每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址，匹配响应的模块内存地址  module流读取入口  dump的GetModuleList方法，获取dmp文件中的模块列表 读取的模块列表信息保存在MinidumpModuleList中  1ProcessResult MinidumpProcessor::Process( 2 Minidump *dump, ProcessState *process_state) { 3 4 ... 5 // 读取模块信息 6 MinidumpModuleList *module_list = dump-&amp;gt;GetModuleList(); 7 ... 8} MinidumpModuleList 1class MinidumpModuleList : public MinidumpStream, 2 public CodeModules { 3 public: 4 ... 5 private: 6 friend class Minidump; 7 8 // 存放所有的module列表 9 // 每个module使用MinidumpModule对象表示 10 typedef vector&amp;lt;MinidumpModule&amp;gt; MinidumpModules; 11 12 // module的stream类型为MD_MODULE_LIST_STREAM 13 static const uint32_t kStreamType = MD_MODULE_LIST_STREAM; 14 15 // 重新read方法，读取module信息 16 bool Read(uint32_t expected_size); 17 18 // 最大模块数1024 19 // The largest number of modules that will be read from a minidump.</description>
     </item>
     
     <item>
-      <title>dmp文件读取（二）</title>
-      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C/</link>
+      <title>dmp文件读取（二）- Thread</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/</link>
       <pubDate>Thu, 13 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C/</guid>
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/</guid>
       <description>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信息、异常信息、模块信息等。
 breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位置：src/google_breakpad/common/minidump_format.h
 1typedef enum { 2 MD_UNUSED_STREAM = 0, 3 MD_RESERVED_STREAM_0 = 1, 4 MD_RESERVED_STREAM_1 = 2, 5 MD_THREAD_LIST_STREAM = 3, /* MDRawThreadList */ 6 MD_MODULE_LIST_STREAM = 4, /* MDRawModuleList */ 7 MD_MEMORY_LIST_STREAM = 5, /* MDRawMemoryList */ 8 MD_EXCEPTION_STREAM = 6, /* MDRawExceptionStream */ 9 MD_SYSTEM_INFO_STREAM = 7, /* MDRawSystemInfo */ 10 MD_THREAD_EX_LIST_STREAM = 8, 11 MD_MEMORY_64_LIST_STREAM = 9, 12 MD_COMMENT_STREAM_A = 10, 13 MD_COMMENT_STREAM_W = 11, 14 MD_HANDLE_DATA_STREAM = 12, 15 MD_FUNCTION_TABLE_STREAM = 13, 16 MD_UNLOADED_MODULE_LIST_STREAM = 14, 17 MD_MISC_INFO_STREAM = 15, /* MDRawMiscInfo */ 18 MD_MEMORY_INFO_LIST_STREAM = 16, /* MDRawMemoryInfoList */ 19 MD_THREAD_INFO_LIST_STREAM = 17, 20 MD_HANDLE_OPERATION_LIST_STREAM = 18, 21 MD_TOKEN_STREAM = 19, 22 MD_JAVASCRIPT_DATA_STREAM = 20, 23 MD_SYSTEM_MEMORY_INFO_STREAM = 21, 24 MD_PROCESS_VM_COUNTERS_STREAM = 22, 25 MD_LAST_RESERVED_STREAM = 0x0000ffff, 26 27 /* Breakpad extension types.</description>
     </item>
     
     <item>
-      <title>dmp文件读取（一）</title>
-      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80/</link>
+      <title>dmp文件读取（一）- 概述</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/</link>
       <pubDate>Mon, 10 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80/</guid>
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/</guid>
       <description>dmp文件解析 dmp读取源码分析（一） 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数
 1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体流程： Minidump对象用于保存dmp文件流内容，核心代码
 1PrintMinidumpProcess(...) { 2 ... 3 // 第一步：读取dmp文件内容 4 Minidump dump(minidump_file); 5 if (!dump.Read()) { 6 BPLOG(ERROR) &amp;lt;&amp;lt; &amp;#34;Minidump &amp;#34; &amp;lt;&amp;lt; dump.path() &amp;lt;&amp;lt; &amp;#34; could not be read&amp;#34;; 7 return false; 8 } 9 10 // 第二步：开始分析dmp 11 minidump_processor.Process(&amp;amp;dump, &amp;amp;process_state) 12 13 // 第三步：打印分析结果 14 PrintProcessState(.</description>

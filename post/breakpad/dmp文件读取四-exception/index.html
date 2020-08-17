@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="">
-  <head>  <title>源码分析 | kinnylee</title>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>dmp文件读取（四）- Exception | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,16 +12,17 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
+  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="">
+<meta name="description" content="dmp文件读取">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "源码分析" />
-<meta property = "og:url" content = "https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" />
-<meta property = "og:title" content = "源码分析" />
-<meta property = "og:description" content = "" />
-<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<meta name = "twitter:title" content = "dmp文件读取（四）- Exception" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/" />
+<meta property = "og:title" content = "dmp文件读取（四）- Exception" />
+<meta property = "og:description" content = "dmp文件读取" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/google.jpg" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
@@ -30,7 +31,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/'>
 
     
 
@@ -125,51 +126,10 @@
 </header>
 
     <main>
-
-<div class='grid-inverse wrap content'>
-  <ul class='posts' id = 'posts'>
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/'>dmp文件读取（五）- Memory</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 16, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的stream：memory stream
-Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中memory列表的stream类型为MD_MEMORY_LIST_STREAM，枚举值是5 memory分为很多的区域（region），每个区域使用MinidumpMemoryRegion对象表示  Memory Stream读取入口  dump的GetMemoryList方法，获取dmp文件中的内存信息 读取的模块列表信息保存 …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
   
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/'>dmp文件读取（四）- Exception</a>
-      </h3>
-      <div class = 'post_meta'>
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>dmp文件读取（四）- Exception</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
@@ -181,159 +141,189 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
   </a>
 </div>
 
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取
-Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场的基本信息 崩溃信息包括：  崩溃时的线程id 异常状态码 异常标识 异常的内存地址 寄存器信息 其他信息   以上信息都保存在MDRawExceptionStream中  Exception Stream读取入口  dump的GetException方法，获取dmp文件中的崩溃信息 读取的模块列表信息保存在MinidumpException …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/'>动态链接库与静态链接库</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 15, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/c&#43;&#43;' class = 'post_tag button button_translucent'>C&#43;&#43;
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=dmp%e6%96%87%e4%bb%b6%e8%af%bb%e5%8f%96%ef%bc%88%e5%9b%9b%ef%bc%89-%20Exception&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E8%25AF%25BB%25E5%258F%2596%25E5%259B%259B-exception%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
   </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E8%25AF%25BB%25E5%258F%2596%25E5%259B%259B-exception%2f&t=dmp%e6%96%87%e4%bb%b6%e8%af%bb%e5%8f%96%ef%bc%88%e5%9b%9b%ef%bc%89-%20Exception" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
   </a>
 </div>
 
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>概述 静态链接库  windows: .lib文件 linux：.a文件  动态链接库  windows：.dll文件 linux：.so文件  </p>
-          <a href='https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/'>dmp文件读取（三）- Moduel</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 14, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。
-module stream概述  module信息记录了应用程序（exe）在运行时，加载了哪些dll 每个dll相关的信息，在dmp中称为module dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4 每个module使用MinidumpModule对象表示 每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址， …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/'>dmp文件读取（二）- Thread</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 13, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信息、异常信息、模块信息等。
-breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位置：src/google_breakpad/common/minidump_format.h
-1typedef enum { 2 MD_UNUSED_STREAM = 0, 3 MD_RESERVED_STREAM_0 = 1, 4 MD_RESERVED_STREAM_1 = 2, 5 MD_THREAD_LIST_STREAM = 3, /* MDRawThreadList …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/'>dmp文件读取（一）- 概述</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 10, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件解析 dmp读取源码分析（一） 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数
-1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体流程： Minidump对象用于保存dmp文件流内容，核心代码
-1PrintMinidumpProcess(...) { 2 ... 3 // 第一步：读取dmp文件内容 4 Minidump dump(minidump_file); 5 if …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-    <li>
-
-
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#dmp文件读取四">dmp文件读取（四）</a>
+      <ul>
+        <li><a href="#exception-stream概述">Exception Stream概述</a></li>
+        <li><a href="#exception-stream读取入口">Exception Stream读取入口</a></li>
+        <li><a href="#minidumpexception">MinidumpException</a></li>
+        <li><a href="#mdrawexceptionstream">MDRawExceptionStream</a></li>
+        <li><a href="#exception-stream读取核心代码">Exception stream读取核心代码</a></li>
+        <li><a href="#read方法">Read方法</a></li>
+      </ul>
     </li>
   </ul>
+</nav>
+    <h2 id="dmp文件读取四">dmp文件读取（四）</h2>
+<p>前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取</p>
+<h3 id="exception-stream概述">Exception Stream概述</h3>
+<ul>
+<li>Exception Stream记录了进程崩溃时，崩溃现场的基本信息</li>
+<li>崩溃信息包括：
+<ul>
+<li>崩溃时的线程id</li>
+<li>异常状态码</li>
+<li>异常标识</li>
+<li>异常的内存地址</li>
+<li>寄存器信息</li>
+<li>其他信息</li>
+</ul>
+</li>
+<li>以上信息都保存在<code>MDRawExceptionStream</code>中</li>
+</ul>
+<h3 id="exception-stream读取入口">Exception Stream读取入口</h3>
+<ul>
+<li>dump的GetException方法，获取dmp文件中的崩溃信息</li>
+<li>读取的模块列表信息保存在MinidumpException中</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln">1</span><span class="n">ProcessResult</span> <span class="n">MinidumpProcessor</span><span class="o">::</span><span class="n">Process</span><span class="p">(</span>
+<span class="ln">2</span>    <span class="n">Minidump</span> <span class="o">*</span><span class="n">dump</span><span class="p">,</span> <span class="n">ProcessState</span> <span class="o">*</span><span class="n">process_state</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">3</span>    <span class="p">...</span>
+<span class="ln">4</span>    <span class="c1">// 异常信息读取入口
+</span><span class="ln">5</span><span class="c1"></span>    <span class="n">MinidumpException</span> <span class="o">*</span><span class="n">exception</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetException</span><span class="p">();</span>
+<span class="ln">6</span>    <span class="p">...</span>
+<span class="ln">7</span><span class="p">}</span>
+</code></pre></div><h3 id="minidumpexception">MinidumpException</h3>
+<ul>
+<li>Exception Stream的类型为MD_EXCEPTION_STREAM</li>
+<li>存储在dmp文件中的exectpion信息，反序列化之后保存为MDRawExceptionStream对象</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="k">class</span> <span class="nc">MinidumpException</span> <span class="o">:</span> <span class="k">public</span> <span class="n">MinidumpStream</span> <span class="p">{</span>
+<span class="ln"> 2</span> <span class="k">public</span><span class="o">:</span>
+<span class="ln"> 3</span>  <span class="k">virtual</span> <span class="o">~</span><span class="n">MinidumpException</span><span class="p">();</span>
+<span class="ln"> 4</span>
+<span class="ln"> 5</span>  <span class="k">const</span> <span class="n">MDRawExceptionStream</span><span class="o">*</span> <span class="nf">exception</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+<span class="ln"> 6</span>    <span class="k">return</span> <span class="n">valid_</span> <span class="o">?</span> <span class="o">&amp;</span><span class="nl">exception_</span> <span class="p">:</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="ln"> 7</span>  <span class="p">}</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="c1">// The thread ID is used to determine if a thread is the exception thread,
+</span><span class="ln">10</span><span class="c1"></span>  <span class="c1">// so a special getter is provided to retrieve this data from the
+</span><span class="ln">11</span><span class="c1"></span>  <span class="c1">// MDRawExceptionStream structure.  Returns false if the thread ID cannot
+</span><span class="ln">12</span><span class="c1"></span>  <span class="c1">// be determined.
+</span><span class="ln">13</span><span class="c1"></span>  <span class="kt">bool</span> <span class="nf">GetThreadID</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="o">*</span><span class="n">thread_id</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+<span class="ln">14</span>
+<span class="ln">15</span>  <span class="n">MinidumpContext</span><span class="o">*</span> <span class="nf">GetContext</span><span class="p">();</span>
+<span class="ln">16</span>
+<span class="ln">17</span>  <span class="c1">// Print a human-readable representation of the object to stdout.
+</span><span class="ln">18</span><span class="c1"></span>  <span class="kt">void</span> <span class="nf">Print</span><span class="p">();</span>
+<span class="ln">19</span>
+<span class="ln">20</span> <span class="k">private</span><span class="o">:</span>
+<span class="ln">21</span>  <span class="k">friend</span> <span class="k">class</span> <span class="nc">Minidump</span><span class="p">;</span>
+<span class="ln">22</span>
+<span class="ln">23</span>  <span class="k">static</span> <span class="k">const</span> <span class="kt">uint32_t</span> <span class="n">kStreamType</span> <span class="o">=</span> <span class="n">MD_EXCEPTION_STREAM</span><span class="p">;</span>
+<span class="ln">24</span>
+<span class="ln">25</span>  <span class="k">explicit</span> <span class="nf">MinidumpException</span><span class="p">(</span><span class="n">Minidump</span><span class="o">*</span> <span class="n">minidump</span><span class="p">);</span>
+<span class="ln">26</span>
+<span class="ln">27</span>  <span class="kt">bool</span> <span class="nf">Read</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">expected_size</span><span class="p">)</span> <span class="k">override</span><span class="p">;</span>
+<span class="ln">28</span>
+<span class="ln">29</span>  <span class="n">MDRawExceptionStream</span> <span class="n">exception_</span><span class="p">;</span>
+<span class="ln">30</span>  <span class="n">MinidumpContext</span><span class="o">*</span>     <span class="n">context_</span><span class="p">;</span>
+<span class="ln">31</span>
+<span class="ln">32</span>  <span class="n">DISALLOW_COPY_AND_ASSIGN</span><span class="p">(</span><span class="n">MinidumpException</span><span class="p">);</span>
+<span class="ln">33</span><span class="p">};</span>
+</code></pre></div><h3 id="mdrawexceptionstream">MDRawExceptionStream</h3>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 线程id
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="kt">uint32_t</span>             <span class="n">thread_id</span><span class="p">;</span>        
+<span class="ln"> 4</span>  <span class="kt">uint32_t</span>             <span class="n">__align</span><span class="p">;</span>
+<span class="ln"> 5</span>  
+<span class="ln"> 6</span>  <span class="c1">// 异常详情
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="n">MDException</span>          <span class="n">exception_record</span><span class="p">;</span>
+<span class="ln"> 8</span>  
+<span class="ln"> 9</span>  <span class="c1">// 线程上下文
+</span><span class="ln">10</span><span class="c1"></span>  <span class="n">MDLocationDescriptor</span> <span class="n">thread_context</span><span class="p">;</span>  
+<span class="ln">11</span><span class="p">}</span> <span class="n">MDRawExceptionStream</span><span class="p">;</span>  <span class="cm">/* MINIDUMP_EXCEPTION_STREAM */</span>
+</code></pre></div><h3 id="exception-stream读取核心代码">Exception stream读取核心代码</h3>
+<ul>
+<li>这部分实现和上一篇介绍的一样，此处不再赘述</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln">1</span><span class="n">MinidumpException</span><span class="o">*</span> <span class="n">Minidump</span><span class="o">::</span><span class="n">GetException</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="n">MinidumpException</span><span class="o">*</span> <span class="n">exception</span><span class="p">;</span>
+<span class="ln">3</span>  <span class="k">return</span> <span class="nf">GetStream</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception</span><span class="p">);</span>
+<span class="ln">4</span><span class="p">}</span>
+</code></pre></div><h3 id="read方法">Read方法</h3>
+<ul>
+<li>该方法和前面介绍的也基本相同</li>
+<li>先读取数据信息到exception_对象中</li>
+<li>根据大小端判断是否需要做高低位交换</li>
+<li>读取完毕，崩溃现场信息就保存在MinidumpException对象中，为后续真正分析做准备</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="kt">bool</span> <span class="n">MinidumpException</span><span class="o">::</span><span class="n">Read</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">expected_size</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// Invalidate cached data.
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="k">delete</span> <span class="n">context_</span><span class="p">;</span>
+<span class="ln"> 4</span>  <span class="n">context_</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span>  <span class="n">valid_</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span>  <span class="k">if</span> <span class="p">(</span><span class="n">expected_size</span> <span class="o">!=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">exception_</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 9</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpException size mismatch, &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">expected_size</span> <span class="o">&lt;&lt;</span>
+<span class="ln">10</span>                    <span class="s">&#34; != &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">exception_</span><span class="p">);</span>
+<span class="ln">11</span>    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln">12</span>  <span class="p">}</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">minidump_</span><span class="o">-&gt;</span><span class="n">ReadBytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">exception_</span><span class="p">)))</span> <span class="p">{</span>
+<span class="ln">15</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;MinidumpException cannot read exception&#34;</span><span class="p">;</span>
+<span class="ln">16</span>    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln">17</span>  <span class="p">}</span>
+<span class="ln">18</span>
+<span class="ln">19</span>  <span class="k">if</span> <span class="p">(</span><span class="n">minidump_</span><span class="o">-&gt;</span><span class="n">swap</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln">20</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">thread_id</span><span class="p">);</span>
+<span class="ln">21</span>    <span class="c1">// exception_.__align is for alignment only and does not need to be
+</span><span class="ln">22</span><span class="c1"></span>    <span class="c1">// swapped.
+</span><span class="ln">23</span><span class="c1"></span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">exception_record</span><span class="p">.</span><span class="n">exception_code</span><span class="p">);</span>
+<span class="ln">24</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">exception_record</span><span class="p">.</span><span class="n">exception_flags</span><span class="p">);</span>
+<span class="ln">25</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">exception_record</span><span class="p">.</span><span class="n">exception_record</span><span class="p">);</span>
+<span class="ln">26</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">exception_record</span><span class="p">.</span><span class="n">exception_address</span><span class="p">);</span>
+<span class="ln">27</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">exception_record</span><span class="p">.</span><span class="n">number_parameters</span><span class="p">);</span>
+<span class="ln">28</span>    <span class="c1">// exception_.exception_record.__align is for alignment only and does not
+</span><span class="ln">29</span><span class="c1"></span>    <span class="c1">// need to be swapped.
+</span><span class="ln">30</span><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">parameter_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln">31</span>         <span class="n">parameter_index</span> <span class="o">&lt;</span> <span class="n">MD_EXCEPTION_MAXIMUM_PARAMETERS</span><span class="p">;</span>
+<span class="ln">32</span>         <span class="o">++</span><span class="n">parameter_index</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">33</span>      <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">exception_record</span><span class="p">.</span><span class="n">exception_information</span><span class="p">[</span><span class="n">parameter_index</span><span class="p">]);</span>
+<span class="ln">34</span>    <span class="p">}</span>
+<span class="ln">35</span>    <span class="n">Swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">exception_</span><span class="p">.</span><span class="n">thread_context</span><span class="p">);</span>
+<span class="ln">36</span>  <span class="p">}</span>
+<span class="ln">37</span>
+<span class="ln">38</span>  <span class="n">valid_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">39</span>  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">40</span><span class="p">}</span>
+</code></pre></div>
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -353,9 +343,6 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/" class="nav-link">breakpad概述</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/" class="nav-link">dmp文件读取（四）- Exception</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/" class="nav-link">代码是如何编译成可执行文件的</a>
@@ -452,8 +439,6 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
 </aside>
 
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
