@@ -4,11 +4,41 @@
   
   <url>
     <loc>https://kinnylee.github.io/</loc>
-    <lastmod>2020-08-17T00:00:00+00:00</lastmod>
+    <lastmod>2020-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/breakpad/</loc>
+    <lastmod>2020-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/</loc>
+    <lastmod>2020-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/</loc>
+    <lastmod>2020-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/</loc>
+    <lastmod>2020-08-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
+    <lastmod>2020-08-18T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/categories/</loc>
+    <lastmod>2020-08-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/go/</loc>
     <lastmod>2020-08-17T00:00:00+00:00</lastmod>
   </url>
   
@@ -18,7 +48,17 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/go/module/go-cli/</loc>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/</loc>
+    <lastmod>2020-08-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</loc>
+    <lastmod>2020-08-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/</loc>
     <lastmod>2020-08-17T00:00:00+00:00</lastmod>
   </url>
   
@@ -28,27 +68,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/</loc>
-    <lastmod>2020-08-17T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/tags/</loc>
-    <lastmod>2020-08-17T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/tags/breakpad/</loc>
-    <lastmod>2020-08-16T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/</loc>
-    <lastmod>2020-08-16T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
     <lastmod>2020-08-16T00:00:00+00:00</lastmod>
   </url>
   
@@ -128,12 +148,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/tags/go/</loc>
-    <lastmod>2020-07-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/post/go/go%E5%85%A5%E9%97%A8/</loc>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</loc>
     <lastmod>2020-07-10T00:00:00+00:00</lastmod>
   </url>
   
@@ -149,6 +164,10 @@
   
   <url>
     <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sort/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/</loc>
   </url>
   
   <url>

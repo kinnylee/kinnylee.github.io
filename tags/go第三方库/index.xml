@@ -13,10 +13,10 @@
     
     <item>
       <title>Go第三库之命令行框架：go-cli</title>
-      <link>https://kinnylee.github.io/post/go/module/go-cli/</link>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/</link>
       <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/module/go-cli/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/</guid>
       <description>Go-cli 简介  A simple, fast, and fun package for building command line apps in Go 一个简单的、快速的、并且有趣的用于构建go应用程序的包 github地址 目标是帮助开发人员快速构建易于表达的命令行程序 目前存在两个版本v1、v2（新版本）  快速上手 v2官方使用说明
    添加模块依赖    1GO111MODULE=on go get github.com/urfave/cli/v2   使用    1package main 2 3import ( 4 &amp;#34;os&amp;#34; 5 &amp;#34;github.com/urfave/cli/v2&amp;#34; 6) 7 8func main() { 9 (&amp;amp;cli.App{}).Run(os.Args) 10}   编译：生成可执行文件    1go build   使用：会打印出帮助文档    1.</description>
     </item>

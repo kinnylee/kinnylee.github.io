@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>go on kinnylee</title>
-    <link>https://kinnylee.github.io/tags/go/</link>
-    <description>Recent content in go on kinnylee</description>
+    <title>go基础入门 on kinnylee</title>
+    <link>https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</link>
+    <description>Recent content in go基础入门 on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
     <lastBuildDate>Mon, 17 Aug 2020 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://kinnylee.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -20,16 +20,6 @@
       <description>协程在手，说Go就Go 协程概述  协程：轻量级线程 协程的优势：  占用空间少 线程上下文切换成本少    简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &amp;#34;fmt&amp;#34; 5 &amp;#34;time&amp;#34; 6) 7 8func One(){ 9 fmt.Println(&amp;#34;1&amp;#34;) 10} 11 12func Two(){ 13 fmt.Println(&amp;#34;2&amp;#34;) 14} 15 16func main(){ 17 go One() 18 go Two() 19}  上面的代码执行后，并不会如期打印结果，原因在于协程是并发的，协程调用前，主函数已经退出，协程也被销毁了。
  1func main(){ 2 go gorouting() 3 // 可通过简单的sleep，让主线程等待协程执行完 4 // 但是执行顺序不一定是按照1，2顺序输出 5 time.Sleep(5 * 1e9) 6} 7 前面的例子，可看到协程使用需要考虑：
  如何控制协程调用顺序（特别是访问临界资源） 如何实现不同协程的通讯  实现思路：</description>
-    </item>
-    
-    <item>
-      <title>go入门</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</link>
-      <pubDate>Fri, 10 Jul 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</guid>
-      <description>go语言入门介绍
-安装 基本语法 </description>
     </item>
     
   </channel>

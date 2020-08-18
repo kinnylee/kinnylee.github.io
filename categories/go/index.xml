@@ -12,21 +12,32 @@
     
     
     <item>
-      <title>Go第三库之命令行框架：go-cli</title>
-      <link>https://kinnylee.github.io/post/go/module/go-cli/</link>
+      <title>go协程</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/</link>
       <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/module/go-cli/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/</guid>
+      <description>协程在手，说Go就Go 协程概述  协程：轻量级线程 协程的优势：  占用空间少 线程上下文切换成本少    简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &amp;#34;fmt&amp;#34; 5 &amp;#34;time&amp;#34; 6) 7 8func One(){ 9 fmt.Println(&amp;#34;1&amp;#34;) 10} 11 12func Two(){ 13 fmt.Println(&amp;#34;2&amp;#34;) 14} 15 16func main(){ 17 go One() 18 go Two() 19}  上面的代码执行后，并不会如期打印结果，原因在于协程是并发的，协程调用前，主函数已经退出，协程也被销毁了。
+ 1func main(){ 2 go gorouting() 3 // 可通过简单的sleep，让主线程等待协程执行完 4 // 但是执行顺序不一定是按照1，2顺序输出 5 time.Sleep(5 * 1e9) 6} 7 前面的例子，可看到协程使用需要考虑：
+ 如何控制协程调用顺序（特别是访问临界资源） 如何实现不同协程的通讯  实现思路：</description>
+    </item>
+    
+    <item>
+      <title>Go第三库之命令行框架：go-cli</title>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/</link>
+      <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/</guid>
       <description>Go-cli 简介  A simple, fast, and fun package for building command line apps in Go 一个简单的、快速的、并且有趣的用于构建go应用程序的包 github地址 目标是帮助开发人员快速构建易于表达的命令行程序 目前存在两个版本v1、v2（新版本）  快速上手 v2官方使用说明
    添加模块依赖    1GO111MODULE=on go get github.com/urfave/cli/v2   使用    1package main 2 3import ( 4 &amp;#34;os&amp;#34; 5 &amp;#34;github.com/urfave/cli/v2&amp;#34; 6) 7 8func main() { 9 (&amp;amp;cli.App{}).Run(os.Args) 10}   编译：生成可执行文件    1go build   使用：会打印出帮助文档    1.</description>
     </item>
     
     <item>
       <title>go入门</title>
-      <link>https://kinnylee.github.io/post/go/go%E5%85%A5%E9%97%A8/</link>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</link>
       <pubDate>Fri, 10 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/go%E5%85%A5%E9%97%A8/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</guid>
       <description>go语言入门介绍
 安装 基本语法 </description>
     </item>

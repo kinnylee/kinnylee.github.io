@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="">
-  <head>  <title>jvm | kinnylee</title>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>go协程 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,15 +12,16 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
+  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="">
+<meta name="description" content="协程在手，说Go就Go 协程概述  协程：轻量级线程 协程的优势：  占用空间少 线程上下文切换成本少    简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 …">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "jvm" />
-<meta property = "og:url" content = "https://kinnylee.github.io/tags/jvm/" />
-<meta property = "og:title" content = "jvm" />
-<meta property = "og:description" content = "" />
+<meta name = "twitter:title" content = "go协程" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/" />
+<meta property = "og:title" content = "go协程" />
+<meta property = "og:description" content = "协程在手，说Go就Go 协程概述  协程：轻量级线程 协程的优势：  占用空间少 线程上下文切换成本少    简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 …" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -30,7 +31,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/tags/jvm/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/'>
 
     
 
@@ -127,41 +128,213 @@
 </header>
 
     <main>
-
-<div class='grid-inverse wrap content'>
-  <ul class='posts' id = 'posts'>
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/java/jvm/'>jvm</a>
-      </h3>
-      <div class = 'post_meta'>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>go协程</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Aug 9, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/jvm' class = 'post_tag button button_translucent'>jvm
+    Aug 17, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
   </a>
 </div>
 
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>jvm原理</p>
-          <a href='https://kinnylee.github.io/post/java/jvm/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=go%e5%8d%8f%e7%a8%8b&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgrouting%25E5%258D%258F%25E7%25A8%258B%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
+  </a>
   
-    <li>
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgrouting%25E5%258D%258F%25E7%25A8%258B%2f&t=go%e5%8d%8f%e7%a8%8b" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
 
-
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#协程概述">协程概述</a>
+      <ul>
+        <li><a href="#简单入门">简单入门</a></li>
+      </ul>
     </li>
+    <li><a href="#sync同步锁">sync同步锁</a></li>
+    <li><a href="#channel">channel</a>
+      <ul>
+        <li><a href="#概述">概述</a></li>
+        <li><a href="#基本使用">基本使用</a></li>
+        <li><a href="#上述chanel特点">上述chanel特点</a></li>
+        <li><a href="#channel控制执行顺序">channel控制执行顺序</a></li>
+      </ul>
+    </li>
+    <li><a href="#range">range</a></li>
+    <li><a href="#select">select</a></li>
+    <li><a href="#带缓存的channel">带缓存的channel</a></li>
+    <li><a href="#协程调度">协程调度</a></li>
   </ul>
+</nav>
+    <h1 id="协程在手说go就go">协程在手，说Go就Go</h1>
+<h2 id="协程概述">协程概述</h2>
+<ul>
+<li>协程：轻量级线程</li>
+<li>协程的优势：
+<ul>
+<li>占用空间少</li>
+<li>线程上下文切换成本少</li>
+</ul>
+</li>
+</ul>
+<h3 id="简单入门">简单入门</h3>
+<ul>
+<li>go语言中通过go关键字来调用</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
+<span class="ln"> 4</span>  <span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 5</span>  <span class="s">&#34;time&#34;</span>
+<span class="ln"> 6</span><span class="p">)</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(){</span>
+<span class="ln"> 9</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln">10</span><span class="p">}</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(){</span>
+<span class="ln">13</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">14</span><span class="p">}</span>
+<span class="ln">15</span>
+<span class="ln">16</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">17</span>  <span class="k">go</span> <span class="nf">One</span><span class="p">()</span>
+<span class="ln">18</span>  <span class="k">go</span> <span class="nf">Two</span><span class="p">()</span>
+<span class="ln">19</span><span class="p">}</span>
+</code></pre></div><blockquote>
+<p>上面的代码执行后，并不会如期打印结果，原因在于协程是并发的，协程调用前，主函数已经退出，协程也被销毁了。</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">2</span>  <span class="k">go</span> <span class="nf">gorouting</span><span class="p">()</span>
+<span class="ln">3</span>  <span class="c1">// 可通过简单的sleep，让主线程等待协程执行完
+</span><span class="ln">4</span><span class="c1"></span>  <span class="c1">// 但是执行顺序不一定是按照1，2顺序输出
+</span><span class="ln">5</span><span class="c1"></span>  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+<span class="ln">6</span><span class="p">}</span>
+<span class="ln">7</span>
+</code></pre></div><p>前面的例子，可看到协程使用需要考虑：</p>
+<ul>
+<li>如何控制协程调用顺序（特别是访问临界资源）</li>
+<li>如何实现不同协程的通讯</li>
+</ul>
+<p>实现思路：</p>
+<ul>
+<li>同步问题：sync同步锁</li>
+<li>通讯问题：channel</li>
+</ul>
+<h2 id="sync同步锁">sync同步锁</h2>
+<h2 id="channel">channel</h2>
+<h3 id="概述">概述</h3>
+<ul>
+<li>channel是go语言中一种特殊的数据类型</li>
+<li>可以通过chanel发送类型化数据，实现协程通讯</li>
+<li>channel是有方向的，包括流入和流出</li>
+</ul>
+<h3 id="基本使用">基本使用</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="c1">// 普通channel
+</span><span class="ln">2</span><span class="c1"></span><span class="kd">var</span> <span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">string</span>
+<span class="ln">3</span><span class="nx">ch</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">string</span><span class="p">)</span>
+<span class="ln">4</span><span class="c1">// 只写chanel(流入)
+</span><span class="ln">5</span><span class="c1"></span><span class="kd">var</span> <span class="nx">writeCh</span> <span class="kd">chan</span> <span class="o">&lt;-</span> <span class="kt">int</span>
+<span class="ln">6</span><span class="c1">// 只读chanel（流出）
+</span><span class="ln">7</span><span class="c1"></span><span class="kd">var</span> <span class="nx">readCh</span> <span class="o">&lt;-</span> <span class="kd">chan</span> <span class="kt">int</span>
+</code></pre></div><h3 id="上述chanel特点">上述chanel特点</h3>
+<p>上述channel不带缓冲区，或者说长度为1，有如下特点：</p>
+<ul>
+<li>同一时间只有一条数据</li>
+<li>一旦有数据放入，必须被取出才能继续放入</li>
+</ul>
+<h3 id="channel控制执行顺序">channel控制执行顺序</h3>
+<ul>
+<li>下面的代码可以保证先执行One，再执行Two</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
+<span class="ln"> 4</span>	<span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 5</span>	<span class="s">&#34;time&#34;</span>
+<span class="ln"> 6</span><span class="p">)</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln"> 9</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln">10</span>	<span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
+<span class="ln">11</span><span class="p">}</span>
+<span class="ln">12</span>
+<span class="ln">13</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln">14</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">15</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">16</span><span class="p">}</span>
+<span class="ln">17</span>
+<span class="ln">18</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">19</span>	<span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
+<span class="ln">20</span>	<span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">21</span>	<span class="k">go</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">22</span>	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+<span class="ln">23</span><span class="p">}</span>
+</code></pre></div><p>将main函数本身也看成协程，不用sleep实现同步</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
+<span class="ln"> 4</span>	<span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 5</span><span class="p">)</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln"> 8</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln"> 9</span>	<span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
+<span class="ln">10</span><span class="p">}</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln">13</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">14</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">15</span><span class="p">}</span>
+<span class="ln">16</span>
+<span class="ln">17</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">18</span>	<span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
+<span class="ln">19</span>	<span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">20</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">21</span>	<span class="c1">//go Two(ch)
+</span><span class="ln">22</span><span class="c1"></span>	<span class="c1">//time.Sleep(5 * 1e9)
+</span><span class="ln">23</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><h2 id="range">range</h2>
+<p>range关键字在使用channel的时候，会自动等待channel的动作一直到channel关闭。通俗点将就是channel可以自动开关。</p>
+<h2 id="select">select</h2>
+<p>被称为通信开关。</p>
+<p>首先要明确select做了什么？？</p>
+<p>select中存在着一种轮询机制，select监听进入通道的数据，也可以是通道发送值的时候，监听到相应的行为后就执行case里面的操作</p>
+<h2 id="带缓存的channel">带缓存的channel</h2>
+<h2 id="协程调度">协程调度</h2>
+
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -178,9 +351,6 @@
       
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/" class="nav-link">dmp文件读取（六）- Others</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/" class="nav-link">go协程</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>
@@ -290,8 +460,6 @@
 </aside>
 
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>

@@ -104,6 +104,7 @@
         <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
         <div class = 'nav_sub'>
           <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/tags/ansible' class = 'nav_child nav_item'>Ansible</a>
         </div>
       </div>
       <div class = 'nav_parent'>
@@ -129,6 +130,40 @@
 
 <div class='grid-inverse wrap content'>
   <ul class='posts' id = 'posts'>
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/'>dmp文件读取（六）- Others</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 18, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件读取（六） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常、内存这四种stream的读取，至此，核心的stream读取已经介绍完，本章介绍其他的stream读取，这些stream不是不重要，而是代码比较简单，这些stream包括：
+ MD_SYSTEM_INFO_STREAM MD_MISC_INFO_STREAM MD_BREAKPAD_INFO_STREAM MD_ASSERTION_INFO_STREAM  MD_SYSTEM_INFO_STREAM  包含cpu架构 包含操作系统信息 MDRawSystemInfo  system stream 读取入口 1ProcessResult …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
       
 <li class = 'post_item'>
   <div class = 'excerpt'>
@@ -350,7 +385,13 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/module/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/" class="nav-link">dmp文件读取（六）- Others</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/" class="nav-link">go协程</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/" class="nav-link">dmp文件读取（五）- Memory</a>
@@ -367,24 +408,18 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
       <li>
         <a href="https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/" class="nav-link">动态链接库与静态链接库</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/" class="nav-link">dmp文件读取（三）- Moduel</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/" class="nav-link">dmp文件读取（二）- Thread</a>
-      </li>
     </ul> 
     
     <div>
       <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
       <nav class="tags_nav">
-        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
-          C&#43;&#43;
-          <span class='button_tally'>2</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
           GO
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
           <span class='button_tally'>2</span>
         </a>
         
@@ -412,12 +447,12 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
           BREAKPAD
-          <span class='button_tally'>6</span>
+          <span class='button_tally'>7</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>6</span>
+          <span class='button_tally'>7</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
@@ -427,6 +462,11 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
         
         <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
           GO
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
           <span class='button_tally'>1</span>
         </a>
         

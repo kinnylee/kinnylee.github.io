@@ -6,10 +6,20 @@
     <description>Recent content in 源码分析 on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Sun, 16 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 18 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>dmp文件读取（六）- Others</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/</link>
+      <pubDate>Tue, 18 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/</guid>
+      <description>dmp文件读取（六） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常、内存这四种stream的读取，至此，核心的stream读取已经介绍完，本章介绍其他的stream读取，这些stream不是不重要，而是代码比较简单，这些stream包括：
+ MD_SYSTEM_INFO_STREAM MD_MISC_INFO_STREAM MD_BREAKPAD_INFO_STREAM MD_ASSERTION_INFO_STREAM  MD_SYSTEM_INFO_STREAM  包含cpu架构 包含操作系统信息 MDRawSystemInfo  system stream 读取入口 1ProcessResult MinidumpProcessor::Process( 2 Minidump *dump, ProcessState *process_state) { 3 bool has_cpu_info = GetCPUInfo(dump, &amp;amp;process_state-&amp;gt;system_info_); 4} 5 6bool MinidumpProcessor::GetCPUInfo(Minidump *dump, SystemInfo *info) { 7 ... 8 MinidumpSystemInfo *system_info; 9 const MDRawSystemInfo *raw_system_info = GetSystemInfo(dump, &amp;amp;system_info); 10} 11 12static const MDRawSystemInfo* GetSystemInfo(Minidump *dump, 13 MinidumpSystemInfo **system_info) { 14 MinidumpSystemInfo *minidump_system_info = dump-&amp;gt;GetSystemInfo(); 15 if (!minidump_system_info) 16 return NULL; 17 18 if (system_info) 19 *system_info = minidump_system_info; 20 21 return minidump_system_info-&amp;gt;system_info(); 22} MinidumpSystemInfo  MinidumpSystemInfo类用来保存系统信息 核心数据结构是：MDRawSystemInfo stream type是MD_SYSTEM_INFO_STREAM  系统信息数据结构：MDRawSystemInfo MDRawSystemInfo结构体保存了系统核心信息，包括：</description>
+    </item>
     
     <item>
       <title>dmp文件读取（五）- Memory</title>
