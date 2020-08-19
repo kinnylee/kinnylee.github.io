@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>dmp文件分析（一）- 概述 | kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.74.3" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+  
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="dmp文件分析">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "dmp文件分析（一）- 概述" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/" />
+<meta property = "og:title" content = "dmp文件分析（一）- 概述" />
+<meta property = "og:description" content = "dmp文件分析" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/google.jpg" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/'>
+
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css" integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ==' as="style">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js" as="script">
+
+    
+    <link rel = 'stylesheet' href = 'https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css' integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ=='>
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <svg class="icon">
+          <use xlink:href="#open-menu"></use>
+        </svg>
+        <svg class="icon">
+          <use xlink:href="#closeme"></use>
+        </svg>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://twitter.com/' class = 'nav_child nav_item'>中间件</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/tags/ansible' class = 'nav_child nav_item'>Ansible</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>dmp文件分析（一）- 概述</h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 19, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=dmp%e6%96%87%e4%bb%b6%e5%88%86%e6%9e%90%ef%bc%88%e4%b8%80%ef%bc%89-%20%e6%a6%82%e8%bf%b0&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2580-%25E6%25A6%2582%25E8%25BF%25B0%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
+  </a>
+  
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2580-%25E6%25A6%2582%25E8%25BF%25B0%2f&t=dmp%e6%96%87%e4%bb%b6%e5%88%86%e6%9e%90%ef%bc%88%e4%b8%80%ef%bc%89-%20%e6%a6%82%e8%bf%b0" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#dmp文件分析一">dmp文件分析（一）</a>
+      <ul>
+        <li><a href="#dmp读取流程回顾">dmp读取流程回顾</a></li>
+        <li><a href="#线程堆栈分析核心流程">线程堆栈分析核心流程</a></li>
+        <li><a href="#walk方法概述">Walk方法概述</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    <h2 id="dmp文件分析一">dmp文件分析（一）</h2>
+<p>前面的章节已经将dmp文件读取分析完成，读取过程将dmp中的信息加载到对象中，用于后续分析，这篇文章开始介绍分析流程。</p>
+<h3 id="dmp读取流程回顾">dmp读取流程回顾</h3>
+<p>如下源码已经做了详细注释，总结如下：</p>
+<ol>
+<li>读取头文件中的文件创建时间</li>
+<li>读取进程运行时长</li>
+<li>读取cpu信息</li>
+<li>读取操作系统信息</li>
+<li>读取崩溃的线程id</li>
+<li>读取崩溃原因</li>
+<li>读取断言信息</li>
+<li>读取模块信息，并拷贝一份，用于后续分析（分析时会修改原始数据）</li>
+<li>读取内存信息</li>
+<li>读取线程信息</li>
+<li>for循环，依次分析每个线程的调用栈</li>
+</ol>
+<h4 id="分析调用栈需要的数据">分析调用栈需要的数据</h4>
+<ul>
+<li>操作系统信息</li>
+<li>上下文信息</li>
+<li>线程内存信息</li>
+<li>模块列表</li>
+<li>符号相关参数信息</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln">  1</span><span class="n">ProcessResult</span> <span class="n">MinidumpProcessor</span><span class="o">::</span><span class="n">Process</span><span class="p">(</span>
+<span class="ln">  2</span>    <span class="n">Minidump</span> <span class="o">*</span><span class="n">dump</span><span class="p">,</span> <span class="n">ProcessState</span> <span class="o">*</span><span class="n">process_state</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">  3</span>
+<span class="ln">  4</span>  <span class="c1">// 读取dmp文件头
+</span><span class="ln">  5</span><span class="c1"></span>  <span class="k">const</span> <span class="n">MDRawHeader</span> <span class="o">*</span><span class="n">header</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">header</span><span class="p">();</span>
+<span class="ln">  6</span>  <span class="c1">// 取出创建的时间戳
+</span><span class="ln">  7</span><span class="c1"></span>  <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">time_date_stamp_</span> <span class="o">=</span> <span class="n">header</span><span class="o">-&gt;</span><span class="n">time_date_stamp</span><span class="p">;</span>
+<span class="ln">  8</span>
+<span class="ln">  9</span>  <span class="c1">// 读取misc stream中的进程运行时长
+</span><span class="ln"> 10</span><span class="c1"></span>  <span class="kt">bool</span> <span class="n">has_process_create_time</span> <span class="o">=</span>
+<span class="ln"> 11</span>      <span class="n">GetProcessCreateTime</span><span class="p">(</span><span class="n">dump</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">process_create_time_</span><span class="p">);</span>
+<span class="ln"> 12</span>
+<span class="ln"> 13</span>  <span class="c1">// 读取system stream中的cpu、处理器架构信息
+</span><span class="ln"> 14</span><span class="c1"></span>  <span class="kt">bool</span> <span class="n">has_cpu_info</span> <span class="o">=</span> <span class="n">GetCPUInfo</span><span class="p">(</span><span class="n">dump</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">system_info_</span><span class="p">);</span>
+<span class="ln"> 15</span>  <span class="c1">// 读取system stream中的操作系统信息
+</span><span class="ln"> 16</span><span class="c1"></span>  <span class="kt">bool</span> <span class="n">has_os_info</span> <span class="o">=</span> <span class="n">GetOSInfo</span><span class="p">(</span><span class="n">dump</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">system_info_</span><span class="p">);</span>
+<span class="ln"> 17</span>
+<span class="ln"> 18</span>  <span class="c1">// 读取breakpad stream中的自定义崩溃信息
+</span><span class="ln"> 19</span><span class="c1"></span>  <span class="n">MinidumpBreakpadInfo</span> <span class="o">*</span><span class="n">breakpad_info</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetBreakpadInfo</span><span class="p">();</span>
+<span class="ln"> 20</span>  <span class="k">if</span> <span class="p">(</span><span class="n">breakpad_info</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 21</span>    <span class="c1">// 如果breakpad中有崩溃线程id，以这个线程id为准
+</span><span class="ln"> 22</span><span class="c1"></span>    <span class="n">has_dump_thread</span> <span class="o">=</span> <span class="n">breakpad_info</span><span class="o">-&gt;</span><span class="n">GetDumpThreadID</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dump_thread_id</span><span class="p">);</span>
+<span class="ln"> 23</span>    <span class="n">has_requesting_thread</span> <span class="o">=</span>
+<span class="ln"> 24</span>        <span class="n">breakpad_info</span><span class="o">-&gt;</span><span class="n">GetRequestingThreadID</span><span class="p">(</span><span class="o">&amp;</span><span class="n">requesting_thread_id</span><span class="p">);</span>
+<span class="ln"> 25</span>  <span class="p">}</span>
+<span class="ln"> 26</span>  <span class="c1">// 读取exception中的异常描述信息
+</span><span class="ln"> 27</span><span class="c1"></span>  <span class="n">MinidumpException</span> <span class="o">*</span><span class="n">exception</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetException</span><span class="p">();</span>
+<span class="ln"> 28</span>  <span class="k">if</span> <span class="p">(</span><span class="n">exception</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 29</span>    <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">crashed_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln"> 30</span>    <span class="n">has_requesting_thread</span> <span class="o">=</span> <span class="n">exception</span><span class="o">-&gt;</span><span class="n">GetThreadID</span><span class="p">(</span><span class="o">&amp;</span><span class="n">requesting_thread_id</span><span class="p">);</span>
+<span class="ln"> 31</span>    <span class="c1">// 获取进程崩溃原因
+</span><span class="ln"> 32</span><span class="c1"></span>    <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">crash_reason_</span> <span class="o">=</span> <span class="n">GetCrashReason</span><span class="p">(</span>
+<span class="ln"> 33</span>        <span class="n">dump</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">crash_address_</span><span class="p">);</span>
+<span class="ln"> 34</span>  <span class="p">}</span>
+<span class="ln"> 35</span>
+<span class="ln"> 36</span>  <span class="c1">// 获取assert stream中的断言信息
+</span><span class="ln"> 37</span><span class="c1"></span>  <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">assertion_</span> <span class="o">=</span> <span class="n">GetAssertion</span><span class="p">(</span><span class="n">dump</span><span class="p">);</span>
+<span class="ln"> 38</span>  <span class="c1">// 获取module stream中的模块列表信息
+</span><span class="ln"> 39</span><span class="c1"></span>  <span class="n">MinidumpModuleList</span> <span class="o">*</span><span class="n">module_list</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetModuleList</span><span class="p">();</span>
+<span class="ln"> 40</span>  <span class="k">if</span> <span class="p">(</span><span class="n">module_list</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 41</span>    <span class="c1">// 将模块信息拷贝一份，后面分析时使用拷贝的副本进行分析
+</span><span class="ln"> 42</span><span class="c1"></span>    <span class="c1">// 原因是：后续在分析调用栈时，会动态的修改这个字段，不能在原有的字段上操作
+</span><span class="ln"> 43</span><span class="c1"></span>    <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">modules_</span> <span class="o">=</span> <span class="n">module_list</span><span class="o">-&gt;</span><span class="n">Copy</span><span class="p">();</span>
+<span class="ln"> 44</span>  <span class="p">}</span>
+<span class="ln"> 45</span>  <span class="c1">// 获取未加载的模块列表信息（这个模块跟module stream类似，没有专门介绍）
+</span><span class="ln"> 46</span><span class="c1"></span>  <span class="n">MinidumpUnloadedModuleList</span> <span class="o">*</span><span class="n">unloaded_module_list</span> <span class="o">=</span>
+<span class="ln"> 47</span>      <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetUnloadedModuleList</span><span class="p">();</span>
+<span class="ln"> 48</span>  <span class="c1">// 获取 memory stream中的内存信息
+</span><span class="ln"> 49</span><span class="c1"></span>  <span class="n">MinidumpMemoryList</span> <span class="o">*</span><span class="n">memory_list</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetMemoryList</span><span class="p">();</span>
+<span class="ln"> 50</span>  <span class="c1">// 获取 thread stream中的线程列表信息
+</span><span class="ln"> 51</span><span class="c1"></span>  <span class="n">MinidumpThreadList</span> <span class="o">*</span><span class="n">threads</span> <span class="o">=</span> <span class="n">dump</span><span class="o">-&gt;</span><span class="n">GetThreadList</span><span class="p">();</span>
+<span class="ln"> 52</span>
+<span class="ln"> 53</span>  <span class="c1">// 遍历所有的线程
+</span><span class="ln"> 54</span><span class="c1"></span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">thread_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln"> 55</span>       <span class="n">thread_index</span> <span class="o">&lt;</span> <span class="n">thread_count</span><span class="p">;</span>
+<span class="ln"> 56</span>       <span class="o">++</span><span class="n">thread_index</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 57</span>
+<span class="ln"> 58</span>    <span class="n">MinidumpThread</span> <span class="o">*</span><span class="kr">thread</span> <span class="o">=</span> <span class="n">threads</span><span class="o">-&gt;</span><span class="n">GetThreadAtIndex</span><span class="p">(</span><span class="n">thread_index</span><span class="p">);</span>
+<span class="ln"> 59</span>
+<span class="ln"> 60</span>    <span class="c1">// breakpad中记录的线程，表示是崩溃线程，这个线程跳过分析
+</span><span class="ln"> 61</span><span class="c1"></span>    <span class="c1">// 因为这个崩溃的线程的堆栈和上下文信息有可能被损坏了，分析它并不会给我们提供有用信息
+</span><span class="ln"> 62</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">has_dump_thread</span> <span class="o">&amp;&amp;</span> <span class="n">thread_id</span> <span class="o">==</span> <span class="n">dump_thread_id</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 63</span>      <span class="k">continue</span><span class="p">;</span>
+<span class="ln"> 64</span>    <span class="p">}</span>
+<span class="ln"> 65</span>
+<span class="ln"> 66</span>    <span class="c1">// 获取线程的上下文信息
+</span><span class="ln"> 67</span><span class="c1"></span>    <span class="n">MinidumpContext</span> <span class="o">*</span><span class="n">context</span> <span class="o">=</span> <span class="kr">thread</span><span class="o">-&gt;</span><span class="n">GetContext</span><span class="p">();</span>
+<span class="ln"> 68</span>
+<span class="ln"> 69</span>    <span class="k">if</span> <span class="p">(</span><span class="n">has_requesting_thread</span> <span class="o">&amp;&amp;</span> <span class="n">thread_id</span> <span class="o">==</span> <span class="n">requesting_thread_id</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 70</span>      <span class="c1">// 如果找到两个崩溃线程，出错
+</span><span class="ln"> 71</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">found_requesting_thread</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 72</span>        <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Duplicate requesting thread: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">thread_string</span><span class="p">;</span>
+<span class="ln"> 73</span>        <span class="k">return</span> <span class="n">PROCESS_ERROR_DUPLICATE_REQUESTING_THREADS</span><span class="p">;</span>
+<span class="ln"> 74</span>      <span class="p">}</span>
+<span class="ln"> 75</span>      <span class="c1">// 如果exception stream中有上下文信息，就用这个上下文信息代替线程本身的上下文信息
+</span><span class="ln"> 76</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">crashed_</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 77</span>        <span class="n">MinidumpContext</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">exception</span><span class="o">-&gt;</span><span class="n">GetContext</span><span class="p">();</span>
+<span class="ln"> 78</span>        <span class="n">context</span> <span class="o">=</span> <span class="n">ctx</span> <span class="o">?</span> <span class="nl">ctx</span> <span class="p">:</span> <span class="kr">thread</span><span class="o">-&gt;</span><span class="n">GetContext</span><span class="p">();</span>
+<span class="ln"> 79</span>      <span class="p">}</span>
+<span class="ln"> 80</span>    <span class="p">}</span>
+<span class="ln"> 81</span>
+<span class="ln"> 82</span>    <span class="c1">// 读取线程运行时的内存信息
+</span><span class="ln"> 83</span><span class="c1"></span>    <span class="n">MinidumpMemoryRegion</span> <span class="o">*</span><span class="n">thread_memory</span> <span class="o">=</span> <span class="kr">thread</span><span class="o">-&gt;</span><span class="n">GetMemory</span><span class="p">();</span>
+<span class="ln"> 84</span>    <span class="c1">// 如果读取不到线程中存储的内存信息
+</span><span class="ln"> 85</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">thread_memory</span> <span class="o">&amp;&amp;</span> <span class="n">memory_list</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 86</span>      <span class="c1">// 尝试获取线程堆栈的起始内存地址
+</span><span class="ln"> 87</span><span class="c1"></span>      <span class="kt">uint64_t</span> <span class="n">start_stack_memory_range</span> <span class="o">=</span> <span class="kr">thread</span><span class="o">-&gt;</span><span class="n">GetStartOfStackMemoryRange</span><span class="p">();</span>
+<span class="ln"> 88</span>      <span class="k">if</span> <span class="p">(</span><span class="n">start_stack_memory_range</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 89</span>        <span class="c1">// 根据线程栈中的起始内存地址，在进程内存列表中找到一个比较符合的内存信息
+</span><span class="ln"> 90</span><span class="c1"></span>        <span class="n">thread_memory</span> <span class="o">=</span> <span class="n">memory_list</span><span class="o">-&gt;</span><span class="n">GetMemoryRegionForAddress</span><span class="p">(</span>
+<span class="ln"> 91</span>           <span class="n">start_stack_memory_range</span><span class="p">);</span>
+<span class="ln"> 92</span>      <span class="p">}</span>
+<span class="ln"> 93</span>    <span class="p">}</span>
+<span class="ln"> 94</span>
+<span class="ln"> 95</span>    <span class="cm">/**
+</span><span class="ln"> 96</span><span class="cm">    * 这里是分析的入口函数，前面都是读取dmp文件的各种数据初始化操作
+</span><span class="ln"> 97</span><span class="cm">    * 外面套了一个for循环，依次对dmp中的每个线程做堆栈的提取和分析
+</span><span class="ln"> 98</span><span class="cm">    * 从这个函数可以看出，分析每个线程的堆栈需要的参数有：
+</span><span class="ln"> 99</span><span class="cm">    *   1. 操作系统信息
+</span><span class="ln">100</span><span class="cm">        1. 上下文信息
+</span><span class="ln">101</span><span class="cm">    *   3. 线程内存信息
+</span><span class="ln">102</span><span class="cm">    *   4. 模块列表
+</span><span class="ln">103</span><span class="cm">    *   5. 未加载的模块列表
+</span><span class="ln">104</span><span class="cm">    *   6. 符号相关参数信息（最后一个参数frame_symbolizer_）
+</span><span class="ln">105</span><span class="cm">    */</span>
+<span class="ln">106</span>    <span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">Stackwalker</span><span class="o">&gt;</span> <span class="n">stackwalker</span><span class="p">(</span>
+<span class="ln">107</span>        <span class="n">Stackwalker</span><span class="o">::</span><span class="n">StackwalkerForCPU</span><span class="p">(</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">system_info</span><span class="p">(),</span>
+<span class="ln">108</span>                                       <span class="n">context</span><span class="p">,</span>
+<span class="ln">109</span>                                       <span class="n">thread_memory</span><span class="p">,</span>
+<span class="ln">110</span>                                       <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">modules_</span><span class="p">,</span>
+<span class="ln">111</span>                                       <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">unloaded_modules_</span><span class="p">,</span>
+<span class="ln">112</span>                                       <span class="n">frame_symbolizer_</span><span class="p">));</span>
+<span class="ln">113</span>
+<span class="ln">114</span>    <span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">CallStack</span><span class="o">&gt;</span> <span class="n">stack</span><span class="p">(</span><span class="k">new</span> <span class="n">CallStack</span><span class="p">());</span>
+<span class="ln">115</span>    <span class="k">if</span> <span class="p">(</span><span class="n">stackwalker</span><span class="p">.</span><span class="n">get</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln">116</span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">stackwalker</span><span class="o">-&gt;</span><span class="n">Walk</span><span class="p">(</span><span class="n">stack</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span>
+<span class="ln">117</span>                             <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">modules_without_symbols_</span><span class="p">,</span>
+<span class="ln">118</span>                             <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">modules_with_corrupt_symbols_</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln">119</span>        <span class="n">BPLOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Stackwalker interrupt (missing symbols?) at &#34;</span>
+<span class="ln">120</span>                    <span class="o">&lt;&lt;</span> <span class="n">thread_string</span><span class="p">;</span>
+<span class="ln">121</span>        <span class="n">interrupted</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">122</span>      <span class="p">}</span>
+<span class="ln">123</span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">124</span>      <span class="c1">// 线程如果找不到cpu上下文信息，将会走到这一步
+</span><span class="ln">125</span><span class="c1"></span>      <span class="c1">// 但是并不会终止分析，只是认为只是一个被损坏的线程，会继续进行下一个线程的分析，
+</span><span class="ln">126</span><span class="c1"></span>      <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;No stackwalker for &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">thread_string</span><span class="p">;</span>
+<span class="ln">127</span>    <span class="p">}</span>
+<span class="ln">128</span>    <span class="c1">// 重置栈的线程id
+</span><span class="ln">129</span><span class="c1"></span>    <span class="n">stack</span><span class="o">-&gt;</span><span class="n">set_tid</span><span class="p">(</span><span class="n">thread_id</span><span class="p">);</span>
+<span class="ln">130</span>    <span class="c1">// 保存栈帧信息到堆栈列表
+</span><span class="ln">131</span><span class="c1"></span>    <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">threads_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">stack</span><span class="p">.</span><span class="n">release</span><span class="p">());</span>
+<span class="ln">132</span>    <span class="c1">// 保存线程内存信息到内存列表
+</span><span class="ln">133</span><span class="c1"></span>    <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">thread_memory_regions_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">thread_memory</span><span class="p">);</span>
+<span class="ln">134</span>  <span class="p">}</span>
+<span class="ln">135</span>  <span class="p">...</span>
+<span class="ln">136</span><span class="p">}</span>
+</code></pre></div><h3 id="线程堆栈分析核心流程">线程堆栈分析核心流程</h3>
+<ul>
+<li>Stackwalker::StackwalkerForCPU函数根据不同的cpu类型实例化不同的类</li>
+<li>构造stackwalker对象</li>
+<li>调用stackwalker的Walk方法开始分析</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="n">ProcessResult</span> <span class="n">MinidumpProcessor</span><span class="o">::</span><span class="n">Process</span><span class="p">(</span>
+<span class="ln"> 2</span>    <span class="n">Minidump</span> <span class="o">*</span><span class="n">dump</span><span class="p">,</span> <span class="n">ProcessState</span> <span class="o">*</span><span class="n">process_state</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span>  <span class="p">...</span>
+<span class="ln"> 5</span>  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">thread_index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln"> 6</span>       <span class="n">thread_index</span> <span class="o">&lt;</span> <span class="n">thread_count</span><span class="p">;</span>
+<span class="ln"> 7</span>       <span class="o">++</span><span class="n">thread_index</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 8</span>    <span class="p">...</span>
+<span class="ln"> 9</span>    <span class="cm">/**
+</span><span class="ln">10</span><span class="cm">    * 这里是分析的入口函数，前面都是读取dmp文件的各种数据初始化操作
+</span><span class="ln">11</span><span class="cm">    * 外面套了一个for循环，依次对dmp中的每个线程做堆栈的提取和分析
+</span><span class="ln">12</span><span class="cm">    * 从这个函数可以看出，分析每个线程的堆栈需要的参数有：
+</span><span class="ln">13</span><span class="cm">    *   1. 操作系统信息
+</span><span class="ln">14</span><span class="cm">        1. 上下文信息
+</span><span class="ln">15</span><span class="cm">    *   3. 线程内存信息
+</span><span class="ln">16</span><span class="cm">    *   4. 模块列表
+</span><span class="ln">17</span><span class="cm">    *   5. 未加载的模块列表
+</span><span class="ln">18</span><span class="cm">    *   6. 符号相关参数信息（最后一个参数frame_symbolizer_）
+</span><span class="ln">19</span><span class="cm">    */</span>
+<span class="ln">20</span>    <span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">Stackwalker</span><span class="o">&gt;</span> <span class="n">stackwalker</span><span class="p">(</span>
+<span class="ln">21</span>        <span class="c1">// 根据CPU信息，实例化不同的类
+</span><span class="ln">22</span><span class="c1"></span>        <span class="n">Stackwalker</span><span class="o">::</span><span class="n">StackwalkerForCPU</span><span class="p">(</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">system_info</span><span class="p">(),</span>
+<span class="ln">23</span>                                       <span class="n">context</span><span class="p">,</span>
+<span class="ln">24</span>                                       <span class="n">thread_memory</span><span class="p">,</span>
+<span class="ln">25</span>                                       <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">modules_</span><span class="p">,</span>
+<span class="ln">26</span>                                       <span class="n">process_state</span><span class="o">-&gt;</span><span class="n">unloaded_modules_</span><span class="p">,</span>
+<span class="ln">27</span>                                       <span class="n">frame_symbolizer_</span><span class="p">));</span>
+<span class="ln">28</span>
+<span class="ln">29</span>    <span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">CallStack</span><span class="o">&gt;</span> <span class="n">stack</span><span class="p">(</span><span class="k">new</span> <span class="n">CallStack</span><span class="p">());</span>
+<span class="ln">30</span>    <span class="k">if</span> <span class="p">(</span><span class="n">stackwalker</span><span class="p">.</span><span class="n">get</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln">31</span>      <span class="c1">// 分析的核心方法
+</span><span class="ln">32</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">stackwalker</span><span class="o">-&gt;</span><span class="n">Walk</span><span class="p">(</span><span class="n">stack</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span>
+<span class="ln">33</span>                             <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">modules_without_symbols_</span><span class="p">,</span>
+<span class="ln">34</span>                             <span class="o">&amp;</span><span class="n">process_state</span><span class="o">-&gt;</span><span class="n">modules_with_corrupt_symbols_</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln">35</span>        <span class="n">BPLOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Stackwalker interrupt (missing symbols?) at &#34;</span>
+<span class="ln">36</span>                    <span class="o">&lt;&lt;</span> <span class="n">thread_string</span><span class="p">;</span>
+<span class="ln">37</span>        <span class="n">interrupted</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">38</span>      <span class="p">}</span>
+<span class="ln">39</span>    <span class="p">}</span>
+<span class="ln">40</span>  <span class="p">...</span>
+<span class="ln">41</span><span class="p">}</span>
+</code></pre></div><h4 id="构造stackwalker">构造Stackwalker</h4>
+<ul>
+<li>Stackwalker是一个基类，不同类型的cpu，都继承这个类，实现自己的堆栈分析方法</li>
+<li>调用context中的方法，得到cpu信息，初始化不同的子类</li>
+<li>不同的子类，重写基类的Walk方法</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="n">Stackwalker</span><span class="o">*</span> <span class="n">Stackwalker</span><span class="o">::</span><span class="n">StackwalkerForCPU</span><span class="p">(</span>
+<span class="ln"> 2</span>    <span class="k">const</span> <span class="n">SystemInfo</span><span class="o">*</span> <span class="n">system_info</span><span class="p">,</span>
+<span class="ln"> 3</span>    <span class="n">DumpContext</span><span class="o">*</span> <span class="n">context</span><span class="p">,</span>
+<span class="ln"> 4</span>    <span class="n">MemoryRegion</span><span class="o">*</span> <span class="n">memory</span><span class="p">,</span>
+<span class="ln"> 5</span>    <span class="k">const</span> <span class="n">CodeModules</span><span class="o">*</span> <span class="n">modules</span><span class="p">,</span>
+<span class="ln"> 6</span>    <span class="k">const</span> <span class="n">CodeModules</span><span class="o">*</span> <span class="n">unloaded_modules</span><span class="p">,</span>
+<span class="ln"> 7</span>    <span class="n">StackFrameSymbolizer</span><span class="o">*</span> <span class="n">frame_symbolizer</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 8</span>  <span class="c1">// 获取cpu信息
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="kt">uint32_t</span> <span class="n">cpu</span> <span class="o">=</span> <span class="n">context</span><span class="o">-&gt;</span><span class="n">GetContextCPU</span><span class="p">();</span>
+<span class="ln">10</span>  <span class="c1">// 根据不同的cpu类型，初始化不同的子类
+</span><span class="ln">11</span><span class="c1"></span>  <span class="c1">// 可以看到，不同的cpu类型，获取context（上下文）的方法也不同
+</span><span class="ln">12</span><span class="c1"></span>  <span class="k">switch</span> <span class="p">(</span><span class="n">cpu</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">13</span>    <span class="k">case</span> <span class="nl">MD_CONTEXT_X86</span><span class="p">:</span>
+<span class="ln">14</span>      <span class="n">cpu_stackwalker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StackwalkerX86</span><span class="p">(</span><span class="n">system_info</span><span class="p">,</span>
+<span class="ln">15</span>                                           <span class="n">context</span><span class="o">-&gt;</span><span class="n">GetContextX86</span><span class="p">(),</span>
+<span class="ln">16</span>                                           <span class="n">memory</span><span class="p">,</span> <span class="n">modules</span><span class="p">,</span> <span class="n">frame_symbolizer</span><span class="p">);</span>
+<span class="ln">17</span>      <span class="k">break</span><span class="p">;</span>
+<span class="ln">18</span>
+<span class="ln">19</span>    <span class="k">case</span> <span class="nl">MD_CONTEXT_PPC</span><span class="p">:</span>
+<span class="ln">20</span>      <span class="n">cpu_stackwalker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StackwalkerPPC</span><span class="p">(</span><span class="n">system_info</span><span class="p">,</span>
+<span class="ln">21</span>                                           <span class="n">context</span><span class="o">-&gt;</span><span class="n">GetContextPPC</span><span class="p">(),</span>
+<span class="ln">22</span>                                           <span class="n">memory</span><span class="p">,</span> <span class="n">modules</span><span class="p">,</span> <span class="n">frame_symbolizer</span><span class="p">);</span>
+<span class="ln">23</span>      <span class="k">break</span><span class="p">;</span>
+<span class="ln">24</span>
+<span class="ln">25</span>    <span class="p">...</span>
+<span class="ln">26</span>  <span class="p">}</span>
+<span class="ln">27</span>
+<span class="ln">28</span>  <span class="k">return</span> <span class="n">cpu_stackwalker</span><span class="p">;</span>
+<span class="ln">29</span><span class="p">}</span>
+</code></pre></div><h4 id="不同cpu的context">不同cpu的context</h4>
+<ul>
+<li>context记录的线程堆栈分析的核心数据</li>
+<li>context使用union（联合体）记录这些数据</li>
+<li>写入时，根据cpu类型，只会给cpu相匹配的字段赋值</li>
+<li>读取时，根据cpu类型，只会获取指定字段的值</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="k">union</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="n">MDRawContextBase</span><span class="o">*</span>  <span class="n">base</span><span class="p">;</span>
+<span class="ln"> 3</span>    <span class="n">MDRawContextX86</span><span class="o">*</span>   <span class="n">x86</span><span class="p">;</span>
+<span class="ln"> 4</span>    <span class="n">MDRawContextPPC</span><span class="o">*</span>   <span class="n">ppc</span><span class="p">;</span>
+<span class="ln"> 5</span>    <span class="n">MDRawContextPPC64</span><span class="o">*</span> <span class="n">ppc64</span><span class="p">;</span>
+<span class="ln"> 6</span>    <span class="n">MDRawContextAMD64</span><span class="o">*</span> <span class="n">amd64</span><span class="p">;</span>
+<span class="ln"> 7</span>    <span class="c1">// on Solaris SPARC, sparc is defined as a numeric constant,
+</span><span class="ln"> 8</span><span class="c1"></span>    <span class="c1">// so variables can NOT be named as sparc
+</span><span class="ln"> 9</span><span class="c1"></span>    <span class="n">MDRawContextSPARC</span><span class="o">*</span> <span class="n">ctx_sparc</span><span class="p">;</span>
+<span class="ln">10</span>    <span class="n">MDRawContextARM</span><span class="o">*</span>   <span class="n">arm</span><span class="p">;</span>
+<span class="ln">11</span>    <span class="n">MDRawContextARM64</span><span class="o">*</span> <span class="n">arm64</span><span class="p">;</span>
+<span class="ln">12</span>    <span class="n">MDRawContextMIPS</span><span class="o">*</span>  <span class="n">ctx_mips</span><span class="p">;</span>
+<span class="ln">13</span>  <span class="p">}</span> <span class="n">context_</span><span class="p">;</span>
+</code></pre></div><h3 id="walk方法概述">Walk方法概述</h3>
+<ul>
+<li>根据不同cpu构造好Stackwalker的子类后，开始调用Walk方法进行堆栈分析</li>
+<li>分析每一个栈帧时，会先读取匹配的符号信息，协助分析</li>
+<li>每一个栈帧中保存着寄存器的指令地址：eip</li>
+<li>分析完一个栈帧，会查找它的调用者（上一级）栈帧，直到分析到栈结束</li>
+<li>或者调用者的栈帧方法为：GetCallerFrame，下一章专门介绍</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="kt">bool</span> <span class="n">Stackwalker</span><span class="o">::</span><span class="n">Walk</span><span class="p">(</span>
+<span class="ln"> 2</span>    <span class="n">CallStack</span><span class="o">*</span> <span class="n">stack</span><span class="p">,</span>
+<span class="ln"> 3</span>    <span class="n">vector</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">CodeModule</span><span class="o">*&gt;*</span> <span class="n">modules_without_symbols</span><span class="p">,</span>
+<span class="ln"> 4</span>    <span class="n">vector</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">CodeModule</span><span class="o">*&gt;*</span> <span class="n">modules_with_corrupt_symbols</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span>  <span class="c1">// 先清空堆栈信息
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="n">stack</span><span class="o">-&gt;</span><span class="n">Clear</span><span class="p">();</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="c1">// 开始根据栈帧的上下文信息，找到上层调用者，直到调用结束
+</span><span class="ln">10</span><span class="c1"></span>  <span class="c1">// 记录调用栈的层数，防止递归调用死循环的存在
+</span><span class="ln">11</span><span class="c1"></span>  <span class="kt">uint32_t</span> <span class="n">scanned_frames</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln">12</span>
+<span class="ln">13</span>  <span class="c1">// 构造一个栈帧，并取出context中的寄存器的eip，并缓存下来
+</span><span class="ln">14</span><span class="c1"></span>  <span class="n">scoped_ptr</span><span class="o">&lt;</span><span class="n">StackFrame</span><span class="o">&gt;</span> <span class="n">frame</span><span class="p">(</span><span class="n">GetContextFrame</span><span class="p">());</span>
+<span class="ln">15</span>
+<span class="ln">16</span>  <span class="c1">// 这里是一个死循环，一直分析并提取堆栈，直到下一个栈帧为空
+</span><span class="ln">17</span><span class="c1"></span>  <span class="k">while</span> <span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">get</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln">18</span>    <span class="c1">// 栈帧始终包含一个有效的调用栈信息，并设置指令地址
+</span><span class="ln">19</span><span class="c1"></span>    <span class="c1">// 指令地址来自context中的eip，或者被调用者
+</span><span class="ln">20</span><span class="c1"></span>
+<span class="ln">21</span>    <span class="c1">// 提取symbol信息，协助分析
+</span><span class="ln">22</span><span class="c1"></span>    <span class="n">StackFrameSymbolizer</span><span class="o">::</span><span class="n">SymbolizerResult</span> <span class="n">symbolizer_result</span> <span class="o">=</span>
+<span class="ln">23</span>        <span class="n">frame_symbolizer_</span><span class="o">-&gt;</span><span class="n">FillSourceLineInfo</span><span class="p">(</span><span class="n">modules_</span><span class="p">,</span> <span class="n">unloaded_modules_</span><span class="p">,</span>
+<span class="ln">24</span>                                              <span class="n">system_info_</span><span class="p">,</span>
+<span class="ln">25</span>                                              <span class="n">frame</span><span class="p">.</span><span class="n">get</span><span class="p">());</span>
+<span class="ln">26</span>    <span class="c1">// 匹配的符号文件的结果
+</span><span class="ln">27</span><span class="c1"></span>    <span class="k">switch</span> <span class="p">(</span><span class="n">symbolizer_result</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">28</span>      <span class="k">case</span> <span class="n">StackFrameSymbolizer</span><span class="o">::</span><span class="nl">kInterrupt</span><span class="p">:</span>
+<span class="ln">29</span>        <span class="n">BPLOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Stack walk is interrupted.&#34;</span><span class="p">;</span>
+<span class="ln">30</span>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln">31</span>        <span class="k">break</span><span class="p">;</span>
+<span class="ln">32</span>      <span class="k">case</span> <span class="n">StackFrameSymbolizer</span><span class="o">::</span><span class="nl">kError</span><span class="p">:</span>
+<span class="ln">33</span>        <span class="n">InsertSpecialAttentionModule</span><span class="p">(</span><span class="n">symbolizer_result</span><span class="p">,</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="p">,</span>
+<span class="ln">34</span>                                     <span class="n">modules_without_symbols</span><span class="p">);</span>
+<span class="ln">35</span>        <span class="k">break</span><span class="p">;</span>
+<span class="ln">36</span>      <span class="k">case</span> <span class="n">StackFrameSymbolizer</span><span class="o">::</span><span class="nl">kWarningCorruptSymbols</span><span class="p">:</span>
+<span class="ln">37</span>        <span class="n">InsertSpecialAttentionModule</span><span class="p">(</span><span class="n">symbolizer_result</span><span class="p">,</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="p">,</span>
+<span class="ln">38</span>                                     <span class="n">modules_with_corrupt_symbols</span><span class="p">);</span>
+<span class="ln">39</span>        <span class="k">break</span><span class="p">;</span>
+<span class="ln">40</span>      <span class="k">case</span> <span class="n">StackFrameSymbolizer</span><span class="o">::</span><span class="nl">kNoError</span><span class="p">:</span>
+<span class="ln">41</span>        <span class="k">break</span><span class="p">;</span>
+<span class="ln">42</span>      <span class="k">default</span><span class="o">:</span>
+<span class="ln">43</span>        <span class="n">assert</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+<span class="ln">44</span>        <span class="k">break</span><span class="p">;</span>
+<span class="ln">45</span>    <span class="p">}</span>
+<span class="ln">46</span>
+<span class="ln">47</span>    <span class="c1">// 调用层数 +1
+</span><span class="ln">48</span><span class="c1"></span>    <span class="k">switch</span> <span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">get</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">trust</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">49</span>       <span class="k">case</span> <span class="n">StackFrame</span><span class="o">::</span><span class="nl">FRAME_TRUST_NONE</span><span class="p">:</span>
+<span class="ln">50</span>       <span class="k">case</span> <span class="n">StackFrame</span><span class="o">::</span><span class="nl">FRAME_TRUST_SCAN</span><span class="p">:</span>
+<span class="ln">51</span>       <span class="k">case</span> <span class="n">StackFrame</span><span class="o">::</span><span class="nl">FRAME_TRUST_CFI_SCAN</span><span class="p">:</span>
+<span class="ln">52</span>         <span class="n">scanned_frames</span><span class="o">++</span><span class="p">;</span>
+<span class="ln">53</span>         <span class="k">break</span><span class="p">;</span>
+<span class="ln">54</span>      <span class="k">default</span><span class="o">:</span>
+<span class="ln">55</span>        <span class="k">break</span><span class="p">;</span>
+<span class="ln">56</span>    <span class="p">}</span>
+<span class="ln">57</span>
+<span class="ln">58</span>    <span class="c1">// 添加分析完毕的栈帧信息到堆栈列表中
+</span><span class="ln">59</span><span class="c1"></span>    <span class="n">stack</span><span class="o">-&gt;</span><span class="n">frames_</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">frame</span><span class="p">.</span><span class="n">release</span><span class="p">());</span>
+<span class="ln">60</span>
+<span class="ln">61</span>    <span class="c1">// 获取下一个栈帧（调用者的栈帧）
+</span><span class="ln">62</span><span class="c1"></span>    <span class="kt">bool</span> <span class="n">stack_scan_allowed</span> <span class="o">=</span> <span class="n">scanned_frames</span> <span class="o">&lt;</span> <span class="n">max_frames_scanned_</span><span class="p">;</span>
+<span class="ln">63</span>
+<span class="ln">64</span>    <span class="c1">// 栈帧回溯的核心方法：GetCallerFrame
+</span><span class="ln">65</span><span class="c1"></span>    <span class="n">frame</span><span class="p">.</span><span class="n">reset</span><span class="p">(</span><span class="n">GetCallerFrame</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">stack_scan_allowed</span><span class="p">));</span>
+<span class="ln">66</span>  <span class="p">}</span>
+<span class="ln">67</span>
+<span class="ln">68</span>  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">69</span><span class="p">}</span>
+</code></pre></div><h4 id="getcontextframe">GetContextFrame</h4>
+<ul>
+<li>GetContextFrame是基类的一个虚方法，子类必须重新</li>
+<li>这里以x86的cpu架构为例，分析实现逻辑</li>
+<li>内部实现：
+<ul>
+<li>构造一个StackFrame对象</li>
+<li>取出寄存器中的eip，放入StackFrame的成员变量中</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="n">StackFrame</span><span class="o">*</span> <span class="n">StackwalkerX86</span><span class="o">::</span><span class="n">GetContextFrame</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span>  <span class="n">StackFrameX86</span><span class="o">*</span> <span class="n">frame</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StackFrameX86</span><span class="p">();</span>
+<span class="ln"> 4</span>
+<span class="ln"> 5</span>  <span class="c1">// context中记录了寄存器的信息，
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="c1">// 其中最核心的是指令指针：eip
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="c1">// 将eip传给栈帧的instruction字段，用于后续分析
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context</span> <span class="o">=</span> <span class="o">*</span><span class="n">context_</span><span class="p">;</span>
+<span class="ln"> 9</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context_validity</span> <span class="o">=</span> <span class="n">StackFrameX86</span><span class="o">::</span><span class="n">CONTEXT_VALID_ALL</span><span class="p">;</span>
+<span class="ln">10</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">trust</span> <span class="o">=</span> <span class="n">StackFrame</span><span class="o">::</span><span class="n">FRAME_TRUST_CONTEXT</span><span class="p">;</span>
+<span class="ln">11</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">instruction</span> <span class="o">=</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">.</span><span class="n">eip</span><span class="p">;</span>
+<span class="ln">12</span>
+<span class="ln">13</span>  <span class="k">return</span> <span class="n">frame</span><span class="p">;</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div>
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">Read More</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/" class="nav-link">dmp文件读取（六）- Others</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/" class="nav-link">go协程</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/" class="nav-link">dmp文件读取（五）- Memory</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/" class="nav-link">breakpad概述</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/" class="nav-link">dmp文件读取（四）- Exception</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/" class="nav-link">代码是如何编译成可执行文件的</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script src = 'https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js'></script>
+  </body>
+</html>

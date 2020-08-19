@@ -6,10 +6,21 @@
     <description>Recent content in 源码分析 on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Tue, 18 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>dmp文件分析（一）- 概述</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/</link>
+      <pubDate>Wed, 19 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/</guid>
+      <description>dmp文件分析（一） 前面的章节已经将dmp文件读取分析完成，读取过程将dmp中的信息加载到对象中，用于后续分析，这篇文章开始介绍分析流程。
+dmp读取流程回顾 如下源码已经做了详细注释，总结如下：
+ 读取头文件中的文件创建时间 读取进程运行时长 读取cpu信息 读取操作系统信息 读取崩溃的线程id 读取崩溃原因 读取断言信息 读取模块信息，并拷贝一份，用于后续分析（分析时会修改原始数据） 读取内存信息 读取线程信息 for循环，依次分析每个线程的调用栈  分析调用栈需要的数据  操作系统信息 上下文信息 线程内存信息 模块列表 符号相关参数信息  1ProcessResult MinidumpProcessor::Process( 2 Minidump *dump, ProcessState *process_state) { 3 4 // 读取dmp文件头 5 const MDRawHeader *header = dump-&amp;gt;header(); 6 // 取出创建的时间戳 7 process_state-&amp;gt;time_date_stamp_ = header-&amp;gt;time_date_stamp; 8 9 // 读取misc stream中的进程运行时长 10 bool has_process_create_time = 11 GetProcessCreateTime(dump, &amp;amp;process_state-&amp;gt;process_create_time_); 12 13 // 读取system stream中的cpu、处理器架构信息 14 bool has_cpu_info = GetCPUInfo(dump, &amp;amp;process_state-&amp;gt;system_info_); 15 // 读取system stream中的操作系统信息 16 bool has_os_info = GetOSInfo(dump, &amp;amp;process_state-&amp;gt;system_info_); 17 18 // 读取breakpad stream中的自定义崩溃信息 19 MinidumpBreakpadInfo *breakpad_info = dump-&amp;gt;GetBreakpadInfo(); 20 if (breakpad_info) { 21 // 如果breakpad中有崩溃线程id，以这个线程id为准 22 has_dump_thread = breakpad_info-&amp;gt;GetDumpThreadID(&amp;amp;dump_thread_id); 23 has_requesting_thread = 24 breakpad_info-&amp;gt;GetRequestingThreadID(&amp;amp;requesting_thread_id); 25 } 26 // 读取exception中的异常描述信息 27 MinidumpException *exception = dump-&amp;gt;GetException(); 28 if (exception) { 29 process_state-&amp;gt;crashed_ = true; 30 has_requesting_thread = exception-&amp;gt;GetThreadID(&amp;amp;requesting_thread_id); 31 // 获取进程崩溃原因 32 process_state-&amp;gt;crash_reason_ = GetCrashReason( 33 dump, &amp;amp;process_state-&amp;gt;crash_address_); 34 } 35 36 // 获取assert stream中的断言信息 37 process_state-&amp;gt;assertion_ = GetAssertion(dump); 38 // 获取module stream中的模块列表信息 39 MinidumpModuleList *module_list = dump-&amp;gt;GetModuleList(); 40 if (module_list) { 41 // 将模块信息拷贝一份，后面分析时使用拷贝的副本进行分析 42 // 原因是：后续在分析调用栈时，会动态的修改这个字段，不能在原有的字段上操作 43 process_state-&amp;gt;modules_ = module_list-&amp;gt;Copy(); 44 } 45 // 获取未加载的模块列表信息（这个模块跟module stream类似，没有专门介绍） 46 MinidumpUnloadedModuleList *unloaded_module_list = 47 dump-&amp;gt;GetUnloadedModuleList(); 48 // 获取 memory stream中的内存信息 49 MinidumpMemoryList *memory_list = dump-&amp;gt;GetMemoryList(); 50 // 获取 thread stream中的线程列表信息 51 MinidumpThreadList *threads = dump-&amp;gt;GetThreadList(); 52 53 // 遍历所有的线程 54 for (unsigned int thread_index = 0; 55 thread_index &amp;lt; thread_count; 56 ++thread_index) { 57 58 MinidumpThread *thread = threads-&amp;gt;GetThreadAtIndex(thread_index); 59 60 // breakpad中记录的线程，表示是崩溃线程，这个线程跳过分析 61 // 因为这个崩溃的线程的堆栈和上下文信息有可能被损坏了，分析它并不会给我们提供有用信息 62 if (has_dump_thread &amp;amp;&amp;amp; thread_id == dump_thread_id) { 63 continue; 64 } 65 66 // 获取线程的上下文信息 67 MinidumpContext *context = thread-&amp;gt;GetContext(); 68 69 if (has_requesting_thread &amp;amp;&amp;amp; thread_id == requesting_thread_id) { 70 // 如果找到两个崩溃线程，出错 71 if (found_requesting_thread) { 72 BPLOG(ERROR) &amp;lt;&amp;lt; &amp;#34;Duplicate requesting thread: &amp;#34; &amp;lt;&amp;lt; thread_string; 73 return PROCESS_ERROR_DUPLICATE_REQUESTING_THREADS; 74 } 75 // 如果exception stream中有上下文信息，就用这个上下文信息代替线程本身的上下文信息 76 if (process_state-&amp;gt;crashed_) { 77 MinidumpContext *ctx = exception-&amp;gt;GetContext(); 78 context = ctx ?</description>
+    </item>
     
     <item>
       <title>dmp文件读取（六）- Others</title>
