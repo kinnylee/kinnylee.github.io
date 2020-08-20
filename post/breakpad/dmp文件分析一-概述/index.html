@@ -544,14 +544,16 @@
 <span class="ln"> 4</span>
 <span class="ln"> 5</span>  <span class="c1">// context中记录了寄存器的信息，
 </span><span class="ln"> 6</span><span class="c1"></span>  <span class="c1">// 其中最核心的是指令指针：eip
-</span><span class="ln"> 7</span><span class="c1"></span>  <span class="c1">// 将eip传给栈帧的instruction字段，用于后续分析
-</span><span class="ln"> 8</span><span class="c1"></span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context</span> <span class="o">=</span> <span class="o">*</span><span class="n">context_</span><span class="p">;</span>
-<span class="ln"> 9</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context_validity</span> <span class="o">=</span> <span class="n">StackFrameX86</span><span class="o">::</span><span class="n">CONTEXT_VALID_ALL</span><span class="p">;</span>
-<span class="ln">10</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">trust</span> <span class="o">=</span> <span class="n">StackFrame</span><span class="o">::</span><span class="n">FRAME_TRUST_CONTEXT</span><span class="p">;</span>
-<span class="ln">11</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">instruction</span> <span class="o">=</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">.</span><span class="n">eip</span><span class="p">;</span>
-<span class="ln">12</span>
-<span class="ln">13</span>  <span class="k">return</span> <span class="n">frame</span><span class="p">;</span>
-<span class="ln">14</span><span class="p">}</span>
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="c1">// eip寄存器，用来存储CPU要读取指令的地址
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="c1">// 崩溃的时候，eip存放的地址，就是崩溃时的指令地址
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="c1">// 将eip传给栈帧的instruction字段，用于后续分析
+</span><span class="ln">10</span><span class="c1"></span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context</span> <span class="o">=</span> <span class="o">*</span><span class="n">context_</span><span class="p">;</span>
+<span class="ln">11</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context_validity</span> <span class="o">=</span> <span class="n">StackFrameX86</span><span class="o">::</span><span class="n">CONTEXT_VALID_ALL</span><span class="p">;</span>
+<span class="ln">12</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">trust</span> <span class="o">=</span> <span class="n">StackFrame</span><span class="o">::</span><span class="n">FRAME_TRUST_CONTEXT</span><span class="p">;</span>
+<span class="ln">13</span>  <span class="n">frame</span><span class="o">-&gt;</span><span class="n">instruction</span> <span class="o">=</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">.</span><span class="n">eip</span><span class="p">;</span>
+<span class="ln">14</span>
+<span class="ln">15</span>  <span class="k">return</span> <span class="n">frame</span><span class="p">;</span>
+<span class="ln">16</span><span class="p">}</span>
 </code></pre></div>
   </article>
 <aside class="sidebar">
@@ -569,6 +571,9 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/" class="nav-link">dmp文件读取（六）- Others</a>
       </li>
       <li>
@@ -585,9 +590,6 @@
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/" class="nav-link">dmp文件读取（四）- Exception</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/" class="nav-link">代码是如何编译成可执行文件的</a>
       </li>
     </ul> 
     
@@ -628,12 +630,12 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
           BREAKPAD
-          <span class='button_tally'>8</span>
+          <span class='button_tally'>9</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>8</span>
+          <span class='button_tally'>9</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">

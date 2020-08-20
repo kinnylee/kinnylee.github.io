@@ -136,6 +136,41 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/'>dmp文件分析（二）- symbol</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 20, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件分析（二）- symbol 上一篇回顾了dmp的解析，并介绍了dmp分析的入口，通过不同的cpu架构，构造Stackwalker的不同子类，并调用Walk方法分析调用栈，其中Walk方法中包含两步：
+ 读取寄存器中的eip，构造初始化栈帧 提取symbol信息，用于协助分析，使分析结果能准确到代码行数级别 根据eip，分析顶层栈调用情况 根据栈帧查找原理，获取caller（上层调用者）的栈帧信息，直到栈帧结束  第一步上一篇已经介绍过，这篇文章主要介绍内容包括：
+ symbol是什么 symbol文件格式以及存储格式规范 如何通过寄存器eip，快速定位到哪个模块崩溃 如何通过某种查找规则，找到模块对应的symbol …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
         <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/'>dmp文件分析（一）- 概述</a>
       </h3>
       <div class = 'post_meta'>
@@ -410,40 +445,6 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
     </div>
   </li>
   
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/'>dmp文件读取（三）- Moduel</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 14, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。
-module stream概述  module信息记录了应用程序（exe）在运行时，加载了哪些dll 每个dll相关的信息，在dmp中称为module dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4 每个module使用MinidumpModule对象表示 每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址， …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
     <li>
 <ul class="pagination">
   <li class="page-item">
@@ -484,6 +485,9 @@ module stream概述  module信息记录了应用程序（exe）在运行时，�
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/" class="nav-link">dmp文件分析（一）- 概述</a>
       </li>
       <li>
@@ -503,9 +507,6 @@ module stream概述  module信息记录了应用程序（exe）在运行时，�
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/" class="nav-link">dmp文件读取（四）- Exception</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/" class="nav-link">代码是如何编译成可执行文件的</a>
       </li>
     </ul> 
     
@@ -546,12 +547,12 @@ module stream概述  module信息记录了应用程序（exe）在运行时，�
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
           BREAKPAD
-          <span class='button_tally'>8</span>
+          <span class='button_tally'>9</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>8</span>
+          <span class='button_tally'>9</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">

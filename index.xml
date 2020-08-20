@@ -6,10 +6,22 @@
     <description>Recent content on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Wed, 19 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 20 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>dmp文件分析（二）- symbol</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/</link>
+      <pubDate>Thu, 20 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/</guid>
+      <description>dmp文件分析（二）- symbol 上一篇回顾了dmp的解析，并介绍了dmp分析的入口，通过不同的cpu架构，构造Stackwalker的不同子类，并调用Walk方法分析调用栈，其中Walk方法中包含两步：
+ 读取寄存器中的eip，构造初始化栈帧 提取symbol信息，用于协助分析，使分析结果能准确到代码行数级别 根据eip，分析顶层栈调用情况 根据栈帧查找原理，获取caller（上层调用者）的栈帧信息，直到栈帧结束  第一步上一篇已经介绍过，这篇文章主要介绍内容包括：
+ symbol是什么 symbol文件格式以及存储格式规范 如何通过寄存器eip，快速定位到哪个模块崩溃 如何通过某种查找规则，找到模块对应的symbol  Walk方法回顾 核心方法包括以下三步
+ GetContextFrame：填充eip，构造顶层栈帧（上一篇已经介绍） FillSourceLineInfo：获取符号信息，协助准确定位崩溃代码行 GetCallerFrame：获取调用者的栈帧  1bool Stackwalker::Walk( 2 CallStack* stack, 3 vector&amp;lt;const CodeModule*&amp;gt;* modules_without_symbols, 4 vector&amp;lt;const CodeModule*&amp;gt;* modules_with_corrupt_symbols) { 5 ... 6 // 构造一个栈帧，并取出context中的寄存器的eip，并缓存下来 7 scoped_ptr&amp;lt;StackFrame&amp;gt; frame(GetContextFrame()); 8 9 // 这里是一个死循环，一直分析并提取堆栈，直到下一个栈帧为空 10 while (frame.get()) { 11 // 栈帧始终包含一个有效的调用栈信息，并设置指令地址 12 // 指令地址来自context中的eip，或者被调用者 13 14 // 提取symbol信息，协助分析 15 StackFrameSymbolizer::SymbolizerResult symbolizer_result = 16 frame_symbolizer_-&amp;gt;FillSourceLineInfo(modules_, unloaded_modules_, 17 system_info_, 18 // 添加分析完毕的栈帧信息到堆栈列表中 19 stack-&amp;gt;frames_.</description>
+    </item>
     
     <item>
       <title>dmp文件分析（一）- 概述</title>
