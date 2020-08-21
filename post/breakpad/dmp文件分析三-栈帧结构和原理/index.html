@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="">
-  <head>  <title>kinnylee</title>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>dmp文件分析（三）- 栈帧结构和原理 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -14,15 +14,15 @@
 </script>
   
 <meta property = "og:locale" content = "en_US" />
-<meta property="og:type" content="website">
-<meta name="description" content="">
+<meta property="og:type" content="article">
+<meta name="description" content="dmp文件分析">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "" />
-<meta property = "og:url" content = "https://kinnylee.github.io/" />
-<meta property = "og:title" content = "" />
-<meta property = "og:description" content = "" />
-<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<meta name = "twitter:title" content = "dmp文件分析（三）- 栈帧结构和原理" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" />
+<meta property = "og:title" content = "dmp文件分析（三）- 栈帧结构和原理" />
+<meta property = "og:description" content = "dmp文件分析" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/google.jpg" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
@@ -31,7 +31,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/'>
 
     
 
@@ -64,7 +64,7 @@
       </div>
     </a>
     <div class = 'nav_body nav_body_left'>
-      <div class = 'nav_parent nav_active'>
+      <div class = 'nav_parent'>
         <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
       </div>
       <div class = 'nav_parent'>
@@ -128,19 +128,10 @@
 </header>
 
     <main>
-
   
-
-<div class='grid-inverse wrap content'>
-  <ul class='posts' id = 'posts'>
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/'>dmp文件分析（三）- 栈帧结构和原理</a>
-      </h3>
-      <div class = 'post_meta'>
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>dmp文件分析（三）- 栈帧结构和原理</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
@@ -152,332 +143,192 @@
   </a>
 </div>
 
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件分析（三）- 寄存器与栈帧结构 上一篇文件讲解了一个崩溃调用栈中第一个栈帧的分析过程：
- 获取指令寄存器eip的地址，通过该地址去模块列表中匹配，找到符合的模块，确定崩溃在哪个模块了 通过模块信息，根据一定路径拼接规则去查找给定模块的符号文件是否存在 解析符号文件，并保存 将符号文件的内存地址和模块的内存地址做匹配，得到崩溃模块的源码信息  分析完一个栈帧后，会根据栈帧结构，查找上层调用函数的eip，继续分析下一个栈帧，再继续分析源码之前，先介绍一下栈帧结构和寄存器相关知识，breakpad中主要用到eip、ebp、esp
-寄存器 寄存器是CPU内部用来存放数据的一些小型存储区域，包括通用寄存器、专用寄存器和控制寄存器。寄 …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/'>dmp文件分析（二）- symbol</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 20, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=dmp%e6%96%87%e4%bb%b6%e5%88%86%e6%9e%90%ef%bc%88%e4%b8%89%ef%bc%89-%20%e6%a0%88%e5%b8%a7%e7%bb%93%e6%9e%84%e5%92%8c%e5%8e%9f%e7%90%86&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2589-%25E6%25A0%2588%25E5%25B8%25A7%25E7%25BB%2593%25E6%259E%2584%25E5%2592%258C%25E5%258E%259F%25E7%2590%2586%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
   </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fbreakpad%2fdmp%25E6%2596%2587%25E4%25BB%25B6%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2589-%25E6%25A0%2588%25E5%25B8%25A7%25E7%25BB%2593%25E6%259E%2584%25E5%2592%258C%25E5%258E%259F%25E7%2590%2586%2f&t=dmp%e6%96%87%e4%bb%b6%e5%88%86%e6%9e%90%ef%bc%88%e4%b8%89%ef%bc%89-%20%e6%a0%88%e5%b8%a7%e7%bb%93%e6%9e%84%e5%92%8c%e5%8e%9f%e7%90%86" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
   </a>
 </div>
 
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件分析（二）- symbol 上一篇回顾了dmp的解析，并介绍了dmp分析的入口，通过不同的cpu架构，构造Stackwalker的不同子类，并调用Walk方法分析调用栈，其中Walk方法中包含两步：
- 读取寄存器中的eip，构造初始化栈帧 提取symbol信息，用于协助分析，使分析结果能准确到代码行数级别 根据eip，分析顶层栈调用情况 根据栈帧查找原理，获取caller（上层调用者）的栈帧信息，直到栈帧结束  第一步上一篇已经介绍过，这篇文章主要介绍内容包括：
- symbol是什么 symbol文件格式以及存储格式规范 如何通过寄存器eip，快速定位到哪个模块崩溃 如何通过某种查找规则，找到模块对应的symbol …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/'>dmp文件分析（一）- 概述</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 19, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件分析（一） 前面的章节已经将dmp文件读取分析完成，读取过程将dmp中的信息加载到对象中，用于后续分析，这篇文章开始介绍分析流程。
-dmp读取流程回顾 如下源码已经做了详细注释，总结如下：
- 读取头文件中的文件创建时间 读取进程运行时长 读取cpu信息 读取操作系统信息 读取崩溃的线程id 读取崩溃原因 读取断言信息 读取模块信息，并拷贝一份，用于后续分析（分析时会修改原始数据） 读取内存信息 读取线程信息 for循环，依次分析每个线程的调用栈  分析调用栈需要的数据  操作系统信息 上下文信息 线程内存信息 模块列表 符号相关参数信息  1ProcessResult MinidumpProcessor::Process( …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/'>dmp文件读取（六）- Others</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 18, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（六） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常、内存这四种stream的读取，至此，核心的stream读取已经介绍完，本章介绍其他的stream读取，这些stream不是不重要，而是代码比较简单，这些stream包括：
- MD_SYSTEM_INFO_STREAM MD_MISC_INFO_STREAM MD_BREAKPAD_INFO_STREAM MD_ASSERTION_INFO_STREAM  MD_SYSTEM_INFO_STREAM  包含cpu架构 包含操作系统信息 MDRawSystemInfo  system stream 读取入口 1ProcessResult …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/'>go协程</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 17, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>协程在手，说Go就Go 协程概述  协程：轻量级线程 协程的优势：  占用空间少 线程上下文切换成本少    简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 fmt.Println(&#34;1&#34;) 10} 11 12func Two(){ 13 fmt.Println(&#34;2&#34;) 14} 15 16func main(){ 17 go One() 18 go Two() 19}  上面的代码执行后，并不会如期打印结果，原因在于协程是并发的，协程调用前，主函 …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/'>Go第三库之命令行框架：go-cli</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 17, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93' class = 'post_tag button button_translucent'>Go第三方库
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>Go-cli 简介  A simple, fast, and fun package for building command line apps in Go 一个简单的、快速的、并且有趣的用于构建go应用程序的包 github地址 目标是帮助开发人员快速构建易于表达的命令行程序 目前存在两个版本v1、v2（新版本）  快速上手 v2官方使用说明
-   添加模块依赖    1GO111MODULE=on go get github.com/urfave/cli/v2   使用    1package main 2 3import ( 4 &#34;os&#34; 5 …</p>
-          <a href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/'>dmp文件读取（五）- Memory</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 16, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的stream：memory stream
-Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中memory列表的stream类型为MD_MEMORY_LIST_STREAM，枚举值是5 memory分为很多的区域（region），每个区域使用MinidumpMemoryRegion对象表示  Memory Stream读取入口  dump的GetMemoryList方法，获取dmp文件中的内存信息 读取的模块列表信息保存 …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/'>breakpad概述</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 15, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/c&#43;&#43;' class = 'post_tag button button_translucent'>C&#43;&#43;
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>breakpad是什么  google开源的一套实现崩溃报告系统的客户端和服务端组件 C++语言实现 现在已经被广泛运用在google的一系列产品及其它公司的桌面程序上，如chrome，piscal，firefox等。 github地址 官方网站  功能特性  崩溃转储 崩溃分析 跨平台：windows、mac、linux 可以运行于一系列架构的cpu上  主要组件  client：集成到应用程序源码中，用于抓取崩溃信息，并生成minidmp文件 symbol dumper：读取编译器生成的调试信息（pdb），生成symbol文件 processor：读取minidump文件，并结合symbol文件，生成可读的堆栈调用信息  各组件 …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/'>dmp文件读取（四）- Exception</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 15, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取
-Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场的基本信息 崩溃信息包括：  崩溃时的线程id 异常状态码 异常标识 异常的内存地址 寄存器信息 其他信息   以上信息都保存在MDRawExceptionStream中  Exception Stream读取入口  dump的GetException方法，获取dmp文件中的崩溃信息 读取的模块列表信息保存在MinidumpException …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/'>代码是如何编译成可执行文件的</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 15, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86' class = 'post_tag button button_translucent'>计算机原理
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'></p>
-          <a href='https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-    <li>
-<ul class="pagination">
-  <li class="page-item">
-    <a href="/" class="page-link" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
-  </li>
-  <li class="page-item disabled">
-    <a  class="page-link" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
-  </li>
-  <li class="page-item active">
-    <a class="page-link" href="/">1</a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/page/2/">2</a>
-  </li>
-  <li class="page-item">
-    <a href="/page/2/" class="page-link" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
-  </li>
-  <li class="page-item">
-    <a href="/page/2/" class="page-link" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
-  </li>
-</ul>
-
-
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#dmp文件分析三--寄存器与栈帧结构">dmp文件分析（三）- 寄存器与栈帧结构</a>
+      <ul>
+        <li><a href="#寄存器">寄存器</a></li>
+        <li><a href="#地址空间">地址空间</a></li>
+        <li><a href="#栈帧结构">栈帧结构</a></li>
+        <li><a href="#栈帧原理">栈帧原理</a></li>
+      </ul>
     </li>
   </ul>
+</nav>
+    <h2 id="dmp文件分析三--寄存器与栈帧结构">dmp文件分析（三）- 寄存器与栈帧结构</h2>
+<p>上一篇文件讲解了一个崩溃调用栈中第一个栈帧的分析过程：</p>
+<ul>
+<li>获取指令寄存器eip的地址，通过该地址去模块列表中匹配，找到符合的模块，确定崩溃在哪个模块了</li>
+<li>通过模块信息，根据一定路径拼接规则去查找给定模块的符号文件是否存在</li>
+<li>解析符号文件，并保存</li>
+<li>将符号文件的内存地址和模块的内存地址做匹配，得到崩溃模块的源码信息</li>
+</ul>
+<p>分析完一个栈帧后，会根据栈帧结构，查找上层调用函数的eip，继续分析下一个栈帧，再继续分析源码之前，先介绍一下栈帧结构和寄存器相关知识，breakpad中主要用到eip、ebp、esp</p>
+<h3 id="寄存器">寄存器</h3>
+<p>寄存器是CPU内部用来存放数据的一些小型存储区域，包括通用寄存器、专用寄存器和控制寄存器。寄存器拥有非常高的读写速度，所以在寄存器之间的数据传送非常快。不同架构cpu的寄存器不一样，本文介绍32位cpu经典寄存器。包括：</p>
+<ul>
+<li>数据寄存器：4个：EAX，EBX，ECX，EDX</li>
+<li>指令寄存器：1个：EIP</li>
+<li>指针寄存器：2个：ESP、EBP</li>
+<li>变址寄存器：2个：ESI、EDI</li>
+<li>标志寄存器：1个：EFlags</li>
+</ul>
+<p><img src="https://img-blog.csdn.net/20130530152826820" alt="寄存器"></p>
+<h4 id="数据寄存器">数据寄存器</h4>
+<ul>
+<li>
+<p>数据寄存器用于保存操作数和计算结果</p>
+</li>
+<li>
+<p>EAX、EBX、ECX、EDX为32位寄存器，对低16位数据的读取，不会影响高16位数据的读取</p>
+</li>
+<li>
+<p>低16位寄存器命名为：AX、BX、CX、DX</p>
+</li>
+<li>
+<p>低16位寄存器又可分割为8个独立的位寄存器，每个寄存器有自己独立的名字，可以独立存取</p>
+<ul>
+<li>AX：AH-AL</li>
+<li>BX：BH-BL</li>
+<li>CX：CH-CL</li>
+<li>DX：DH-DL</li>
+</ul>
+</li>
+<li>
+<p><code>AX</code>：累加器，用于乘、除、输入、输出（赋值）等操作，使用频率很高</p>
+</li>
+<li>
+<p><code>BX</code>：基地址寄存器，作为存储器指针来使</p>
+</li>
+<li>
+<p><code>CX</code>：计数寄存器，用于控制循环次数</p>
+</li>
+<li>
+<p><code>DX</code>：数据寄存器，在乘、除运算时的作为默认操作数，也可用于io操作存储端口</p>
+</li>
+</ul>
+<h4 id="指针寄存器">指针寄存器</h4>
+<ul>
+<li>主要用于<code>访问堆栈内的存储单元</code></li>
+<li><code>EBP</code>：基指针寄存器，用它可直接存取堆栈中的数据</li>
+<li><code>ESP</code>：堆栈指针寄存器，只可以访问栈顶</li>
+<li>breakpad中用到ebp和esp，根据栈帧结构做堆栈调用分析</li>
+</ul>
+<h4 id="指令寄存器">指令寄存器</h4>
+<ul>
+<li>EIP，ip(Instruction Pointer):存放<code>下次将要执行的指令</code>在代码段的偏移量</li>
+<li>breakpad中，前面我们多次提到，会以eip的地址做为分析的起始地址</li>
+</ul>
+<h4 id="变址寄存器">变址寄存器</h4>
+<ul>
+<li>主要用于存放存储单元在段内的偏移量，目的：<code>存储寻址</code></li>
+<li>用它们可实现多种存储器操作数的<code>寻址方式</code>，为以不同的地址形式访问存储单元提供方便</li>
+</ul>
+<h4 id="标志寄存器">标志寄存器</h4>
+<p>标志寄存器包括多个标志位：</p>
+<ul>
+<li>进位标志：CF</li>
+<li>奇偶标志：PF</li>
+<li>辅助进位标志：ACF</li>
+<li>零标志：ZF</li>
+<li>溢出标志：OF</li>
+<li>&hellip;</li>
+</ul>
+<h3 id="地址空间">地址空间</h3>
+<p>在真正了解栈帧结构前，需要对虚拟地址空间和进程地址空间有一定了解。</p>
+<h4 id="虚拟地址空间">虚拟地址空间</h4>
+<ul>
+<li>操作系统提供了内存的一种抽象概念：虚拟地址空间，使得应用程序不用关心物理内存就可以执行操作</li>
+<li>虚拟地址空间分为两类：
+<ul>
+<li>内核空间：32位系统，0xC000000000~0xFFFFFFFF共1G的大小</li>
+<li>用户空间：32位系统，0x0000000000~0xBFFFFFFF共3G的大小</li>
+</ul>
+</li>
+<li>内核空间是系统预留的，用户进程只能使用用户空间</li>
+</ul>
+<h4 id="进程地址空间">进程地址空间</h4>
+<ul>
+<li>每个进程都有一个连续完整的地址空间。</li>
+<li>进程的地址空间是分段的，每个段都有特定的作用：
+<ul>
+<li>Code VMA：代码段，CPU执行的机器指令部分。通常，这一段是可以共享的，即多线程共享进程的代码段。并且，此段是只读的，不能修改。</li>
+<li>Data VMA: 即程序的数据段</li>
+<li>堆：new或者malloc分配的空间在堆上，需要程序猿维护，若没有主动释放堆上的空间，进程运行结束后会被释放。由低向高增长</li>
+<li>栈：栈上的是函数栈临时的变量，还有程序的局部变量，自动释放。由高向低下降</li>
+<li>共享库和mmap内容映射区：位于栈和堆之间，例如程序使用的printf，函数共享库printf.o固定在某个物理内存位置上，让许多进程映射共享。mmap是一个系统函数，可以把磁盘文件的一部分直接映射到内存，这样文件中的位置直接就有对应的内存地址</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://www.choudan.net/assets/img/linux_process_address_space_02.png" alt="地址空间"></p>
+<h3 id="栈帧结构">栈帧结构</h3>
+<p>一个函数在运行时，会在栈上申明局部变量，为单个过程分配的那部分栈就叫做栈帧。当有子函数调用时，会继续在栈上形成新的栈帧。调用者与被调用者形成的栈帧结构为：</p>
+<p><img src="https://pic1.zhimg.com/80/v2-bd5a0aa1625c4445ba33e506b91dba29_1440w.png" alt="栈帧结构"></p>
+<p>栈帧有如下特点：</p>
+<ul>
+<li>每次函数调用都会形成新的栈帧，函数退出时栈被回收，栈帧消失</li>
+<li>栈帧的两端，由基指针寄存器<code>EBP</code>和栈指针寄存器<code>ESP</code>界定</li>
+</ul>
+<h3 id="栈帧原理">栈帧原理</h3>
+<p>函数调用可能是有很多层的，但是EBP和ESP只有两个，它是如何实现函数调用的呢？&mdash; 跟保存局部变量一样，将上一个栈帧的EBP入栈保存，函数调用结束时，将EBP出栈，就能快速恢复上一次的栈帧。</p>
+<h4 id="函数调用的栈帧变化情况">函数调用的栈帧变化情况</h4>
+<ul>
+<li>父函数将调用参数从后向前压栈</li>
+<li>将返回地址压栈保存</li>
+<li>跳转到子函数地址执行</li>
+<li>子函数将父函数栈帧起始地址EBP压栈</li>
+<li>将EBP的值设置为当前ESP的值（EBP指向子函数栈帧起始地址）</li>
+</ul>
+<h4 id="函数返回的栈帧变化情况">函数返回的栈帧变化情况</h4>
+<p>函数返回时，从EAX获取返回值，之后需要将栈结构恢复到调用开始的状态，并跳转到父函数的返回地址继续执行。由于函数调用时，已经保存了返回地址和父函数栈帧起始地址，只需执行两步即可恢复栈帧：</p>
+<ul>
+<li>将EBP的值传给ESP，即让当前指针指向栈的起始位置</li>
+<li>将当前栈顶函数退栈，被传给EBP，即让EBP指向上次保存的父函数的栈底</li>
+</ul>
+<p>使用汇编语言描述，可以表示为：</p>
+<div class="highlight"><pre class="chroma"><code class="language-ASM" data-lang="ASM"><span class="ln">1</span><span class="nf">mov</span> <span class="nv">%ebp</span> <span class="nv">%esp</span>
+<span class="ln">2</span><span class="nf">pop</span> <span class="nv">%ebp</span>
+</code></pre></div><p>由上面的分析，可以发现，只需要知道当前栈帧的寄存器情况，就可以通过一定规律，还原整个堆栈调用过程，表示的公式如下，这个公式将在breakpad中的栈帧查找中用得到：</p>
+<p>caller: 调用函数（父函数）
+callee: 被调用函数(子函数)</p>
+<div class="highlight"><pre class="chroma"><code class="language-ASM" data-lang="ASM"><span class="ln">1</span><span class="err">%</span><span class="nf">caller_esp</span> <span class="err">=</span> <span class="p">*(</span><span class="nv">%callee_ebp</span> <span class="err">+</span> <span class="mi">16</span><span class="p">)</span>
+<span class="ln">2</span><span class="err">%</span><span class="nf">caller_eip</span> <span class="err">=</span> <span class="p">*(</span><span class="nv">%callee_ebp</span> <span class="err">+</span> <span class="mi">8</span><span class="p">)</span>
+<span class="ln">3</span><span class="err">%</span><span class="nf">caller_ebp</span> <span class="err">=</span> <span class="p">*(</span><span class="nv">%callee_ebp</span><span class="p">)</span>
+</code></pre></div>
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -492,9 +343,6 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
     <h2 class="mt-4">Recent Posts</h2>
     <ul class="flex-column">
       
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
-      </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
       </li>
@@ -606,8 +454,6 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
 </aside>
 
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
