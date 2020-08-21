@@ -486,6 +486,195 @@
 </span><span class="ln">50</span><span class="c1"></span>  <span class="o">*</span><span class="n">symbol_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">;</span>
 <span class="ln">51</span>  <span class="k">return</span> <span class="n">FOUND</span><span class="p">;</span>
 <span class="ln">52</span><span class="p">}</span>
+</code></pre></div><h4 id="读取symbol文件的后续操作">读取symbol文件的后续操作</h4>
+<p>前一个方法读取到symbol文本，并保存到字符串中，之后调用以下方法进行后续处理</p>
+<ul>
+<li>LoadModuleUsingMemoryBuffer：使用内存缓存加载模块</li>
+<li>FillSourceLineInfo：填充崩溃处栈帧对应的源码信息</li>
+</ul>
+<h5 id="loadmoduleusingmemorybuffer">LoadModuleUsingMemoryBuffer</h5>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="kt">bool</span> <span class="n">SourceLineResolverBase</span><span class="o">::</span><span class="n">LoadModuleUsingMemoryBuffer</span><span class="p">(</span>
+<span class="ln"> 2</span>    <span class="k">const</span> <span class="n">CodeModule</span> <span class="o">*</span><span class="n">module</span><span class="p">,</span>
+<span class="ln"> 3</span>    <span class="kt">char</span> <span class="o">*</span><span class="n">memory_buffer</span><span class="p">,</span>
+<span class="ln"> 4</span>    <span class="n">size_t</span> <span class="n">memory_buffer_size</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 5</span>  <span class="c1">// 工厂方法构造一个Module子类，用于接收symbol读取后的文本，并转换成对象
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="n">Module</span> <span class="o">*</span><span class="n">basic_module</span> <span class="o">=</span> <span class="n">module_factory_</span><span class="o">-&gt;</span><span class="n">CreateModule</span><span class="p">(</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">());</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span>  <span class="c1">// 将symbol文本格式转换为特定的模型
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">basic_module</span><span class="o">-&gt;</span><span class="n">LoadMapFromMemory</span><span class="p">(</span><span class="n">memory_buffer</span><span class="p">,</span> <span class="n">memory_buffer_size</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln">10</span>    <span class="n">BPLOG</span><span class="p">(</span><span class="n">ERROR</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Too many error while parsing symbol data for module &#34;</span>
+<span class="ln">11</span>                 <span class="o">&lt;&lt;</span> <span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">();</span>
+<span class="ln">12</span>    <span class="n">assert</span><span class="p">(</span><span class="n">basic_module</span><span class="o">-&gt;</span><span class="n">IsCorrupt</span><span class="p">());</span>
+<span class="ln">13</span>  <span class="p">}</span>
+<span class="ln">14</span>
+<span class="ln">15</span>  <span class="n">modules_</span><span class="o">-&gt;</span><span class="n">insert</span><span class="p">(</span><span class="n">make_pair</span><span class="p">(</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">(),</span> <span class="n">basic_module</span><span class="p">));</span>
+<span class="ln">16</span><span class="p">}</span>
+</code></pre></div><h5 id="解析symbol文本">解析symbol文本</h5>
+<ul>
+<li>LoadMapFromMemory方法解析symbol文件</li>
+<li>依次读取前面介绍过的symbol中的各种行
+<ul>
+<li>MODULE</li>
+<li>FILE</li>
+<li>PUBLIC</li>
+<li>STACK</li>
+<li>INFO</li>
+<li>&hellip;</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln">  1</span><span class="kt">bool</span> <span class="n">BasicSourceLineResolver</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">LoadMapFromMemory</span><span class="p">(</span>
+<span class="ln">  2</span>    <span class="kt">char</span> <span class="o">*</span><span class="n">memory_buffer</span><span class="p">,</span>
+<span class="ln">  3</span>    <span class="n">size_t</span> <span class="n">memory_buffer_size</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">  4</span>
+<span class="ln">  5</span>  <span class="c1">// 首先确保字符串末尾以‘\n`结尾
+</span><span class="ln">  6</span><span class="c1"></span>  <span class="n">size_t</span> <span class="n">last_null_terminator</span> <span class="o">=</span> <span class="n">memory_buffer_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+<span class="ln">  7</span>  <span class="k">if</span> <span class="p">(</span><span class="n">memory_buffer</span><span class="p">[</span><span class="n">last_null_terminator</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">  8</span>    <span class="n">memory_buffer</span><span class="p">[</span><span class="n">last_null_terminator</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+<span class="ln">  9</span>  <span class="p">}</span>
+<span class="ln"> 10</span>
+<span class="ln"> 11</span>  <span class="c1">// 跳过所有的&#39;\n&#39;字符（除了末尾的）
+</span><span class="ln"> 12</span><span class="c1"></span>  <span class="c1">// 并且确保读取的symbol字符串没有&#39;\n&#39;，有的都替换为‘_&#39;
+</span><span class="ln"> 13</span><span class="c1"></span>  <span class="kt">bool</span> <span class="n">has_null_terminator_in_the_middle</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="ln"> 14</span>  <span class="k">while</span> <span class="p">(</span><span class="n">last_null_terminator</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span>
+<span class="ln"> 15</span>         <span class="n">memory_buffer</span><span class="p">[</span><span class="n">last_null_terminator</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 16</span>    <span class="n">last_null_terminator</span><span class="o">--</span><span class="p">;</span>
+<span class="ln"> 17</span>  <span class="p">}</span>
+<span class="ln"> 18</span>  <span class="k">for</span> <span class="p">(</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">last_null_terminator</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 19</span>    <span class="k">if</span> <span class="p">(</span><span class="n">memory_buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 20</span>      <span class="n">memory_buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;_&#39;</span><span class="p">;</span>
+<span class="ln"> 21</span>      <span class="n">has_null_terminator_in_the_middle</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln"> 22</span>    <span class="p">}</span>
+<span class="ln"> 23</span>  <span class="p">}</span>
+<span class="ln"> 24</span>  <span class="c1">// 如果有‘\n’字符在中间，抛出错误提示信息
+</span><span class="ln"> 25</span><span class="c1"></span>  <span class="k">if</span> <span class="p">(</span><span class="n">has_null_terminator_in_the_middle</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 26</span>    <span class="n">LogParseError</span><span class="p">(</span>
+<span class="ln"> 27</span>       <span class="s">&#34;Null terminator is not expected in the middle of the symbol data&#34;</span><span class="p">,</span>
+<span class="ln"> 28</span>       <span class="n">line_number</span><span class="p">,</span>
+<span class="ln"> 29</span>       <span class="o">&amp;</span><span class="n">num_errors</span><span class="p">);</span>
+<span class="ln"> 30</span>  <span class="p">}</span>
+<span class="ln"> 31</span>
+<span class="ln"> 32</span>  <span class="c1">// 将文本字符串按照&#39;\r\n&#39;做切割，就是按行切割成字符串列表
+</span><span class="ln"> 33</span><span class="c1"></span>  <span class="kt">char</span> <span class="o">*</span><span class="n">buffer</span><span class="p">;</span>
+<span class="ln"> 34</span>  <span class="n">buffer</span> <span class="o">=</span> <span class="n">strtok_r</span><span class="p">(</span><span class="n">memory_buffer</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">save_ptr</span><span class="p">);</span>
+<span class="ln"> 35</span>
+<span class="ln"> 36</span>  <span class="c1">// 遍历所有行
+</span><span class="ln"> 37</span><span class="c1"></span>  <span class="k">while</span> <span class="p">(</span><span class="n">buffer</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 38</span>    <span class="o">++</span><span class="n">line_number</span><span class="p">;</span>
+<span class="ln"> 39</span>
+<span class="ln"> 40</span>    <span class="c1">// 解析symbol中的 FILE（前5个字符是FILE）
+</span><span class="ln"> 41</span><span class="c1"></span>    <span class="k">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s">&#34;FILE &#34;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 42</span>      <span class="c1">// 将FILE字符串转换为对象,并保存到一个保存File信息的RangeMap中
+</span><span class="ln"> 43</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 44</span>        <span class="n">LogParseError</span><span class="p">(</span><span class="s">&#34;ParseFile on buffer failed&#34;</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">num_errors</span><span class="p">);</span>
+<span class="ln"> 45</span>      <span class="p">}</span>
+<span class="ln"> 46</span>    <span class="p">}</span><span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s">&#34;STACK &#34;</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 47</span>      <span class="c1">// 处理 symbole中的 STACK（前六个字符是STACK）
+</span><span class="ln"> 48</span><span class="c1"></span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ParseStackInfo</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 49</span>        <span class="n">LogParseError</span><span class="p">(</span><span class="s">&#34;ParseStackInfo failed&#34;</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">num_errors</span><span class="p">);</span>
+<span class="ln"> 50</span>      <span class="p">}</span>
+<span class="ln"> 51</span>    <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s">&#34;FUNC &#34;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 52</span>      <span class="c1">// 处理 symbole中的 FUNC（前五个字符是STACK）
+</span><span class="ln"> 53</span><span class="c1"></span>      <span class="n">cur_func</span><span class="p">.</span><span class="n">reset</span><span class="p">(</span><span class="n">ParseFunction</span><span class="p">(</span><span class="n">buffer</span><span class="p">));</span>
+<span class="ln"> 54</span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">cur_func</span><span class="p">.</span><span class="n">get</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln"> 55</span>        <span class="n">LogParseError</span><span class="p">(</span><span class="s">&#34;ParseFunction failed&#34;</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">num_errors</span><span class="p">);</span>
+<span class="ln"> 56</span>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 57</span>        <span class="c1">// StoreRange will fail if the function has an invalid address or size.
+</span><span class="ln"> 58</span><span class="c1"></span>        <span class="c1">// We&#39;ll silently ignore this, the function and any corresponding lines
+</span><span class="ln"> 59</span><span class="c1"></span>        <span class="c1">// will be destroyed when cur_func is released.
+</span><span class="ln"> 60</span><span class="c1"></span>        <span class="n">functions_</span><span class="p">.</span><span class="n">StoreRange</span><span class="p">(</span><span class="n">cur_func</span><span class="o">-&gt;</span><span class="n">address</span><span class="p">,</span> <span class="n">cur_func</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">,</span> <span class="n">cur_func</span><span class="p">);</span>
+<span class="ln"> 61</span>      <span class="p">}</span>
+<span class="ln"> 62</span>    <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s">&#34;PUBLIC &#34;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 63</span>      <span class="c1">// 处理 symbole中的 FUNC（前五个字符是STACK）
+</span><span class="ln"> 64</span><span class="c1"></span>      <span class="c1">// Clear cur_func: public symbols don&#39;t contain line number information.
+</span><span class="ln"> 65</span><span class="c1"></span>      <span class="n">cur_func</span><span class="p">.</span><span class="n">reset</span><span class="p">();</span>
+<span class="ln"> 66</span>
+<span class="ln"> 67</span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ParsePublicSymbol</span><span class="p">(</span><span class="n">buffer</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln"> 68</span>        <span class="n">LogParseError</span><span class="p">(</span><span class="s">&#34;ParsePublicSymbol failed&#34;</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">num_errors</span><span class="p">);</span>
+<span class="ln"> 69</span>      <span class="p">}</span>
+<span class="ln"> 70</span>    <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s">&#34;MODULE &#34;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 71</span>      <span class="c1">// 处理 symbole中的 MODULE（前7个字符是MODULE）
+</span><span class="ln"> 72</span><span class="c1"></span>      <span class="c1">// 忽略不处理，没有崩溃的有用信息
+</span><span class="ln"> 73</span><span class="c1"></span>      <span class="c1">// 主要用来做唯一标识，格式如下：
+</span><span class="ln"> 74</span><span class="c1"></span>      <span class="c1">// MODULE &lt;guid&gt; &lt;age&gt; &lt;filename&gt;
+</span><span class="ln"> 75</span><span class="c1"></span>    <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s">&#34;INFO &#34;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 76</span>      <span class="c1">// 处理 symbole中的 INFO（前5个字符是INFO）
+</span><span class="ln"> 77</span><span class="c1"></span>      <span class="c1">// 忽略不处理，没有崩溃的有用信息，格式如下：
+</span><span class="ln"> 78</span><span class="c1"></span>      <span class="c1">// INFO CODE_ID &lt;code id&gt; &lt;filename&gt;
+</span><span class="ln"> 79</span><span class="c1"></span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 80</span>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">cur_func</span><span class="p">.</span><span class="n">get</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln"> 81</span>        <span class="n">LogParseError</span><span class="p">(</span><span class="s">&#34;Found source line data without a function&#34;</span><span class="p">,</span>
+<span class="ln"> 82</span>                       <span class="n">line_number</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">num_errors</span><span class="p">);</span>
+<span class="ln"> 83</span>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 84</span>        <span class="n">Line</span> <span class="o">*</span><span class="n">line</span> <span class="o">=</span> <span class="n">ParseLine</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>
+<span class="ln"> 85</span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">line</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 86</span>          <span class="n">LogParseError</span><span class="p">(</span><span class="s">&#34;ParseLine failed&#34;</span><span class="p">,</span> <span class="n">line_number</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">num_errors</span><span class="p">);</span>
+<span class="ln"> 87</span>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 88</span>          <span class="n">cur_func</span><span class="o">-&gt;</span><span class="n">lines</span><span class="p">.</span><span class="n">StoreRange</span><span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">address</span><span class="p">,</span> <span class="n">line</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">,</span>
+<span class="ln"> 89</span>                                     <span class="n">linked_ptr</span><span class="o">&lt;</span><span class="n">Line</span><span class="o">&gt;</span><span class="p">(</span><span class="n">line</span><span class="p">));</span>
+<span class="ln"> 90</span>        <span class="p">}</span>
+<span class="ln"> 91</span>      <span class="p">}</span>
+<span class="ln"> 92</span>    <span class="p">}</span>
+<span class="ln"> 93</span>    <span class="k">if</span> <span class="p">(</span><span class="n">num_errors</span> <span class="o">&gt;</span> <span class="n">kMaxErrorsBeforeBailing</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 94</span>      <span class="k">break</span><span class="p">;</span>
+<span class="ln"> 95</span>    <span class="p">}</span>
+<span class="ln"> 96</span>    <span class="n">buffer</span> <span class="o">=</span> <span class="n">strtok_r</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">&#34;</span><span class="se">\r\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">save_ptr</span><span class="p">);</span>
+<span class="ln"> 97</span>  <span class="p">}</span>
+<span class="ln"> 98</span>  <span class="n">is_corrupt_</span> <span class="o">=</span> <span class="n">num_errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln"> 99</span>  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="ln">100</span><span class="p">}</span>
+</code></pre></div><h5 id="fillsourcelineinfo">FillSourceLineInfo</h5>
+<ul>
+<li>该函数将加载的符号信息和栈帧的信息做匹配</li>
+<li>然后将符号信息中匹配到的源代码信息赋值给栈帧对象</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-C++" data-lang="C++"><span class="ln"> 1</span><span class="kt">void</span> <span class="n">SourceLineResolverBase</span><span class="o">::</span><span class="n">FillSourceLineInfo</span><span class="p">(</span><span class="n">StackFrame</span> <span class="o">*</span><span class="n">frame</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="k">if</span> <span class="p">(</span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 3</span>    <span class="n">ModuleMap</span><span class="o">::</span><span class="n">const_iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">modules_</span><span class="o">-&gt;</span><span class="n">find</span><span class="p">(</span><span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">code_file</span><span class="p">());</span>
+<span class="ln"> 4</span>    <span class="k">if</span> <span class="p">(</span><span class="n">it</span> <span class="o">!=</span> <span class="n">modules_</span><span class="o">-&gt;</span><span class="n">end</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln"> 5</span>      <span class="n">it</span><span class="o">-&gt;</span><span class="n">second</span><span class="o">-&gt;</span><span class="n">LookupAddress</span><span class="p">(</span><span class="n">frame</span><span class="p">);</span>
+<span class="ln"> 6</span>    <span class="p">}</span>
+<span class="ln"> 7</span>  <span class="p">}</span>
+<span class="ln"> 8</span><span class="p">}</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span><span class="kt">void</span> <span class="n">BasicSourceLineResolver</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">LookupAddress</span><span class="p">(</span><span class="n">StackFrame</span> <span class="o">*</span><span class="n">frame</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+<span class="ln">11</span>  <span class="n">MemAddr</span> <span class="n">address</span> <span class="o">=</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">instruction</span> <span class="o">-</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">base_address</span><span class="p">();</span>
+<span class="ln">12</span>
+<span class="ln">13</span>  <span class="c1">// First, look for a FUNC record that covers address. Use
+</span><span class="ln">14</span><span class="c1"></span>  <span class="c1">// RetrieveNearestRange instead of RetrieveRange so that, if there
+</span><span class="ln">15</span><span class="c1"></span>  <span class="c1">// is no such function, we can use the next function to bound the
+</span><span class="ln">16</span><span class="c1"></span>  <span class="c1">// extent of the PUBLIC symbol we find, below. This does mean we
+</span><span class="ln">17</span><span class="c1"></span>  <span class="c1">// need to check that address indeed falls within the function we
+</span><span class="ln">18</span><span class="c1"></span>  <span class="c1">// find; do the range comparison in an overflow-friendly way.
+</span><span class="ln">19</span><span class="c1"></span>  <span class="n">linked_ptr</span><span class="o">&lt;</span><span class="n">Function</span><span class="o">&gt;</span> <span class="n">func</span><span class="p">;</span>
+<span class="ln">20</span>  <span class="n">linked_ptr</span><span class="o">&lt;</span><span class="n">PublicSymbol</span><span class="o">&gt;</span> <span class="n">public_symbol</span><span class="p">;</span>
+<span class="ln">21</span>  <span class="n">MemAddr</span> <span class="n">function_base</span><span class="p">;</span>
+<span class="ln">22</span>  <span class="n">MemAddr</span> <span class="n">function_size</span><span class="p">;</span>
+<span class="ln">23</span>  <span class="n">MemAddr</span> <span class="n">public_address</span><span class="p">;</span>
+<span class="ln">24</span>  <span class="k">if</span> <span class="p">(</span><span class="n">functions_</span><span class="p">.</span><span class="n">RetrieveNearestRange</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">func</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">function_base</span><span class="p">,</span>
+<span class="ln">25</span>                                      <span class="nb">NULL</span> <span class="cm">/* delta */</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">function_size</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+<span class="ln">26</span>      <span class="n">address</span> <span class="o">&gt;=</span> <span class="n">function_base</span> <span class="o">&amp;&amp;</span> <span class="n">address</span> <span class="o">-</span> <span class="n">function_base</span> <span class="o">&lt;</span> <span class="n">function_size</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">27</span>    <span class="n">frame</span><span class="o">-&gt;</span><span class="n">function_name</span> <span class="o">=</span> <span class="n">func</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">;</span>
+<span class="ln">28</span>    <span class="n">frame</span><span class="o">-&gt;</span><span class="n">function_base</span> <span class="o">=</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">base_address</span><span class="p">()</span> <span class="o">+</span> <span class="n">function_base</span><span class="p">;</span>
+<span class="ln">29</span>
+<span class="ln">30</span>    <span class="n">linked_ptr</span><span class="o">&lt;</span><span class="n">Line</span><span class="o">&gt;</span> <span class="n">line</span><span class="p">;</span>
+<span class="ln">31</span>    <span class="n">MemAddr</span> <span class="n">line_base</span><span class="p">;</span>
+<span class="ln">32</span>    <span class="k">if</span> <span class="p">(</span><span class="n">func</span><span class="o">-&gt;</span><span class="n">lines</span><span class="p">.</span><span class="n">RetrieveRange</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">line</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">line_base</span><span class="p">,</span> <span class="nb">NULL</span> <span class="cm">/* delta */</span><span class="p">,</span>
+<span class="ln">33</span>                                  <span class="nb">NULL</span> <span class="cm">/* size */</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln">34</span>      <span class="n">FileMap</span><span class="o">::</span><span class="n">const_iterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">files_</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">source_file_id</span><span class="p">);</span>
+<span class="ln">35</span>      <span class="k">if</span> <span class="p">(</span><span class="n">it</span> <span class="o">!=</span> <span class="n">files_</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="p">{</span>
+<span class="ln">36</span>        <span class="n">frame</span><span class="o">-&gt;</span><span class="n">source_file_name</span> <span class="o">=</span> <span class="n">files_</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="n">line</span><span class="o">-&gt;</span><span class="n">source_file_id</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">second</span><span class="p">;</span>
+<span class="ln">37</span>      <span class="p">}</span>
+<span class="ln">38</span>      <span class="n">frame</span><span class="o">-&gt;</span><span class="n">source_line</span> <span class="o">=</span> <span class="n">line</span><span class="o">-&gt;</span><span class="n">line</span><span class="p">;</span>
+<span class="ln">39</span>      <span class="n">frame</span><span class="o">-&gt;</span><span class="n">source_line_base</span> <span class="o">=</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">base_address</span><span class="p">()</span> <span class="o">+</span> <span class="n">line_base</span><span class="p">;</span>
+<span class="ln">40</span>    <span class="p">}</span>
+<span class="ln">41</span>  <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">public_symbols_</span><span class="p">.</span><span class="n">Retrieve</span><span class="p">(</span><span class="n">address</span><span class="p">,</span>
+<span class="ln">42</span>                                      <span class="o">&amp;</span><span class="n">public_symbol</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">public_address</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+<span class="ln">43</span>             <span class="p">(</span><span class="o">!</span><span class="n">func</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="o">||</span> <span class="n">public_address</span> <span class="o">&gt;</span> <span class="n">function_base</span><span class="p">))</span> <span class="p">{</span>
+<span class="ln">44</span>    <span class="n">frame</span><span class="o">-&gt;</span><span class="n">function_name</span> <span class="o">=</span> <span class="n">public_symbol</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">;</span>
+<span class="ln">45</span>    <span class="n">frame</span><span class="o">-&gt;</span><span class="n">function_base</span> <span class="o">=</span> <span class="n">frame</span><span class="o">-&gt;</span><span class="n">module</span><span class="o">-&gt;</span><span class="n">base_address</span><span class="p">()</span> <span class="o">+</span> <span class="n">public_address</span><span class="p">;</span>
+<span class="ln">46</span>  <span class="p">}</span>
+<span class="ln">47</span><span class="p">}</span>
 </code></pre></div>
   </article>
 <aside class="sidebar">
@@ -503,6 +692,9 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧原理</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/" class="nav-link">dmp文件分析（一）- 概述</a>
       </li>
       <li>
@@ -519,9 +711,6 @@
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/" class="nav-link">breakpad概述</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/" class="nav-link">dmp文件读取（四）- Exception</a>
       </li>
     </ul> 
     
@@ -562,12 +751,12 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
           BREAKPAD
-          <span class='button_tally'>9</span>
+          <span class='button_tally'>10</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>9</span>
+          <span class='button_tally'>10</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
