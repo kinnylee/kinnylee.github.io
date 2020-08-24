@@ -117,6 +117,11 @@
       <use xlink:href="#github"></use>
     </svg>
   </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
 <div class = 'color_mode'>
   <input type = 'checkbox' class = 'color_choice' id = 'mode'>
 </div>
@@ -312,7 +317,7 @@ dmp读取流程回顾 如下源码已经做了详细注释，总结如下：
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/'>go协程</a>
+        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/'>go协程入门</a>
       </h3>
       <div class = 'post_meta'>
   <svg class="icon">
@@ -329,8 +334,8 @@ dmp读取流程回顾 如下源码已经做了详细注释，总结如下：
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>协程在手，说Go就Go 协程概述  协程：轻量级线程 协程的优势：  占用空间少 线程上下文切换成本少    简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 fmt.Println(&#34;1&#34;) 10} 11 12func Two(){ 13 fmt.Println(&#34;2&#34;) 14} 15 16func main(){ 17 go One() 18 go Two() 19}  上面的代码执行后，并不会如期打印结果，原因在于协程是并发的，协程调用前，主函 …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/' class='excerpt_more button'>Read More</a>
+          <p class = 'pale'>协程在手，说Go就Go 协程概述  协程：轻量级、用户级线程。 协程的调度：  由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度   协程的优势：  占用空间少(只需2k，系统线程为2M) 线程上下文切换成本少   go：语言层面提出了Groutine的概念，支持协程  简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 fmt.Println(&#34;1&#34;) 10} 11 12func Two(){ 13 fmt.Println(&#34;2&#34;) …</p>
+          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
     </div>
@@ -516,7 +521,7 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/" class="nav-link">dmp文件读取（六）- Others</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/grouting%E5%8D%8F%E7%A8%8B/" class="nav-link">go协程</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/" class="nav-link">go协程入门</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>

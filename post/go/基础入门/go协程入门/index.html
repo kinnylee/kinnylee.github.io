@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>go基本介绍 | kinnylee</title>
+  <head>  <title>go协程入门 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -15,15 +15,13 @@
   
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="go语言基本介绍 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
-go语言的诞生  google的三位大咖与2007年开始发明设计，称为21世纪的C语言 动力：对超级复杂的C&#43;&#43;11特性的吹捧报告的鄙视 目标：设计网络和多核时代的C语言 发布：2010年9月正式发布， …">
+<meta name="description" content="协程在手，说Go就Go 协程概述  协程：轻量级、用户级线程。 协程的调度：  由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度   协程的优势：  占用空间少(只需2k，系统线程为2M) 线程上下文切换成本少   go：语言层面提出了Groutine的概念，支持协程  简单入门  go语言中通过go关键字 …">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go基本介绍" />
-<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" />
-<meta property = "og:title" content = "go基本介绍" />
-<meta property = "og:description" content = "go语言基本介绍 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
-go语言的诞生  google的三位大咖与2007年开始发明设计，称为21世纪的C语言 动力：对超级复杂的C&#43;&#43;11特性的吹捧报告的鄙视 目标：设计网络和多核时代的C语言 发布：2010年9月正式发布， …" />
+<meta name = "twitter:title" content = "go协程入门" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/" />
+<meta property = "og:title" content = "go协程入门" />
+<meta property = "og:description" content = "协程在手，说Go就Go 协程概述  协程：轻量级、用户级线程。 协程的调度：  由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度   协程的优势：  占用空间少(只需2k，系统线程为2M) 线程上下文切换成本少   go：语言层面提出了Groutine的概念，支持协程  简单入门  go语言中通过go关键字 …" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -33,7 +31,7 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/'>
 
     
 
@@ -138,32 +136,34 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content'>
-    <h1 class='post_title'>go基本介绍</h1><div class = 'post_meta'>
+    <h1 class='post_title'>go协程入门</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Jul 10, 2020</span>
+    Aug 17, 2020</span>
   <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
   </a>
 </div>
 
     <div class='post_share'>
   Share on:
-  <a href="https://twitter.com/intent/tweet?text=go%e5%9f%ba%e6%9c%ac%e4%bb%8b%e7%bb%8d&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%259F%25BA%25E6%259C%25AC%25E4%25BB%258B%25E7%25BB%258D%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+  <a href="https://twitter.com/intent/tweet?text=go%e5%8d%8f%e7%a8%8b%e5%85%a5%e9%97%a8&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%258D%258F%25E7%25A8%258B%25E5%2585%25A5%25E9%2597%25A8%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
     <svg class="icon">
       <use xlink:href="#twitter"></use>
     </svg>
   </a>
   
-  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%259F%25BA%25E6%259C%25AC%25E4%25BB%258B%25E7%25BB%258D%2f&t=go%e5%9f%ba%e6%9c%ac%e4%bb%8b%e7%bb%8d" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%258D%258F%25E7%25A8%258B%25E5%2585%25A5%25E9%2597%25A8%2f&t=go%e5%8d%8f%e7%a8%8b%e5%85%a5%e9%97%a8" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
     <svg class="icon">
       <use xlink:href="#facebook"></use>
     </svg>
   </a>
   <script>
     function shareViaLinkedin() {
-      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
     }
   </script>
   <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
@@ -171,7 +171,7 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
       <use xlink:href="#linkedin"></use>
     </svg>
   </a>
-  <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" title="Copy Link" class="link link_yank">
+  <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/" title="Copy Link" class="link link_yank">
     <svg class="icon">
       <use xlink:href="#yank"></use>
     </svg>
@@ -179,213 +179,242 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
 </div>
 
     
-    <h1 id="go语言基本介绍">go语言基本介绍</h1>
-<p>纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言</p>
-<h2 id="go语言的诞生">go语言的诞生</h2>
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#协程概述">协程概述</a>
+      <ul>
+        <li><a href="#简单入门">简单入门</a></li>
+      </ul>
+    </li>
+    <li><a href="#sync同步锁">sync同步锁</a></li>
+    <li><a href="#channel">channel</a>
+      <ul>
+        <li><a href="#概述">概述</a></li>
+        <li><a href="#基本使用">基本使用</a></li>
+        <li><a href="#上述chanel特点">上述chanel特点</a></li>
+        <li><a href="#channel控制执行顺序">channel控制执行顺序</a></li>
+      </ul>
+    </li>
+    <li><a href="#range">range</a></li>
+    <li><a href="#带缓存的channel">带缓存的channel</a>
+      <ul>
+        <li><a href="#go携程实现生产者-消费者模型">go携程实现生产者-消费者模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#select">select</a></li>
+  </ul>
+</nav>
+    <h1 id="协程在手说go就go">协程在手，说Go就Go</h1>
+<h2 id="协程概述">协程概述</h2>
 <ul>
-<li>google的三位大咖与2007年开始发明设计，称为21世纪的C语言</li>
-<li>动力：对超级复杂的C++11特性的吹捧报告的鄙视</li>
-<li>目标：设计网络和多核时代的C语言</li>
-<li>发布：2010年9月正式发布，并开源源代码</li>
-</ul>
-<h3 id="语言基因">语言基因</h3>
-<p>go语言继承了贝尔实验室半个世纪的软件设计基因</p>
-<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5f9ce6afa1fb456695abe4bcb4a3da1d~tplv-k3u1fbpfcp-zoom-1.image" alt="语言基因"></p>
+<li>协程：轻量级、用户级线程。</li>
+<li>协程的调度：
 <ul>
-<li>并发特性：由1978年发布的CSP理论演化而来（ErLang语言也实现了该理论）</li>
-<li>面向对象和包特性：继承自pascal语言</li>
-<li>C语言特性：继承了C语言的优点，并抛弃了危险的指针操作等缺点</li>
-<li>嵌套函数：schema语言</li>
-<li>itoa语法：APL语言</li>
-<li>新的语法：defer等</li>
-</ul>
-<h3 id="并发特性">并发特性</h3>
-<p>并发是go语言的标志性特性，来源于CSP论文，Communicating Sequential Processes(顺序通信进程)</p>
-<h3 id="go语言覆盖范围">go语言覆盖范围</h3>
-<ul>
-<li>容器：docker</li>
-<li>容器编排：k8s</li>
-<li>监控：prometheus</li>
-<li>数据库：etcd、tidb、influxdb</li>
-<li>服务治理：istio</li>
-<li>区块链：Fabric</li>
-<li>存储：minio</li>
-<li>基础设施管理：terraform</li>
-<li>注册中心：consul</li>
-<li>k8s管理平台：rancher</li>
-<li>&hellip;</li>
-</ul>
-<h3 id="hello-world">hello world</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kn">package</span> <span class="nx">main</span>
-<span class="ln">2</span><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
-<span class="ln">3</span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln">4</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;hello world\n&#34;</span><span class="p">)</span>
-<span class="ln">5</span><span class="p">}</span>
-</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">1</span>go run hello.go
-</code></pre></div><h2 id="基本语法">基本语法</h2>
-<h3 id="数组字符串切片">数组、字符串、切片</h3>
-<p>go语言中，三者是密切相关的数据结构。底层原始数据有着相同的内存结构，上层因为语法限制，有不同的行为表现</p>
-<blockquote>
-<p>数据传值，而不传引用，是go语言编程的一个哲学。传值有一定代价，但是换取的好处是切断了对原始数据的依赖（垃圾回收也方便）。即使是传递的切片，也是给切片的指针传值。但是给人一种假象好像是传的引用</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>对比项</th>
-<th>数组</th>
-<th>字符串</th>
-<th>切片</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>特性</td>
-<td>定长</td>
-<td>只读</td>
-<td>长度可伸缩，每个切片有独立的长度和容量信息</td>
-</tr>
-<tr>
-<td>元素是否可修改</td>
-<td>是</td>
-<td>否</td>
-<td>是</td>
-</tr>
-<tr>
-<td>赋值和传参</td>
-<td>整体复制</td>
-<td>只复制数据地址和对应的长度，不会导致底层数据复制</td>
-<td>复制切片头信息，不会导致底层数据复制</td>
-</tr>
-</tbody>
-</table>
-<h4 id="数组">数组</h4>
-<ul>
-<li>数组是值语义，一个数组变量即表示整个数组，并不隐式指向第一个元素（C语言的特性）</li>
-<li>数组赋值时，是复制整个数组底层数据</li>
-<li>为了避免复制数组的开销，可以传递一个数组指针</li>
-<li>数组指针 != 数组，数据类型不一样。但是操作内部数据的使用方式是一样的</li>
-</ul>
-<blockquote>
-<p>长度为0的数组在内存中并不占用空间，空数组虽然很少使用，但是可以用于强调某种特有类型的操作时避免分配额外的内存空间，比如channel的同步操作
-当然，更倾向于使用空结构体</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
-<span class="ln">2</span><span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln">3</span>  <span class="c1">// struct{}表示类型，后一个{}表示结构体值
-</span><span class="ln">4</span><span class="c1"></span>  <span class="nx">ch</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
-<span class="ln">5</span><span class="p">}</span>
-<span class="ln">6</span><span class="o">&lt;-</span> <span class="nx">ch</span>
-</code></pre></div><h4 id="字符串">字符串</h4>
-<ul>
-<li>字符串是不可改变的字节序列，与数组不同，字节不可修改</li>
-<li>底层结构定义如下，reflect.StringHeader</li>
-<li>赋值时，也只是StringHeader结构体的复制</li>
-<li>go语言源文件都是UTF8编码</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="c1">// reflect/value.go
-</span><span class="ln">2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">StringHeader</span> <span class="kd">struct</span> <span class="p">{</span>
-<span class="ln">3</span>  <span class="c1">// 底层字节数组
-</span><span class="ln">4</span><span class="c1"></span>  <span class="nx">Data</span> <span class="kt">uintptr</span>
-<span class="ln">5</span>  <span class="c1">// 字符串长度
-</span><span class="ln">6</span><span class="c1"></span>  <span class="nx">Len</span> <span class="kt">int</span>
-<span class="ln">7</span><span class="p">}</span>
-</code></pre></div><h4 id="切片">切片</h4>
-<ul>
-<li>切片是简化版的动态数组</li>
-<li>数组的类型和操作不够灵活，很少直接使用数组。切片的使用却非常广泛</li>
-<li>底层结构定义如下，reflect.SliceHeader</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">SliceHeader</span> <span class="kd">struct</span> <span class="p">{</span>
-<span class="ln">2</span>  <span class="nx">Data</span> <span class="kt">uintptr</span>
-<span class="ln">3</span>  <span class="nx">Len</span> <span class="kt">int</span>
-<span class="ln">4</span>  <span class="c1">// 内存空间的最大容量（元素个数，不是字节数）
-</span><span class="ln">5</span><span class="c1"></span>  <span class="c1">// 容量必须 大于等于 切片长度
-</span><span class="ln">6</span><span class="c1"></span>  <span class="nx">Cap</span> <span class="kt">int</span>
-<span class="ln">7</span><span class="p">}</span>
-</code></pre></div><h5 id="切片操作">切片操作</h5>
-<p>切片高效操作的要点是要降低内存分配次数，尽量保证append操作不会超出cap的容量，降低触发内存分配次数和每次分配内存的大小</p>
-<ul>
-<li>切片添加元素：sliceA = append(sliceA, a)</li>
-<li>切片删除元素：
-<ul>
-<li>删除尾部一个元素：sliceA = sliceA[:len(sliceA)-1]</li>
-<li>删除尾部N个元素：SliceA = sliceA[:len(sliceA)-N]</li>
-<li>删除开头一个元素：sliceA = sliceA[1:]</li>
-<li>删除开头N个元素：sliceA = sliceA[N:]</li>
+<li>由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度</li>
 </ul>
 </li>
-</ul>
-<h2 id="函数">函数</h2>
+<li>协程的优势：
 <ul>
-<li>函数可以保存到变量中，函数有具名和匿名之分</li>
-<li>可以有多个参数和多个返回值，参数传递方式是传值</li>
-<li>支持可变数量的参数，但必须是最后出现的参数，是一个切片类型的参数</li>
-<li>函数的返回值也可以命名</li>
-<li>递归调用没有深度限制，不会出现<code>内存溢出</code>，go会根据需要动态调整栈大小
-<ul>
-<li>go 1.4以前：链表实现动态栈，分配内存地址不会变，但是cpu缓存命中率低，性能差</li>
-<li>go 1.4之后：连续的动态栈，动态增加会移动数据，<code>分配内存地址会变，go语言指针不再是固定不变的</code></li>
+<li>占用空间少(只需2k，系统线程为2M)</li>
+<li>线程上下文切换成本少</li>
 </ul>
 </li>
+<li>go：语言层面提出了Groutine的概念，支持协程</li>
 </ul>
-<blockquote>
-<p>和c语言不同的是：go语言不再需要关心堆和栈的问题，他们都是动态变化的，new的对象不一定在堆上，局部变量也不一定在栈上。指针不再是固定不变的，它随时可能变化</p>
+<h3 id="简单入门">简单入门</h3>
+<ul>
+<li>go语言中通过go关键字来调用</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
+<span class="ln"> 4</span>  <span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 5</span>  <span class="s">&#34;time&#34;</span>
+<span class="ln"> 6</span><span class="p">)</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(){</span>
+<span class="ln"> 9</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln">10</span><span class="p">}</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(){</span>
+<span class="ln">13</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">14</span><span class="p">}</span>
+<span class="ln">15</span>
+<span class="ln">16</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">17</span>  <span class="k">go</span> <span class="nf">One</span><span class="p">()</span>
+<span class="ln">18</span>  <span class="k">go</span> <span class="nf">Two</span><span class="p">()</span>
+<span class="ln">19</span><span class="p">}</span>
+</code></pre></div><blockquote>
+<p>上面的代码执行后，并不会如期打印结果，原因在于协程是并发的，协程调用前，主函数已经退出，协程也被销毁了。</p>
 </blockquote>
-<h2 id="面向对象">面向对象</h2>
-<h3 id="方法">方法</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">2</span>  <span class="k">go</span> <span class="nf">gorouting</span><span class="p">()</span>
+<span class="ln">3</span>  <span class="c1">// 可通过简单的sleep，让主线程等待协程执行完
+</span><span class="ln">4</span><span class="c1"></span>  <span class="c1">// 但是执行顺序不一定是按照1，2顺序输出
+</span><span class="ln">5</span><span class="c1"></span>  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+<span class="ln">6</span><span class="p">}</span>
+<span class="ln">7</span>
+</code></pre></div><p>前面的例子，可看到协程使用需要考虑：</p>
 <ul>
-<li>go语言的方法关联的是类型，编译时实现静态绑定。（C++是管理的成员函数，关联到对象的虚表中）</li>
-<li>方法只是将函数的第一个参数移动到了函数名前面</li>
+<li>如何控制协程调用顺序（特别是访问临界资源）</li>
+<li>如何实现不同协程的并发通讯</li>
 </ul>
-<h3 id="继承">继承</h3>
+<p>实现思路：</p>
 <ul>
-<li>不支持传统面向对象的继承特性，而是以组合的方式实现方法的继承</li>
-<li>通过在结构体内置匿名的成员来实现继承</li>
-<li>如果要实现虚函数的多态特性，需要借助go语言的接口来完成</li>
+<li>同步问题：sync同步锁</li>
+<li>通讯问题：channel</li>
 </ul>
-<h3 id="接口">接口</h3>
+<h2 id="sync同步锁">sync同步锁</h2>
+<p>go中sync包提供了2个锁，互斥锁sync.Mutex和读写锁sync.RWMutex.我们用互斥锁来解决上述的不同的协程可能同时调度同一个资源的问题</p>
+<h2 id="channel">channel</h2>
+<h3 id="概述">概述</h3>
 <ul>
-<li>go接口的独特之处在于它是满足隐式实现的鸭子类型</li>
-<li>这种设计可以让你创建新的接口类型满足已经存在的具体类型，却不用破坏这些类型原有的定义</li>
+<li>channel是go语言中一种特殊的数据类型</li>
+<li>可以通过chanel发送类型化数据，实现协程通讯</li>
+<li>channel是有方向的，包括流入和流出</li>
 </ul>
+<h3 id="基本使用">基本使用</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="c1">// 普通channel
+</span><span class="ln">2</span><span class="c1"></span><span class="kd">var</span> <span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">string</span>
+<span class="ln">3</span><span class="nx">ch</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">string</span><span class="p">)</span>
+<span class="ln">4</span><span class="c1">// 只写chanel(流入)
+</span><span class="ln">5</span><span class="c1"></span><span class="kd">var</span> <span class="nx">writeCh</span> <span class="kd">chan</span> <span class="o">&lt;-</span> <span class="kt">int</span>
+<span class="ln">6</span><span class="c1">// 只读chanel（流出）
+</span><span class="ln">7</span><span class="c1"></span><span class="kd">var</span> <span class="nx">readCh</span> <span class="o">&lt;-</span> <span class="kd">chan</span> <span class="kt">int</span>
+</code></pre></div><h3 id="上述chanel特点">上述chanel特点</h3>
+<p>上述channel不带缓冲区，或者说长度为1，有如下特点：</p>
+<ul>
+<li>同一时间只有一条数据</li>
+<li>一旦有数据放入，必须被取出才能继续放入</li>
+</ul>
+<h3 id="channel控制执行顺序">channel控制执行顺序</h3>
+<ul>
+<li>下面的代码可以保证先执行One，再执行Two</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
+<span class="ln"> 4</span>	<span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 5</span>	<span class="s">&#34;time&#34;</span>
+<span class="ln"> 6</span><span class="p">)</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln"> 9</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln">10</span>	<span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
+<span class="ln">11</span><span class="p">}</span>
+<span class="ln">12</span>
+<span class="ln">13</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln">14</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">15</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">16</span><span class="p">}</span>
+<span class="ln">17</span>
+<span class="ln">18</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">19</span>	<span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
+<span class="ln">20</span>	<span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">21</span>	<span class="k">go</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">22</span>	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+<span class="ln">23</span><span class="p">}</span>
+</code></pre></div><p>将main函数本身也看成协程，不用sleep实现同步</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
+<span class="ln"> 4</span>	<span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 5</span><span class="p">)</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln"> 8</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln"> 9</span>	<span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
+<span class="ln">10</span><span class="p">}</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
+<span class="ln">13</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">14</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">15</span><span class="p">}</span>
+<span class="ln">16</span>
+<span class="ln">17</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
+<span class="ln">18</span>	<span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
+<span class="ln">19</span>	<span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">20</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">21</span>	<span class="c1">//go Two(ch)
+</span><span class="ln">22</span><span class="c1"></span>	<span class="c1">//time.Sleep(5 * 1e9)
+</span><span class="ln">23</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><h2 id="range">range</h2>
 <blockquote>
-<p>鸭子类型：只要走起路来像鸭子，叫起来像鸭子，就可以把它当做鸭子</p>
+<p>range用于列表的元素遍历，不仅仅可以遍历普通元素，还可以遍历channel</p>
 </blockquote>
-<h2 id="面向并发的内存模型">面向并发的内存模型</h2>
-<p>早期，cpu都是以单核形式顺序执行指令。随着处理器技术发展，多核发展带来机遇，编程语言也开始向并行化方向发展。go语言正是在多核网络化时代背景下诞生的原生支持并发的编程语言。常用并行编程模型有：</p>
 <ul>
-<li>多线程：主流的其他编程语言</li>
-<li>消息队列：erlang、go</li>
+<li>持续的访问数据源并检查channel是否已经关闭，并不高效。go中提供了range关键字。</li>
+<li>range关键字在使用channel的时候，会自动等待channel的动作一直到channel关闭。通俗点将就是channel可以自动开关。</li>
 </ul>
-<h3 id="groutine和系统线程">Groutine和系统线程</h3>
+<h2 id="带缓存的channel">带缓存的channel</h2>
+<p>申明channel时，可以指定长度，长度不为1的channel，可以称为带缓存的channel，数据可以连续写入，直到占满长度为止</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="nx">ch</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="ln">2</span><span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
+<span class="ln">3</span><span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">2</span>
+<span class="ln">4</span><span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">3</span>
+</code></pre></div><h3 id="go携程实现生产者-消费者模型">go携程实现生产者-消费者模型</h3>
+<p>下面的例子是结合协程和range实现的生产者-消费者模型</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
+<span class="ln"> 2</span><span class="kn">import</span> <span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span><span class="kd">var</span> <span class="nx">count</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 7</span>  <span class="nx">exitChan</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="ln"> 8</span>  <span class="nx">c</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>	<span class="c1">// 这里任务数刚好是channel的大小，不会报错
+</span><span class="ln">11</span><span class="c1"></span>	<span class="c1">// 如果改成比chanel大，就会报错。但是如果把这段代码放到consumer后面，就不会报错
+</span><span class="ln">12</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">50</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">13</span>		<span class="nx">c</span> <span class="o">&lt;-</span> <span class="nx">i</span>
+<span class="ln">14</span>	<span class="p">}</span>
+<span class="ln">15</span>
+<span class="ln">16</span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">17</span>		<span class="k">go</span> <span class="nf">Consumer</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">exitChan</span><span class="p">)</span>
+<span class="ln">18</span>	<span class="p">}</span>
+<span class="ln">19</span>	<span class="c1">// 这里关闭任务channel，让调用Consumer函数的协程知道：自己的任务完成了，协程可以退出了
+</span><span class="ln">20</span><span class="c1"></span>	<span class="c1">// 如果不关闭，协程将不退出
+</span><span class="ln">21</span><span class="c1"></span>	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+<span class="ln">22</span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">23</span>		<span class="o">&lt;-</span><span class="nx">exitChan</span>
+<span class="ln">24</span>	<span class="p">}</span>
+<span class="ln">25</span>	<span class="nb">close</span><span class="p">(</span><span class="nx">exitChan</span><span class="p">)</span>
+<span class="ln">26</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span>
+<span class="ln">27</span><span class="p">}</span>
+<span class="ln">28</span><span class="kd">func</span> <span class="nf">Consumer</span><span class="p">(</span><span class="nx">index</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">c</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">exitChan</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">29</span>	<span class="k">for</span> <span class="nx">target</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">c</span> <span class="p">{</span>
+<span class="ln">30</span>		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;no.%d:%d\n&#34;</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">target</span><span class="p">)</span>
+<span class="ln">31</span>		<span class="nx">count</span><span class="o">++</span>
+<span class="ln">32</span>	<span class="p">}</span>
+<span class="ln">33</span>	<span class="c1">// 执行close(c)后，协程会走到这里
+</span><span class="ln">34</span><span class="c1"></span>	<span class="nx">exitChan</span> <span class="o">&lt;-</span> <span class="nx">index</span>
+<span class="ln">35</span><span class="p">}</span>
+</code></pre></div><h2 id="select">select</h2>
+<p>在UNIX中，select()函数用来监控一组描述符，该机制常被用于实现高并发的socket服务器程序。Go语言直接在语言级别支持select关键字，用于处理异步IO问题。</p>
+<p>首先要明确select做了什么？？</p>
 <ul>
-<li>Groutine是go特有的并发体，是一种轻量级的线程</li>
-<li>系统线程：固定大小的栈（一般为2MB），用于保存递归调用时的参数和局部变量</li>
-<li>固定栈大小的弊端：
-<ul>
-<li>对于只需要很小栈空间的线程是一个巨大的浪费</li>
-<li>少数需要巨大栈空间的线程面临栈溢出的风险</li>
+<li>select可以监听多个channel</li>
+<li>select中存在着一种轮询机制，select监听进入通道的数据，也可以是通道发送值的时候，监听到相应的行为后就执行case里面的操作</li>
+<li>select默认是阻塞的，只有当监听的channel中有发送或接收可以进行时才会运行，当多个channel都准备好的时候，select是随机的选择一个执行的。</li>
 </ul>
-</li>
-<li>Groutine的做法：
-<ul>
-<li>以一个很小的栈启动（2kb或4kb）</li>
-<li>栈空间不足时，动态伸缩（最大值可达1GB）</li>
-</ul>
-</li>
-<li>groutine启动代价很小，可以很轻易启动成千上万个</li>
-<li>go语言自己的调度器，发生在用户态，会根据具体函数只保存必要的寄存器，切换代价比系统线程低得多</li>
-</ul>
-<h3 id="原子操作">原子操作</h3>
-<h3 id="顺序一致性内存模型">顺序一致性内存模型</h3>
-<h3 id="初始化顺序">初始化顺序</h3>
-<h3 id="基于通道的通讯">基于通道的通讯</h3>
-<h3 id="不靠谱的同步">不靠谱的同步</h3>
-<h2 id="参考">参考</h2>
-<ul>
-<li>《go语言高级编程》</li>
-</ul>
-
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 一个实现超时的例子
+</span><span class="ln"> 2</span><span class="c1"></span><span class="nx">timeout</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span><span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 5</span>    <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mf">1e9</span><span class="p">)</span>
+<span class="ln"> 6</span>    <span class="nx">timeout</span> <span class="o">&lt;-</span> <span class="kc">true</span>
+<span class="ln"> 7</span><span class="p">}()</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span><span class="k">switch</span> <span class="p">{</span>
+<span class="ln">10</span>    <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">ch</span><span class="p">:</span>
+<span class="ln">11</span>    <span class="c1">// 从ch中读取到数据
+</span><span class="ln">12</span><span class="c1"></span>
+<span class="ln">13</span>    <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">timeout</span><span class="p">:</span>
+<span class="ln">14</span>    <span class="c1">// 没有从ch中读取到数据，但从timeout中读取到了数据
+</span><span class="ln">15</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div>
   </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
@@ -415,9 +444,6 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/" class="nav-link">dmp文件读取（六）- Others</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/" class="nav-link">go协程入门</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>
