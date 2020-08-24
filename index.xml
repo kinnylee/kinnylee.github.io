@@ -24,11 +24,24 @@
   EAX、EBX、ECX、EDX为32位寄存器，对低16位数据的读取，不会影响高16位数据的读取
   低16位寄存器命名为：AX、BX、CX、DX
   低16位寄存器又可分割为8个独立的位寄存器，每个寄存器有自己独立的名字，可以独立存取
- AX：AH-AL BX：BH-BL CX：CH-CL DX：DH-DL    AX：累加器，用于乘、除、输入、输出（赋值）等操作，使用频率很高
-  BX：基地址寄存器，作为存储器指针来使
-  CX：计数寄存器，用于控制循环次数
-  DX：数据寄存器，在乘、除运算时的作为默认操作数，也可用于io操作存储端口
+ AX：AH-AL BX：BH-BL CX：CH-CL DX：DH-DL    EAX：累加器，用于乘、除、输入、输出（赋值）等操作，使用频率很高
+  EBX：基地址寄存器，经常当做返回值使用
+  ECX：计数寄存器，用于控制循环次数
+  EDX：数据寄存器，在乘、除运算时的作为默认操作数，也可用于io操作存储端口
   指针寄存器  主要用于访问堆栈内的存储单元 EBP：基指针寄存器，用它可直接存取堆栈中的数据 ESP：堆栈指针寄存器，只可以访问栈顶 breakpad中用到ebp和esp，根据栈帧结构做堆栈调用分析  指令寄存器  EIP，ip(Instruction Pointer):存放下次将要执行的指令在代码段的偏移量 breakpad中，前面我们多次提到，会以eip的地址做为分析的起始地址  变址寄存器  主要用于存放存储单元在段内的偏移量，目的：存储寻址 用它们可实现多种存储器操作数的寻址方式，为以不同的地址形式访问存储单元提供方便  标志寄存器 标志寄存器包括多个标志位：</description>
+    </item>
+    
+    <item>
+      <title>dmp文件分析（四）- 调用栈分析</title>
+      <link>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/</link>
+      <pubDate>Fri, 21 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/</guid>
+      <description>dmp文件分析（四）- 调用栈分析 前面的章节我们介绍过，分析dmp的一个调用栈的过程，以及获取上一个栈帧的公式。今天介绍这个公式在breakpad中的源码调用。调用栈分析有三种途径，里面很多细节还不是完全理解，只是大概罗列一下代码的框架
+获取调用者的栈帧 前面介绍过Stackwalker方法是基类，每种不同的cpu架构都有自己的实现类，都需要重写几个方法，其中很重要的一个是GetCallerFrame方法，用于获取调用栈的上一个栈帧
+ caller: 调用者（父函数）; callee：被调用者（子函数）
+ 这里以常用的amd64架构cpu介绍源码实现。实现类为 StackwalkerAMD64
+1StackFrame* StackwalkerAMD64::GetCallerFrame(const CallStack* stack, 2 bool stack_scan_allowed) { 3 ... 4 // 先获取调用栈所有的栈帧 5 const vector&amp;lt;StackFrame*&amp;gt; &amp;amp;frames = *stack-&amp;gt;frames(); 6 // 取出最后一个栈帧 7 StackFrameAMD64* last_frame = static_cast&amp;lt;StackFrameAMD64*&amp;gt;(frames.back()); 8 scoped_ptr&amp;lt;StackFrameAMD64&amp;gt; new_frame; 9 10 // 如果symbol中有CFI信息，查找栈帧相关的CFI信息 11 scoped_ptr&amp;lt;CFIFrameInfo&amp;gt; cfi_frame_info( 12 frame_symbolizer_-&amp;gt;FindCFIFrameInfo(last_frame)); 13 if (cfi_frame_info.get()) 14 // 通过CFI信息获取上次调用函数的栈帧 15 new_frame.reset(GetCallerByCFIFrameInfo(frames, cfi_frame_info.get())); 16 17 // If CFI was not available or failed, try using frame pointer recovery.</description>
     </item>
     
     <item>
@@ -174,13 +187,17 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
     </item>
     
     <item>
-      <title>go入门</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</link>
+      <title>go基本介绍</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
       <pubDate>Fri, 10 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</guid>
-      <description>go语言入门介绍
-安装 基本语法 </description>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>go语言基本介绍 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
+go语言的诞生  google的三位大咖与2007年开始发明设计，称为21世纪的C语言 动力：对超级复杂的C++11特性的吹捧报告的鄙视 目标：设计网络和多核时代的C语言 发布：2010年9月正式发布，并开源源代码  语言基因 go语言继承了贝尔实验室半个世纪的软件设计基因
+ 并发特性：由1978年发布的CSP理论演化而来（ErLang语言也实现了该理论） 面向对象和包特性：继承自pascal语言 C语言特性：继承了C语言的优点，并抛弃了危险的指针操作等缺点 嵌套函数：schema语言 itoa语法：APL语言 新的语法：defer等  并发特性 并发是go语言的标志性特性，来源于CSP论文，Communicating Sequential Processes(顺序通信进程)
+go语言覆盖范围  容器：docker 容器编排：k8s 监控：prometheus 数据库：etcd、tidb、influxdb 服务治理：istio 区块链：Fabric 存储：minio 基础设施管理：terraform 注册中心：consul k8s管理平台：rancher &amp;hellip;  hello world 1package main 2import &amp;#34;fmt&amp;#34; 3func main() { 4 fmt.Println(&amp;#34;hello world\n&amp;#34;) 5} 1go run hello.go 基本语法 数组、字符串、切片 go语言中，三者是密切相关的数据结构。底层原始数据有着相同的内存结构，上层因为语法限制，有不同的行为表现
+ 数据传值，而不传引用，是go语言编程的一个哲学。传值有一定代价，但是换取的好处是切断了对原始数据的依赖（垃圾回收也方便）。即使是传递的切片，也是给切片的指针传值。但是给人一种假象好像是传的引用
+    对比项 数组 字符串 切片     特性 定长 只读 长度可伸缩，每个切片有独立的长度和容量信息   元素是否可修改 是 否 是   赋值和传参 整体复制 只复制数据地址和对应的长度，不会导致底层数据复制 复制切片头信息，不会导致底层数据复制    数组  数组是值语义，一个数组变量即表示整个数组，并不隐式指向第一个元素（C语言的特性） 数组赋值时，是复制整个数组底层数据 为了避免复制数组的开销，可以传递一个数组指针 数组指针 !</description>
     </item>
     
     <item>

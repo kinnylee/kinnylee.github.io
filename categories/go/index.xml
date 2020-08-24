@@ -33,13 +33,17 @@
     </item>
     
     <item>
-      <title>go入门</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</link>
+      <title>go基本介绍</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
       <pubDate>Fri, 10 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%85%A5%E9%97%A8/</guid>
-      <description>go语言入门介绍
-安装 基本语法 </description>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>go语言基本介绍 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
+go语言的诞生  google的三位大咖与2007年开始发明设计，称为21世纪的C语言 动力：对超级复杂的C++11特性的吹捧报告的鄙视 目标：设计网络和多核时代的C语言 发布：2010年9月正式发布，并开源源代码  语言基因 go语言继承了贝尔实验室半个世纪的软件设计基因
+ 并发特性：由1978年发布的CSP理论演化而来（ErLang语言也实现了该理论） 面向对象和包特性：继承自pascal语言 C语言特性：继承了C语言的优点，并抛弃了危险的指针操作等缺点 嵌套函数：schema语言 itoa语法：APL语言 新的语法：defer等  并发特性 并发是go语言的标志性特性，来源于CSP论文，Communicating Sequential Processes(顺序通信进程)
+go语言覆盖范围  容器：docker 容器编排：k8s 监控：prometheus 数据库：etcd、tidb、influxdb 服务治理：istio 区块链：Fabric 存储：minio 基础设施管理：terraform 注册中心：consul k8s管理平台：rancher &amp;hellip;  hello world 1package main 2import &amp;#34;fmt&amp;#34; 3func main() { 4 fmt.Println(&amp;#34;hello world\n&amp;#34;) 5} 1go run hello.go 基本语法 数组、字符串、切片 go语言中，三者是密切相关的数据结构。底层原始数据有着相同的内存结构，上层因为语法限制，有不同的行为表现
+ 数据传值，而不传引用，是go语言编程的一个哲学。传值有一定代价，但是换取的好处是切断了对原始数据的依赖（垃圾回收也方便）。即使是传递的切片，也是给切片的指针传值。但是给人一种假象好像是传的引用
+    对比项 数组 字符串 切片     特性 定长 只读 长度可伸缩，每个切片有独立的长度和容量信息   元素是否可修改 是 否 是   赋值和传参 整体复制 只复制数据地址和对应的长度，不会导致底层数据复制 复制切片头信息，不会导致底层数据复制    数组  数组是值语义，一个数组变量即表示整个数组，并不隐式指向第一个元素（C语言的特性） 数组赋值时，是复制整个数组底层数据 为了避免复制数组的开销，可以传递一个数组指针 数组指针 !</description>
     </item>
     
   </channel>
