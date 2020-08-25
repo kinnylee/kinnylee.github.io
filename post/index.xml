@@ -6,10 +6,29 @@
     <description>Recent content in Posts on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Mon, 24 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 25 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>channel原理分析</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/</guid>
+      <description>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  源码分析  位置：src/runtime/chan.go  chan数据结构 1type hchan struct { 2 // 当前队列中总元素个数 3 qcount uint // total data in the queue 4 // 环形队列长度，即缓冲区大小（申明channel时指定的大小） 5 dataqsiz uint // size of the circular queue 6 // 环形队列指针 7 buf unsafe.Pointer // points to an array of dataqsiz elements 8 // 每个元素的大小 9 elemsize uint16 10 // 当前通道是否处于关闭状态，创建通道时该字段为0，关闭时字段为1 11 closed uint32 12 // 元素类型，用于传值过程的赋值 13 elemtype *_type // element type 14 // 环形缓冲区的状态字段：缓冲区当前索引 15 sendx uint // send index 16 recvx uint // receive index 17 // 等待读消息的groutine队列 18 recvq waitq // list of recv waiters 19 // 等待写消息的groutine队列 20 sendq waitq // list of send waiters 21 // 互斥锁，为每个读写操作锁定通道（发送和接收必须互斥） 22 lock mutex 23} 24 25// 等待读写的队列数据结构 26type waitq struct { 27 first *sudog 28 last *sudog 29} 创建chan 1func makechan(t *chantype, size int) *hchan { 2	elem := t.</description>
+    </item>
+    
+    <item>
+      <title>go协程</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</guid>
+      <description>协程原理 协程调度 go中的runtime包，提供了调度器的功能，runtime包提供了以下几个方法：
+Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当前线程，因此当前线程未来会继续执行 NumCPU：返回当前系统的 CPU 核数量 GOMAXPROCS：设置最大的可同时使用的 CPU 核数 Goexit：退出当前 goroutine(但是defer语句会照常执行) NumGoroutine：返回正在执行和排队的任务总数 GOOS：目标操作系统</description>
+    </item>
     
     <item>
       <title>dmp文件分析（四）- 调用栈分析</title>

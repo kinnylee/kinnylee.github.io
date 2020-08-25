@@ -141,6 +141,69 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/'>breakpad概述</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 15, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/c&#43;&#43;' class = 'post_tag button button_translucent'>C&#43;&#43;
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+</div>
+
+    </div>
+      <div class = 'excerpt_footer'>
+        <div>
+          <p class = 'pale'>breakpad是什么  google开源的一套实现崩溃报告系统的客户端和服务端组件 C++语言实现 现在已经被广泛运用在google的一系列产品及其它公司的桌面程序上，如chrome，piscal，firefox等。 github地址 官方网站  功能特性  崩溃转储 崩溃分析 跨平台：windows、mac、linux 可以运行于一系列架构的cpu上  主要组件  client：集成到应用程序源码中，用于抓取崩溃信息，并生成minidmp文件 symbol dumper：读取编译器生成的调试信息（pdb），生成symbol文件 processor：读取minidump文件，并结合symbol文件，生成可读的堆栈调用信息  各组件 …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/'>dmp文件读取（四）- Exception</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 15, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取
+Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场的基本信息 崩溃信息包括：  崩溃时的线程id 异常状态码 异常标识 异常的内存地址 寄存器信息 其他信息   以上信息都保存在MDRawExceptionStream中  Exception Stream读取入口  dump的GetException方法，获取dmp文件中的崩溃信息 读取的模块列表信息保存在MinidumpException …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
         <a href='https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/'>代码是如何编译成可执行文件的</a>
       </h3>
       <div class = 'post_meta'>
@@ -377,31 +440,6 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
     </div>
   </li>
   
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/'></a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Jan 1, 0001</span>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>互斥锁 sync.Mutex 同步锁 sync.RWMutex </p>
-          <a href='https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
     <li>
 <ul class="pagination">
   <li class="page-item">
@@ -416,11 +454,14 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
   <li class="page-item active">
     <a class="page-link" href="/post/page/2/">2</a>
   </li>
-  <li class="page-item disabled">
-    <a  class="page-link" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+  <li class="page-item">
+    <a class="page-link" href="/post/page/3/">3</a>
   </li>
   <li class="page-item">
-    <a href="/post/page/2/" class="page-link" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
+    <a href="/post/page/3/" class="page-link" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+  </li>
+  <li class="page-item">
+    <a href="/post/page/3/" class="page-link" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
   </li>
 </ul>
 
@@ -442,6 +483,12 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/" class="nav-link">channel原理分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/" class="nav-link">dmp文件分析（四）- 调用栈分析</a>
       </li>
       <li>
@@ -459,12 +506,6 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/" class="nav-link">go协程入门</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/" class="nav-link">dmp文件读取（五）- Memory</a>
-      </li>
     </ul> 
     
     <div>
@@ -472,7 +513,7 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
           GO
-          <span class='button_tally'>3</span>
+          <span class='button_tally'>5</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
@@ -512,19 +553,19 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
           <span class='button_tally'>11</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
-          C&#43;&#43;
-          <span class='button_tally'>2</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
           GO
-          <span class='button_tally'>2</span>
+          <span class='button_tally'>4</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
           GO基础入门
-          <span class='button_tally'>1</span>
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">

@@ -395,7 +395,7 @@
 <p>在UNIX中，select()函数用来监控一组描述符，该机制常被用于实现高并发的socket服务器程序。Go语言直接在语言级别支持select关键字，用于处理异步IO问题。</p>
 <p>首先要明确select做了什么？？</p>
 <ul>
-<li>select可以监听多个channel</li>
+<li>select可以监听多个channel相关的io操作，当io发送时，触发相应操作</li>
 <li>select中存在着一种轮询机制，select监听进入通道的数据，也可以是通道发送值的时候，监听到相应的行为后就执行case里面的操作</li>
 <li>select默认是阻塞的，只有当监听的channel中有发送或接收可以进行时才会运行，当多个channel都准备好的时候，select是随机的选择一个执行的。</li>
 </ul>
@@ -431,6 +431,12 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/" class="nav-link">channel原理分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/" class="nav-link">dmp文件分析（四）- 调用栈分析</a>
       </li>
       <li>
@@ -445,12 +451,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/" class="nav-link">dmp文件读取（六）- Others</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/" class="nav-link">Go第三库之命令行框架：go-cli</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/" class="nav-link">dmp文件读取（五）- Memory</a>
-      </li>
     </ul> 
     
     <div>
@@ -458,7 +458,7 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
           GO
-          <span class='button_tally'>3</span>
+          <span class='button_tally'>5</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
@@ -498,19 +498,19 @@
           <span class='button_tally'>11</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
-          C&#43;&#43;
-          <span class='button_tally'>2</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
           GO
-          <span class='button_tally'>2</span>
+          <span class='button_tally'>4</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
           GO基础入门
-          <span class='button_tally'>1</span>
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
