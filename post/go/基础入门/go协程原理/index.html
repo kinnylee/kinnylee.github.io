@@ -15,13 +15,13 @@
   
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过 …">
+<meta name="description" content="协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating …">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "go协程" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" />
 <meta property = "og:title" content = "go协程" />
-<meta property = "og:description" content = "协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过 …" />
+<meta property = "og:description" content = "协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating …" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -185,6 +185,7 @@
     <h2>Overview</h2>
     <nav id="TableOfContents">
   <ul>
+    <li><a href="#并发编程模型">并发编程模型</a></li>
     <li><a href="#csp模型">CSP模型</a>
       <ul>
         <li><a href="#go对csp模型的实现">go对CSP模型的实现</a></li>
@@ -199,9 +200,15 @@
     </li>
     <li><a href="#go-func到底做了什么">go func()到底做了什么</a></li>
     <li><a href="#全局调度器">全局调度器</a></li>
+    <li><a href="#参考">参考</a></li>
   </ul>
 </nav>
     <h1 id="协程原理">协程原理</h1>
+<h2 id="并发编程模型">并发编程模型</h2>
+<ul>
+<li>从内存的角度看，并行计算只有两种：共享内存、消息通讯。</li>
+<li>目的是解决多线程的数据一致性</li>
+</ul>
 <h2 id="csp模型">CSP模型</h2>
 <ul>
 <li>go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。</li>
@@ -807,7 +814,11 @@ G：groutine，协程，本质上是一种轻量级的线程</p>
 <span class="ln">78</span>  <span class="nx">procresizetime</span> <span class="kt">int64</span> <span class="c1">// nanotime() of last change to gomaxprocs
 </span><span class="ln">79</span><span class="c1"></span>  <span class="nx">totaltime</span>      <span class="kt">int64</span> <span class="c1">// ∫gomaxprocs dt up to procresizetime
 </span><span class="ln">80</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div>
+</code></pre></div><h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://github.com/talkgo/night/issues/450">https://github.com/talkgo/night/issues/450</a></li>
+</ul>
+
   </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
@@ -824,7 +835,7 @@ G：groutine，协程，本质上是一种轻量级的线程</p>
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">channel源码分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/" class="nav-link">dmp文件分析（四）- 调用栈分析</a>

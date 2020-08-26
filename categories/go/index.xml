@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>channel源码分析</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <title>go-channel源码分析</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
       <pubDate>Wed, 26 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
       <description>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
 1package main 2import &amp;#34;fmt&amp;#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &amp;lt;- 1 9 }() 10 // 从channel取出数据 11 x := &amp;lt;- c 12 close(c) 13 fmt.Println(x) 14} channel源码入口 channel使用的make、&amp;lt;- 等符号，在源码中没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
 1go tool compile -N -l -S main.go&amp;gt;hello.s 查看部分带有CALL指令的核心内容如下：
@@ -29,7 +29,7 @@
       <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</guid>
-      <description>协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名消息传递使之解耦，在语言层面实现了自动调度，这样屏蔽了很多内部细节 对外提供简单的语法关键字，大大简化了并发编程的思维转换和管理线程的复杂性。 通过GMP调度模型实现语言层面的调度  并发调度原理 go语言的线程MPG调度模型
+      <description>协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名消息传递使之解耦，在语言层面实现了自动调度，这样屏蔽了很多内部细节 对外提供简单的语法关键字，大大简化了并发编程的思维转换和管理线程的复杂性。 通过GMP调度模型实现语言层面的调度  并发调度原理 go语言的线程MPG调度模型
 M：machine，一个M直接关联一个内核线程 P：processor，代表M所需的上下文环境，也是处理用户级代码逻辑的处理器 G：groutine，协程，本质上是一种轻量级的线程
  一个M对应一个内核线程，也会连接一个上下文P 一个上下文P，相当于一个处理器。 p的数量是在启动时被设置为环境变量GOMAXPROCS，意味着运行的线程数量是固定的 一个上下文连接一个或多个groutine p正在执行的Groutine为蓝色的，处于待执行的Groutine为灰色（保存在一个队列中）  G 数据结构  G对应Groutine  1// 源码位置：src/runtime/runtime2.go 2type g struct { 3 // 栈变量，保存运行时的堆栈内存信息 4 // 内部包含两个指针：lo和hi，分别指向栈的上下界 5 stack stack // offset known to runtime/cgo 6 stackguard0 uintptr // offset known to liblink 7 stackguard1 uintptr // offset known to liblink 8 .</description>
     </item>

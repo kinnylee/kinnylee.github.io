@@ -143,7 +143,7 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>channel源码分析</a>
+        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>go-channel源码分析</a>
       </h3>
       <div class = 'post_meta'>
   <svg class="icon">
@@ -164,7 +164,7 @@
         <div>
           <p class = 'pale'>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
 1package main 2import &#34;fmt&#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &lt;- 1 9 }() 10 // 从channel取出数据 11 x := &lt;- c 12 close(c) 13 fmt.Println(x) 14} channel源码入口 channel使用 …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
+          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
     </div>
@@ -194,7 +194,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名消息传递使之解耦，在语言层面实现了自动调度，这样屏蔽了很多内部细节 对外提供简单的语法关键字，大大简化了 …</p>
+          <p class = 'pale'>协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名 …</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -511,7 +511,7 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">channel源码分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程</a>
