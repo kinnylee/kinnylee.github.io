@@ -6,18 +6,21 @@
     <description>Recent content in go on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Tue, 25 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 26 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>channel原理分析</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/</link>
-      <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
+      <title>channel源码分析</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Wed, 26 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/</guid>
-      <description>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  源码分析  位置：src/runtime/chan.go  chan数据结构 1type hchan struct { 2 // 当前队列中总元素个数 3 qcount uint // total data in the queue 4 // 环形队列长度，即缓冲区大小（申明channel时指定的大小） 5 dataqsiz uint // size of the circular queue 6 // 环形队列指针 7 buf unsafe.Pointer // points to an array of dataqsiz elements 8 // 每个元素的大小 9 elemsize uint16 10 // 当前通道是否处于关闭状态，创建通道时该字段为0，关闭时字段为1 11 closed uint32 12 // 元素类型，用于传值过程的赋值 13 elemtype *_type // element type 14 // 环形缓冲区的状态字段：缓冲区当前索引 15 sendx uint // send index 16 recvx uint // receive index 17 // 等待读消息的groutine队列 18 recvq waitq // list of recv waiters 19 // 等待写消息的groutine队列 20 sendq waitq // list of send waiters 21 // 互斥锁，为每个读写操作锁定通道（发送和接收必须互斥） 22 lock mutex 23} 24 25// 等待读写的队列数据结构 26type waitq struct { 27 first *sudog 28 last *sudog 29} 创建chan 1func makechan(t *chantype, size int) *hchan { 2	elem := t.</description>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
+1package main 2import &amp;#34;fmt&amp;#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &amp;lt;- 1 9 }() 10 // 从channel取出数据 11 x := &amp;lt;- c 12 close(c) 13 fmt.Println(x) 14} channel源码入口 channel使用的make、&amp;lt;- 等符号，在源码中没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
+1go tool compile -N -l -S main.go&amp;gt;hello.s 查看部分带有CALL指令的核心内容如下：
+10x0043 00067 (main.go:42) CALL runtime.makechan(SB) 20x006a 00106 (main.go:44) CALL runtime.newproc(SB) 30x008b 00139 (main.</description>
     </item>
     
     <item>
@@ -26,8 +29,9 @@
       <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</guid>
-      <description>协程原理 协程调度 go中的runtime包，提供了调度器的功能，runtime包提供了以下几个方法：
-Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当前线程，因此当前线程未来会继续执行 NumCPU：返回当前系统的 CPU 核数量 GOMAXPROCS：设置最大的可同时使用的 CPU 核数 Goexit：退出当前 goroutine(但是defer语句会照常执行) NumGoroutine：返回正在执行和排队的任务总数 GOOS：目标操作系统</description>
+      <description>协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名消息传递使之解耦，在语言层面实现了自动调度，这样屏蔽了很多内部细节 对外提供简单的语法关键字，大大简化了并发编程的思维转换和管理线程的复杂性。 通过GMP调度模型实现语言层面的调度  并发调度原理 go语言的线程MPG调度模型
+M：machine，一个M直接关联一个内核线程 P：processor，代表M所需的上下文环境，也是处理用户级代码逻辑的处理器 G：groutine，协程，本质上是一种轻量级的线程
+ 一个M对应一个内核线程，也会连接一个上下文P 一个上下文P，相当于一个处理器。 p的数量是在启动时被设置为环境变量GOMAXPROCS，意味着运行的线程数量是固定的 一个上下文连接一个或多个groutine p正在执行的Groutine为蓝色的，处于待执行的Groutine为灰色（保存在一个队列中）  G 数据结构  G对应Groutine  1// 源码位置：src/runtime/runtime2.go 2type g struct { 3 // 栈变量，保存运行时的堆栈内存信息 4 // 内部包含两个指针：lo和hi，分别指向栈的上下界 5 stack stack // offset known to runtime/cgo 6 stackguard0 uintptr // offset known to liblink 7 stackguard1 uintptr // offset known to liblink 8 .</description>
     </item>
     
     <item>
@@ -41,12 +45,12 @@ Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当�
     </item>
     
     <item>
-      <title>go基本介绍</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
+      <title>go高级编程（一）- 概述</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B8%80-%E6%A6%82%E8%BF%B0/</link>
       <pubDate>Fri, 10 Jul 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
-      <description>go语言基本介绍 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B8%80-%E6%A6%82%E8%BF%B0/</guid>
+      <description>go高级编程（一）- 概述 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
 go语言的诞生  google的三位大咖与2007年开始发明设计，称为21世纪的C语言 动力：对超级复杂的C++11特性的吹捧报告的鄙视 目标：设计网络和多核时代的C语言 发布：2010年9月正式发布，并开源源代码  语言基因 go语言继承了贝尔实验室半个世纪的软件设计基因
  并发特性：由1978年发布的CSP理论演化而来（ErLang语言也实现了该理论） 面向对象和包特性：继承自pascal语言 C语言特性：继承了C语言的优点，并抛弃了危险的指针操作等缺点 嵌套函数：schema语言 itoa语法：APL语言 新的语法：defer等  并发特性 并发是go语言的标志性特性，来源于CSP论文，Communicating Sequential Processes(顺序通信进程)
 go语言覆盖范围  容器：docker 容器编排：k8s 监控：prometheus 数据库：etcd、tidb、influxdb 服务治理：istio 区块链：Fabric 存储：minio 基础设施管理：terraform 注册中心：consul k8s管理平台：rancher &amp;hellip;  hello world 1package main 2import &amp;#34;fmt&amp;#34; 3func main() { 4 fmt.Println(&amp;#34;hello world\n&amp;#34;) 5} 1go run hello.go 基本语法 数组、字符串、切片 go语言中，三者是密切相关的数据结构。底层原始数据有着相同的内存结构，上层因为语法限制，有不同的行为表现

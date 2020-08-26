@@ -140,6 +140,75 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/'>dmp文件读取（三）- Moduel</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 14, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。
+module stream概述  module信息记录了应用程序（exe）在运行时，加载了哪些dll 每个dll相关的信息，在dmp中称为module dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4 每个module使用MinidumpModule对象表示 每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址， …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/'>dmp文件读取（二）- Thread</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 13, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信息、异常信息、模块信息等。
+breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位置：src/google_breakpad/common/minidump_format.h
+1typedef enum { 2 MD_UNUSED_STREAM = 0, 3 MD_RESERVED_STREAM_0 = 1, 4 MD_RESERVED_STREAM_1 = 2, 5 MD_THREAD_LIST_STREAM = 3, /* MDRawThreadList …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
         <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/'>dmp文件读取（一）- 概述</a>
       </h3>
       <div class = 'post_meta'>
@@ -210,7 +279,7 @@
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/" class="nav-link">channel原理分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">channel源码分析</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程</a>
@@ -270,13 +339,13 @@
     <div>
       <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
       <nav class="tags_nav">
-        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
-          BREAKPAD
-          <span class='button_tally'>11</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
           <span class='button_tally'>11</span>
         </a>
         

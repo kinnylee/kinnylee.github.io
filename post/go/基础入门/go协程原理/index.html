@@ -15,15 +15,13 @@
   
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="协程原理 协程调度 go中的runtime包，提供了调度器的功能，runtime包提供了以下几个方法：
-Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当前线程，因此当前线程未来会继续执行 NumCPU：返回当前系统的 CPU 核数量 GOMAXPROCS：设置最大的可同时使用的 CPU …">
+<meta name="description" content="协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过 …">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "go协程" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" />
 <meta property = "og:title" content = "go协程" />
-<meta property = "og:description" content = "协程原理 协程调度 go中的runtime包，提供了调度器的功能，runtime包提供了以下几个方法：
-Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当前线程，因此当前线程未来会继续执行 NumCPU：返回当前系统的 CPU 核数量 GOMAXPROCS：设置最大的可同时使用的 CPU …" />
+<meta property = "og:description" content = "协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过 …" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -148,6 +146,8 @@ Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当�
   </a>
   <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
   </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
 </div>
 
     <div class='post_share'>
@@ -185,20 +185,629 @@ Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当�
     <h2>Overview</h2>
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#协程原理">协程原理</a></li>
-    <li><a href="#协程调度">协程调度</a></li>
+    <li><a href="#csp模型">CSP模型</a>
+      <ul>
+        <li><a href="#go对csp模型的实现">go对CSP模型的实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#并发调度原理">并发调度原理</a>
+      <ul>
+        <li><a href="#g-数据结构">G 数据结构</a></li>
+        <li><a href="#p-数据结构">P 数据结构</a></li>
+        <li><a href="#m-数据结构">M 数据结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#go-func到底做了什么">go func()到底做了什么</a></li>
+    <li><a href="#全局调度器">全局调度器</a></li>
   </ul>
 </nav>
-    <h2 id="协程原理">协程原理</h2>
-<h2 id="协程调度">协程调度</h2>
-<p>go中的runtime包，提供了调度器的功能，runtime包提供了以下几个方法：</p>
-<p>Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当前线程，因此当前线程未来会继续执行
-NumCPU：返回当前系统的 CPU 核数量
-GOMAXPROCS：设置最大的可同时使用的 CPU 核数
-Goexit：退出当前 goroutine(但是defer语句会照常执行)
-NumGoroutine：返回正在执行和排队的任务总数
-GOOS：目标操作系统</p>
-
+    <h1 id="协程原理">协程原理</h1>
+<h2 id="csp模型">CSP模型</h2>
+<ul>
+<li>go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。</li>
+<li>CSP是Communicating Sequential Processes(顺序通信进程)的缩写</li>
+<li>CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。</li>
+</ul>
+<h3 id="go对csp模型的实现">go对CSP模型的实现</h3>
+<ul>
+<li>go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。</li>
+<li>实体间通过 channel 继续匿名消息传递使之解耦，在语言层面实现了自动调度，这样屏蔽了很多内部细节</li>
+<li>对外提供简单的语法关键字，大大简化了并发编程的思维转换和管理线程的复杂性。</li>
+<li>通过GMP调度模型实现语言层面的调度</li>
+</ul>
+<h2 id="并发调度原理">并发调度原理</h2>
+<p>go语言的线程MPG调度模型</p>
+<p>M：machine，一个M直接关联一个内核线程
+P：processor，代表M所需的上下文环境，也是处理用户级代码逻辑的处理器
+G：groutine，协程，本质上是一种轻量级的线程</p>
+<p><img src="https://i6448038.github.io/img/csp/GMPrelation.png" alt="线程MPG模型"></p>
+<ul>
+<li>一个M对应一个内核线程，也会连接一个上下文P</li>
+<li>一个上下文P，相当于一个处理器。</li>
+<li>p的数量是在启动时被设置为环境变量<code>GOMAXPROCS</code>，意味着运行的线程数量是固定的</li>
+<li>一个上下文连接一个或多个groutine</li>
+<li>p正在执行的Groutine为蓝色的，处于待执行的Groutine为灰色（保存在一个队列中）</li>
+</ul>
+<h3 id="g-数据结构">G 数据结构</h3>
+<ul>
+<li>G对应Groutine</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">  1</span><span class="c1">// 源码位置：src/runtime/runtime2.go
+</span><span class="ln">  2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">g</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">  3</span>  <span class="c1">// 栈变量，保存运行时的堆栈内存信息
+</span><span class="ln">  4</span><span class="c1"></span>  <span class="c1">// 内部包含两个指针：lo和hi，分别指向栈的上下界
+</span><span class="ln">  5</span><span class="c1"></span>  <span class="nx">stack</span>       <span class="nx">stack</span>   <span class="c1">// offset known to runtime/cgo
+</span><span class="ln">  6</span><span class="c1"></span>  <span class="nx">stackguard0</span> <span class="kt">uintptr</span> <span class="c1">// offset known to liblink
+</span><span class="ln">  7</span><span class="c1"></span>  <span class="nx">stackguard1</span> <span class="kt">uintptr</span> <span class="c1">// offset known to liblink
+</span><span class="ln">  8</span><span class="c1"></span>  <span class="o">...</span>
+<span class="ln">  9</span>  <span class="c1">// 当前的M，即在哪个线程上执行任务
+</span><span class="ln"> 10</span><span class="c1"></span>  <span class="nx">m</span>            <span class="o">*</span><span class="nx">m</span>      <span class="c1">// current m; offset known to arm liblink
+</span><span class="ln"> 11</span><span class="c1"></span>
+<span class="ln"> 12</span>  <span class="c1">// 存放g的上下文信息（寄存器信息），g被停止调度时，会将上下文信息放到这里，唤醒后可以继续调度
+</span><span class="ln"> 13</span><span class="c1"></span>  <span class="c1">// 非常重要的数据信息，替换内核的上下文切换
+</span><span class="ln"> 14</span><span class="c1"></span>  <span class="nx">sched</span>        <span class="nx">gobuf</span>
+<span class="ln"> 15</span>  <span class="nx">syscallsp</span>    <span class="kt">uintptr</span>        <span class="c1">// if status==Gsyscall, syscallsp = sched.sp to use during gc
+</span><span class="ln"> 16</span><span class="c1"></span>  <span class="nx">syscallpc</span>    <span class="kt">uintptr</span>        <span class="c1">// if status==Gsyscall, syscallpc = sched.pc to use during gc
+</span><span class="ln"> 17</span><span class="c1"></span>  <span class="nx">stktopsp</span>     <span class="kt">uintptr</span>        <span class="c1">// expected sp at top of stack, to check in traceback
+</span><span class="ln"> 18</span><span class="c1"></span>  <span class="c1">// 用于参数传递
+</span><span class="ln"> 19</span><span class="c1"></span>  <span class="nx">param</span>        <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// passed parameter on wakeup
+</span><span class="ln"> 20</span><span class="c1"></span>  <span class="nx">atomicstatus</span> <span class="kt">uint32</span>
+<span class="ln"> 21</span>  <span class="nx">stackLock</span>    <span class="kt">uint32</span> <span class="c1">// sigprof/scang lock; TODO: fold in to atomicstatus
+</span><span class="ln"> 22</span><span class="c1"></span>  <span class="c1">// g的id
+</span><span class="ln"> 23</span><span class="c1"></span>  <span class="nx">goid</span>         <span class="kt">int64</span>
+<span class="ln"> 24</span>  <span class="nx">schedlink</span>    <span class="nx">guintptr</span>
+<span class="ln"> 25</span>  <span class="c1">// 被阻塞的时间
+</span><span class="ln"> 26</span><span class="c1"></span>  <span class="nx">waitsince</span>    <span class="kt">int64</span>      <span class="c1">// approx time when the g become blocked
+</span><span class="ln"> 27</span><span class="c1"></span>  <span class="nx">waitreason</span>   <span class="nx">waitReason</span> <span class="c1">// if status==Gwaiting
+</span><span class="ln"> 28</span><span class="c1"></span>
+<span class="ln"> 29</span>  <span class="nx">preempt</span>       <span class="kt">bool</span> <span class="c1">// preemption signal, duplicates stackguard0 = stackpreempt
+</span><span class="ln"> 30</span><span class="c1"></span>  <span class="nx">preemptStop</span>   <span class="kt">bool</span> <span class="c1">// transition to _Gpreempted on preemption; otherwise, just deschedule
+</span><span class="ln"> 31</span><span class="c1"></span>  <span class="nx">preemptShrink</span> <span class="kt">bool</span> <span class="c1">// shrink stack at synchronous safe point
+</span><span class="ln"> 32</span><span class="c1"></span>
+<span class="ln"> 33</span>  <span class="c1">// asyncSafePoint is set if g is stopped at an asynchronous
+</span><span class="ln"> 34</span><span class="c1"></span>  <span class="c1">// safe point. This means there are frames on the stack
+</span><span class="ln"> 35</span><span class="c1"></span>  <span class="c1">// without precise pointer information.
+</span><span class="ln"> 36</span><span class="c1"></span>  <span class="nx">asyncSafePoint</span> <span class="kt">bool</span>
+<span class="ln"> 37</span>
+<span class="ln"> 38</span>  <span class="nx">paniconfault</span> <span class="kt">bool</span> <span class="c1">// panic (instead of crash) on unexpected fault address
+</span><span class="ln"> 39</span><span class="c1"></span>  <span class="nx">gcscandone</span>   <span class="kt">bool</span> <span class="c1">// g has scanned stack; protected by _Gscan bit in status
+</span><span class="ln"> 40</span><span class="c1"></span>  <span class="nx">throwsplit</span>   <span class="kt">bool</span> <span class="c1">// must not split stack
+</span><span class="ln"> 41</span><span class="c1"></span>  <span class="c1">// activeStackChans indicates that there are unlocked channels
+</span><span class="ln"> 42</span><span class="c1"></span>  <span class="c1">// pointing into this goroutine&#39;s stack. If true, stack
+</span><span class="ln"> 43</span><span class="c1"></span>  <span class="c1">// copying needs to acquire channel locks to protect these
+</span><span class="ln"> 44</span><span class="c1"></span>  <span class="c1">// areas of the stack.
+</span><span class="ln"> 45</span><span class="c1"></span>  <span class="nx">activeStackChans</span> <span class="kt">bool</span>
+<span class="ln"> 46</span>
+<span class="ln"> 47</span>  <span class="nx">raceignore</span>     <span class="kt">int8</span>     <span class="c1">// ignore race detection events
+</span><span class="ln"> 48</span><span class="c1"></span>  <span class="nx">sysblocktraced</span> <span class="kt">bool</span>     <span class="c1">// StartTrace has emitted EvGoInSyscall about this goroutine
+</span><span class="ln"> 49</span><span class="c1"></span>  <span class="nx">sysexitticks</span>   <span class="kt">int64</span>    <span class="c1">// cputicks when syscall has returned (for tracing)
+</span><span class="ln"> 50</span><span class="c1"></span>  <span class="nx">traceseq</span>       <span class="kt">uint64</span>   <span class="c1">// trace event sequencer
+</span><span class="ln"> 51</span><span class="c1"></span>  <span class="nx">tracelastp</span>     <span class="nx">puintptr</span> <span class="c1">// last P emitted an event for this goroutine
+</span><span class="ln"> 52</span><span class="c1"></span>
+<span class="ln"> 53</span>  <span class="c1">// 被锁定只在这个M上执行
+</span><span class="ln"> 54</span><span class="c1"></span>  <span class="nx">lockedm</span>        <span class="nx">muintptr</span>
+<span class="ln"> 55</span>  <span class="nx">sig</span>            <span class="kt">uint32</span>
+<span class="ln"> 56</span>  <span class="nx">writebuf</span>       <span class="p">[]</span><span class="kt">byte</span>
+<span class="ln"> 57</span>  <span class="nx">sigcode0</span>       <span class="kt">uintptr</span>
+<span class="ln"> 58</span>  <span class="nx">sigcode1</span>       <span class="kt">uintptr</span>
+<span class="ln"> 59</span>  <span class="nx">sigpc</span>          <span class="kt">uintptr</span>
+<span class="ln"> 60</span>  <span class="nx">gopc</span>           <span class="kt">uintptr</span>         <span class="c1">// pc of go statement that created this goroutine
+</span><span class="ln"> 61</span><span class="c1"></span>  <span class="nx">ancestors</span>      <span class="o">*</span><span class="p">[]</span><span class="nx">ancestorInfo</span> <span class="c1">// ancestor information goroutine(s) that created this goroutine (only used if debug.tracebackancestors)
+</span><span class="ln"> 62</span><span class="c1"></span>  <span class="c1">// 被执行函数
+</span><span class="ln"> 63</span><span class="c1"></span>  <span class="nx">startpc</span>        <span class="kt">uintptr</span>         <span class="c1">// pc of goroutine function
+</span><span class="ln"> 64</span><span class="c1"></span>  <span class="nx">racectx</span>        <span class="kt">uintptr</span>
+<span class="ln"> 65</span>  <span class="nx">waiting</span>        <span class="o">*</span><span class="nx">sudog</span>         <span class="c1">// sudog structures this g is waiting on (that have a valid elem ptr); in lock order
+</span><span class="ln"> 66</span><span class="c1"></span>  <span class="nx">cgoCtxt</span>        <span class="p">[]</span><span class="kt">uintptr</span>      <span class="c1">// cgo traceback context
+</span><span class="ln"> 67</span><span class="c1"></span>  <span class="nx">labels</span>         <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span> <span class="c1">// profiler labels
+</span><span class="ln"> 68</span><span class="c1"></span>  <span class="nx">timer</span>          <span class="o">*</span><span class="nx">timer</span>         <span class="c1">// cached timer for time.Sleep
+</span><span class="ln"> 69</span><span class="c1"></span>  <span class="nx">selectDone</span>     <span class="kt">uint32</span>         <span class="c1">// are we participating in a select and did someone win the race?
+</span><span class="ln"> 70</span><span class="c1"></span>
+<span class="ln"> 71</span>  <span class="c1">// Per-G GC state
+</span><span class="ln"> 72</span><span class="c1"></span>
+<span class="ln"> 73</span>  <span class="c1">// gcAssistBytes is this G&#39;s GC assist credit in terms of
+</span><span class="ln"> 74</span><span class="c1"></span>  <span class="c1">// bytes allocated. If this is positive, then the G has credit
+</span><span class="ln"> 75</span><span class="c1"></span>  <span class="c1">// to allocate gcAssistBytes bytes without assisting. If this
+</span><span class="ln"> 76</span><span class="c1"></span>  <span class="c1">// is negative, then the G must correct this by performing
+</span><span class="ln"> 77</span><span class="c1"></span>  <span class="c1">// scan work. We track this in bytes to make it fast to update
+</span><span class="ln"> 78</span><span class="c1"></span>  <span class="c1">// and check for debt in the malloc hot path. The assist ratio
+</span><span class="ln"> 79</span><span class="c1"></span>  <span class="c1">// determines how this corresponds to scan work debt.
+</span><span class="ln"> 80</span><span class="c1"></span>  <span class="nx">gcAssistBytes</span> <span class="kt">int64</span>
+<span class="ln"> 81</span><span class="p">}</span>
+<span class="ln"> 82</span>
+<span class="ln"> 83</span><span class="kd">type</span> <span class="nx">stack</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 84</span>  <span class="nx">lo</span> <span class="kt">uintptr</span>
+<span class="ln"> 85</span>  <span class="nx">hi</span> <span class="kt">uintptr</span>
+<span class="ln"> 86</span><span class="p">}</span>
+<span class="ln"> 87</span>
+<span class="ln"> 88</span><span class="c1">// 保存上下文寄存器信息的数据结构
+</span><span class="ln"> 89</span><span class="c1">// 核心就是保存寄存器信息
+</span><span class="ln"> 90</span><span class="c1"></span><span class="kd">type</span> <span class="nx">gobuf</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 91</span>  <span class="c1">// The offsets of sp, pc, and g are known to (hard-coded in) libmach.
+</span><span class="ln"> 92</span><span class="c1"></span>  <span class="c1">//
+</span><span class="ln"> 93</span><span class="c1"></span>  <span class="c1">// ctxt is unusual with respect to GC: it may be a
+</span><span class="ln"> 94</span><span class="c1"></span>  <span class="c1">// heap-allocated funcval, so GC needs to track it, but it
+</span><span class="ln"> 95</span><span class="c1"></span>  <span class="c1">// needs to be set and cleared from assembly, where it&#39;s
+</span><span class="ln"> 96</span><span class="c1"></span>  <span class="c1">// difficult to have write barriers. However, ctxt is really a
+</span><span class="ln"> 97</span><span class="c1"></span>  <span class="c1">// saved, live register, and we only ever exchange it between
+</span><span class="ln"> 98</span><span class="c1"></span>  <span class="c1">// the real register and the gobuf. Hence, we treat it as a
+</span><span class="ln"> 99</span><span class="c1"></span>  <span class="c1">// root during stack scanning, which means assembly that saves
+</span><span class="ln">100</span><span class="c1"></span>  <span class="c1">// and restores it doesn&#39;t need write barriers. It&#39;s still
+</span><span class="ln">101</span><span class="c1"></span>  <span class="c1">// typed as a pointer so that any other writes from Go get
+</span><span class="ln">102</span><span class="c1"></span>  <span class="c1">// write barriers.
+</span><span class="ln">103</span><span class="c1"></span>  <span class="c1">// 执行sp寄存器
+</span><span class="ln">104</span><span class="c1"></span>  <span class="nx">sp</span>   <span class="kt">uintptr</span>
+<span class="ln">105</span>  <span class="c1">// 执行pc寄存器
+</span><span class="ln">106</span><span class="c1"></span>  <span class="nx">pc</span>   <span class="kt">uintptr</span>
+<span class="ln">107</span>  <span class="c1">// 指向G本身
+</span><span class="ln">108</span><span class="c1"></span>  <span class="nx">g</span>    <span class="nx">guintptr</span>
+<span class="ln">109</span>  <span class="nx">ctxt</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span>
+<span class="ln">110</span>  <span class="nx">ret</span>  <span class="nx">sys</span><span class="p">.</span><span class="nx">Uintreg</span>
+<span class="ln">111</span>  <span class="nx">lr</span>   <span class="kt">uintptr</span>
+<span class="ln">112</span>  <span class="nx">bp</span>   <span class="kt">uintptr</span> <span class="c1">// for GOEXPERIMENT=framepointer
+</span><span class="ln">113</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><h3 id="p-数据结构">P 数据结构</h3>
+<ul>
+<li>P是一个抽象的概念，并不是真正的物理cpu</li>
+<li>当p有任务时，需要创建或唤醒一个系统线程来执行它队列里的任务，所以P和M需要进行绑定，构成一个可执行单元</li>
+<li>可通过GOMAXPROCS限制同时执行用户级任务的操作系统线</li>
+<li>GOMAXPROCS默认为系统核数</li>
+</ul>
+<h4 id="p队列">P队列</h4>
+<p>P有两种队列，本地队列和全局队列：</p>
+<ul>
+<li>本地队列：当前P的队列，本地队列是Lock-Free，没有数据竞争问题，无需加锁处理，可以提升处理速度。</li>
+<li>全局队列：全局队列为了保证多个P之间任务的平衡。所有M共享P全局队列，为保证数据竞争问题，需要加锁处理。相比本地队列处理速度要低于全局队列</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">  1</span><span class="c1">// 源码位置：src/runtime/runtime2.go
+</span><span class="ln">  2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">p</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">  3</span>  <span class="nx">id</span>          <span class="kt">int32</span>
+<span class="ln">  4</span>  <span class="nx">status</span>      <span class="kt">uint32</span> <span class="c1">// one of pidle/prunning/...
+</span><span class="ln">  5</span><span class="c1"></span>  <span class="nx">link</span>        <span class="nx">puintptr</span>
+<span class="ln">  6</span>  <span class="c1">// 每调度一次加一
+</span><span class="ln">  7</span><span class="c1"></span>  <span class="nx">schedtick</span>   <span class="kt">uint32</span>     <span class="c1">// incremented on every scheduler call
+</span><span class="ln">  8</span><span class="c1"></span>  <span class="c1">// 每次系统调用加一
+</span><span class="ln">  9</span><span class="c1"></span>  <span class="nx">syscalltick</span> <span class="kt">uint32</span>     <span class="c1">// incremented on every system call
+</span><span class="ln"> 10</span><span class="c1"></span>  <span class="nx">sysmontick</span>  <span class="nx">sysmontick</span> <span class="c1">// last tick observed by sysmon
+</span><span class="ln"> 11</span><span class="c1"></span>  <span class="nx">m</span>           <span class="nx">muintptr</span>   <span class="c1">// back-link to associated m (nil if idle)
+</span><span class="ln"> 12</span><span class="c1"></span>  <span class="nx">mcache</span>      <span class="o">*</span><span class="nx">mcache</span>
+<span class="ln"> 13</span>  <span class="nx">pcache</span>      <span class="nx">pageCache</span>
+<span class="ln"> 14</span>  <span class="nx">raceprocctx</span> <span class="kt">uintptr</span>
+<span class="ln"> 15</span>
+<span class="ln"> 16</span>  <span class="nx">deferpool</span>    <span class="p">[</span><span class="mi">5</span><span class="p">][]</span><span class="o">*</span><span class="nx">_defer</span> <span class="c1">// pool of available defer structs of different sizes (see panic.go)
+</span><span class="ln"> 17</span><span class="c1"></span>  <span class="nx">deferpoolbuf</span> <span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">32</span><span class="p">]</span><span class="o">*</span><span class="nx">_defer</span>
+<span class="ln"> 18</span>
+<span class="ln"> 19</span>  <span class="c1">// Cache of goroutine ids, amortizes accesses to runtime·sched.goidgen.
+</span><span class="ln"> 20</span><span class="c1"></span>  <span class="nx">goidcache</span>    <span class="kt">uint64</span>
+<span class="ln"> 21</span>  <span class="nx">goidcacheend</span> <span class="kt">uint64</span>
+<span class="ln"> 22</span>
+<span class="ln"> 23</span>  <span class="c1">// Queue of runnable goroutines. Accessed without lock.
+</span><span class="ln"> 24</span><span class="c1"></span>  <span class="c1">// 可运行的Groutine队列
+</span><span class="ln"> 25</span><span class="c1"></span>  <span class="nx">runqhead</span> <span class="kt">uint32</span>
+<span class="ln"> 26</span>  <span class="nx">runqtail</span> <span class="kt">uint32</span>
+<span class="ln"> 27</span>  <span class="c1">// 保存q的数组，只能存放256个，超出的要放到全局队列
+</span><span class="ln"> 28</span><span class="c1"></span>  <span class="nx">runq</span>     <span class="p">[</span><span class="mi">256</span><span class="p">]</span><span class="nx">guintptr</span>
+<span class="ln"> 29</span>  <span class="c1">// runnext, if non-nil, is a runnable G that was ready&#39;d by
+</span><span class="ln"> 30</span><span class="c1"></span>  <span class="c1">// the current G and should be run next instead of what&#39;s in
+</span><span class="ln"> 31</span><span class="c1"></span>  <span class="c1">// runq if there&#39;s time remaining in the running G&#39;s time
+</span><span class="ln"> 32</span><span class="c1"></span>  <span class="c1">// slice. It will inherit the time left in the current time
+</span><span class="ln"> 33</span><span class="c1"></span>  <span class="c1">// slice. If a set of goroutines is locked in a
+</span><span class="ln"> 34</span><span class="c1"></span>  <span class="c1">// communicate-and-wait pattern, this schedules that set as a
+</span><span class="ln"> 35</span><span class="c1"></span>  <span class="c1">// unit and eliminates the (potentially large) scheduling
+</span><span class="ln"> 36</span><span class="c1"></span>  <span class="c1">// latency that otherwise arises from adding the ready&#39;d
+</span><span class="ln"> 37</span><span class="c1"></span>  <span class="c1">// goroutines to the end of the run queue.
+</span><span class="ln"> 38</span><span class="c1"></span>  <span class="c1">// 下一个运行的g
+</span><span class="ln"> 39</span><span class="c1"></span>  <span class="nx">runnext</span> <span class="nx">guintptr</span>
+<span class="ln"> 40</span>
+<span class="ln"> 41</span>  <span class="c1">// Available G&#39;s (status == Gdead)
+</span><span class="ln"> 42</span><span class="c1"></span>  <span class="nx">gFree</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 43</span>    <span class="nx">gList</span>
+<span class="ln"> 44</span>    <span class="nx">n</span> <span class="kt">int32</span>
+<span class="ln"> 45</span>  <span class="p">}</span>
+<span class="ln"> 46</span>
+<span class="ln"> 47</span>  <span class="nx">sudogcache</span> <span class="p">[]</span><span class="o">*</span><span class="nx">sudog</span>
+<span class="ln"> 48</span>  <span class="nx">sudogbuf</span>   <span class="p">[</span><span class="mi">128</span><span class="p">]</span><span class="o">*</span><span class="nx">sudog</span>
+<span class="ln"> 49</span>
+<span class="ln"> 50</span>  <span class="c1">// Cache of mspan objects from the heap.
+</span><span class="ln"> 51</span><span class="c1"></span>  <span class="nx">mspancache</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 52</span>    <span class="c1">// We need an explicit length here because this field is used
+</span><span class="ln"> 53</span><span class="c1"></span>    <span class="c1">// in allocation codepaths where write barriers are not allowed,
+</span><span class="ln"> 54</span><span class="c1"></span>    <span class="c1">// and eliminating the write barrier/keeping it eliminated from
+</span><span class="ln"> 55</span><span class="c1"></span>    <span class="c1">// slice updates is tricky, moreso than just managing the length
+</span><span class="ln"> 56</span><span class="c1"></span>    <span class="c1">// ourselves.
+</span><span class="ln"> 57</span><span class="c1"></span>    <span class="nx">len</span> <span class="kt">int</span>
+<span class="ln"> 58</span>    <span class="nx">buf</span> <span class="p">[</span><span class="mi">128</span><span class="p">]</span><span class="o">*</span><span class="nx">mspan</span>
+<span class="ln"> 59</span>  <span class="p">}</span>
+<span class="ln"> 60</span>
+<span class="ln"> 61</span>  <span class="nx">tracebuf</span> <span class="nx">traceBufPtr</span>
+<span class="ln"> 62</span>
+<span class="ln"> 63</span>  <span class="c1">// traceSweep indicates the sweep events should be traced.
+</span><span class="ln"> 64</span><span class="c1"></span>  <span class="c1">// This is used to defer the sweep start event until a span
+</span><span class="ln"> 65</span><span class="c1"></span>  <span class="c1">// has actually been swept.
+</span><span class="ln"> 66</span><span class="c1"></span>  <span class="nx">traceSweep</span> <span class="kt">bool</span>
+<span class="ln"> 67</span>  <span class="c1">// traceSwept and traceReclaimed track the number of bytes
+</span><span class="ln"> 68</span><span class="c1"></span>  <span class="c1">// swept and reclaimed by sweeping in the current sweep loop.
+</span><span class="ln"> 69</span><span class="c1"></span>  <span class="nx">traceSwept</span><span class="p">,</span> <span class="nx">traceReclaimed</span> <span class="kt">uintptr</span>
+<span class="ln"> 70</span>
+<span class="ln"> 71</span>  <span class="nx">palloc</span> <span class="nx">persistentAlloc</span> <span class="c1">// per-P to avoid mutex
+</span><span class="ln"> 72</span><span class="c1"></span>
+<span class="ln"> 73</span>  <span class="nx">_</span> <span class="kt">uint32</span> <span class="c1">// Alignment for atomic fields below
+</span><span class="ln"> 74</span><span class="c1"></span>
+<span class="ln"> 75</span>  <span class="c1">// The when field of the first entry on the timer heap.
+</span><span class="ln"> 76</span><span class="c1"></span>  <span class="c1">// This is updated using atomic functions.
+</span><span class="ln"> 77</span><span class="c1"></span>  <span class="c1">// This is 0 if the timer heap is empty.
+</span><span class="ln"> 78</span><span class="c1"></span>  <span class="nx">timer0When</span> <span class="kt">uint64</span>
+<span class="ln"> 79</span>
+<span class="ln"> 80</span>  <span class="c1">// Per-P GC state
+</span><span class="ln"> 81</span><span class="c1"></span>  <span class="nx">gcAssistTime</span>         <span class="kt">int64</span>    <span class="c1">// Nanoseconds in assistAlloc
+</span><span class="ln"> 82</span><span class="c1"></span>  <span class="nx">gcFractionalMarkTime</span> <span class="kt">int64</span>    <span class="c1">// Nanoseconds in fractional mark worker (atomic)
+</span><span class="ln"> 83</span><span class="c1"></span>  <span class="nx">gcBgMarkWorker</span>       <span class="nx">guintptr</span> <span class="c1">// (atomic)
+</span><span class="ln"> 84</span><span class="c1"></span>  <span class="nx">gcMarkWorkerMode</span>     <span class="nx">gcMarkWorkerMode</span>
+<span class="ln"> 85</span>
+<span class="ln"> 86</span>  <span class="c1">// gcMarkWorkerStartTime is the nanotime() at which this mark
+</span><span class="ln"> 87</span><span class="c1"></span>  <span class="c1">// worker started.
+</span><span class="ln"> 88</span><span class="c1"></span>  <span class="nx">gcMarkWorkerStartTime</span> <span class="kt">int64</span>
+<span class="ln"> 89</span>
+<span class="ln"> 90</span>  <span class="c1">// gcw is this P&#39;s GC work buffer cache. The work buffer is
+</span><span class="ln"> 91</span><span class="c1"></span>  <span class="c1">// filled by write barriers, drained by mutator assists, and
+</span><span class="ln"> 92</span><span class="c1"></span>  <span class="c1">// disposed on certain GC state transitions.
+</span><span class="ln"> 93</span><span class="c1"></span>  <span class="nx">gcw</span> <span class="nx">gcWork</span>
+<span class="ln"> 94</span>
+<span class="ln"> 95</span>  <span class="c1">// wbBuf is this P&#39;s GC write barrier buffer.
+</span><span class="ln"> 96</span><span class="c1"></span>  <span class="c1">//
+</span><span class="ln"> 97</span><span class="c1"></span>  <span class="c1">// TODO: Consider caching this in the running G.
+</span><span class="ln"> 98</span><span class="c1"></span>  <span class="nx">wbBuf</span> <span class="nx">wbBuf</span>
+<span class="ln"> 99</span>
+<span class="ln">100</span>  <span class="nx">runSafePointFn</span> <span class="kt">uint32</span> <span class="c1">// if 1, run sched.safePointFn at next safe point
+</span><span class="ln">101</span><span class="c1"></span>
+<span class="ln">102</span>  <span class="c1">// Lock for timers. We normally access the timers while running
+</span><span class="ln">103</span><span class="c1"></span>  <span class="c1">// on this P, but the scheduler can also do it from a different P.
+</span><span class="ln">104</span><span class="c1"></span>  <span class="nx">timersLock</span> <span class="nx">mutex</span>
+<span class="ln">105</span>
+<span class="ln">106</span>  <span class="c1">// Actions to take at some time. This is used to implement the
+</span><span class="ln">107</span><span class="c1"></span>  <span class="c1">// standard library&#39;s time package.
+</span><span class="ln">108</span><span class="c1"></span>  <span class="c1">// Must hold timersLock to access.
+</span><span class="ln">109</span><span class="c1"></span>  <span class="nx">timers</span> <span class="p">[]</span><span class="o">*</span><span class="nx">timer</span>
+<span class="ln">110</span>
+<span class="ln">111</span>  <span class="c1">// Number of timers in P&#39;s heap.
+</span><span class="ln">112</span><span class="c1"></span>  <span class="c1">// Modified using atomic instructions.
+</span><span class="ln">113</span><span class="c1"></span>  <span class="nx">numTimers</span> <span class="kt">uint32</span>
+<span class="ln">114</span>
+<span class="ln">115</span>  <span class="c1">// Number of timerModifiedEarlier timers on P&#39;s heap.
+</span><span class="ln">116</span><span class="c1"></span>  <span class="c1">// This should only be modified while holding timersLock,
+</span><span class="ln">117</span><span class="c1"></span>  <span class="c1">// or while the timer status is in a transient state
+</span><span class="ln">118</span><span class="c1"></span>  <span class="c1">// such as timerModifying.
+</span><span class="ln">119</span><span class="c1"></span>  <span class="nx">adjustTimers</span> <span class="kt">uint32</span>
+<span class="ln">120</span>
+<span class="ln">121</span>  <span class="c1">// Number of timerDeleted timers in P&#39;s heap.
+</span><span class="ln">122</span><span class="c1"></span>  <span class="c1">// Modified using atomic instructions.
+</span><span class="ln">123</span><span class="c1"></span>  <span class="nx">deletedTimers</span> <span class="kt">uint32</span>
+<span class="ln">124</span>
+<span class="ln">125</span>  <span class="c1">// Race context used while executing timer functions.
+</span><span class="ln">126</span><span class="c1"></span>  <span class="nx">timerRaceCtx</span> <span class="kt">uintptr</span>
+<span class="ln">127</span>
+<span class="ln">128</span>  <span class="c1">// preempt is set to indicate that this P should be enter the
+</span><span class="ln">129</span><span class="c1"></span>  <span class="c1">// scheduler ASAP (regardless of what G is running on it).
+</span><span class="ln">130</span><span class="c1"></span>  <span class="nx">preempt</span> <span class="kt">bool</span>
+<span class="ln">131</span>
+<span class="ln">132</span>  <span class="nx">pad</span> <span class="nx">cpu</span><span class="p">.</span><span class="nx">CacheLinePad</span>
+<span class="ln">133</span><span class="p">}</span>
+</code></pre></div><h3 id="m-数据结构">M 数据结构</h3>
+<ul>
+<li>M代表一个线程，每次创建一个M时，都有一个底层线程创建</li>
+<li>所有的G任务，都是在M上执行</li>
+<li>两个特殊的G
+<ul>
+<li>g0:带有调度栈的Groutine，是一个比较特殊的Groutine, g0的栈是对应的M对应的线程的真实内核栈</li>
+<li>curg: 结构体M当前绑定的结构体G</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 源码位置：src/runtime/runtime2.go
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">m</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="c1">// 带有调度栈的Groutine，是一个比较特殊的Groutine
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="c1">// g0的栈是对应的M对应的线程的真实内核栈
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">g0</span>      <span class="o">*</span><span class="nx">g</span>     <span class="c1">// goroutine with scheduling stack
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="nx">morebuf</span> <span class="nx">gobuf</span>  <span class="c1">// gobuf arg to morestack
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nx">divmod</span>  <span class="kt">uint32</span> <span class="c1">// div/mod denominator for arm - known to liblink
+</span><span class="ln"> 8</span><span class="c1"></span>
+<span class="ln"> 9</span>  <span class="c1">// Fields not known to debuggers.
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nx">procid</span>        <span class="kt">uint64</span>       <span class="c1">// for debuggers, but offset not hard-coded
+</span><span class="ln">11</span><span class="c1"></span>  <span class="nx">gsignal</span>       <span class="o">*</span><span class="nx">g</span>           <span class="c1">// signal-handling g
+</span><span class="ln">12</span><span class="c1"></span>  <span class="nx">goSigStack</span>    <span class="nx">gsignalStack</span> <span class="c1">// Go-allocated signal handling stack
+</span><span class="ln">13</span><span class="c1"></span>  <span class="nx">sigmask</span>       <span class="nx">sigset</span>       <span class="c1">// storage for saved signal mask
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">tls</span>           <span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="kt">uintptr</span>   <span class="c1">// thread-local storage (for x86 extern register)
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">mstartfn</span>      <span class="kd">func</span><span class="p">()</span>
+<span class="ln">16</span>  <span class="c1">// 当前绑定的groutine
+</span><span class="ln">17</span><span class="c1"></span>  <span class="nx">curg</span>          <span class="o">*</span><span class="nx">g</span>       <span class="c1">// current running goroutine
+</span><span class="ln">18</span><span class="c1"></span>  <span class="nx">caughtsig</span>     <span class="nx">guintptr</span> <span class="c1">// goroutine running during fatal signal
+</span><span class="ln">19</span><span class="c1"></span>  <span class="c1">// 关联需要执行的代码
+</span><span class="ln">20</span><span class="c1"></span>  <span class="nx">p</span>             <span class="nx">puintptr</span> <span class="c1">// attached p for executing go code (nil if not executing go code)
+</span><span class="ln">21</span><span class="c1"></span>  <span class="nx">nextp</span>         <span class="nx">puintptr</span>
+<span class="ln">22</span>  <span class="nx">oldp</span>          <span class="nx">puintptr</span> <span class="c1">// the p that was attached before executing a syscall
+</span><span class="ln">23</span><span class="c1"></span>  <span class="nx">id</span>            <span class="kt">int64</span>
+<span class="ln">24</span>  <span class="nx">mallocing</span>     <span class="kt">int32</span>
+<span class="ln">25</span>  <span class="nx">throwing</span>      <span class="kt">int32</span>
+<span class="ln">26</span>  <span class="nx">preemptoff</span>    <span class="kt">string</span> <span class="c1">// if != &#34;&#34;, keep curg running on this m
+</span><span class="ln">27</span><span class="c1"></span>  <span class="nx">locks</span>         <span class="kt">int32</span>
+<span class="ln">28</span>  <span class="nx">dying</span>         <span class="kt">int32</span>
+<span class="ln">29</span>  <span class="nx">profilehz</span>     <span class="kt">int32</span>
+<span class="ln">30</span>  <span class="nx">spinning</span>      <span class="kt">bool</span> <span class="c1">// m is out of work and is actively looking for work
+</span><span class="ln">31</span><span class="c1"></span>  <span class="nx">blocked</span>       <span class="kt">bool</span> <span class="c1">// m is blocked on a note
+</span><span class="ln">32</span><span class="c1"></span>  <span class="nx">newSigstack</span>   <span class="kt">bool</span> <span class="c1">// minit on C thread called sigaltstack
+</span><span class="ln">33</span><span class="c1"></span>  <span class="nx">printlock</span>     <span class="kt">int8</span>
+<span class="ln">34</span>  <span class="nx">incgo</span>         <span class="kt">bool</span>   <span class="c1">// m is executing a cgo call
+</span><span class="ln">35</span><span class="c1"></span>  <span class="nx">freeWait</span>      <span class="kt">uint32</span> <span class="c1">// if == 0, safe to free g0 and delete m (atomic)
+</span><span class="ln">36</span><span class="c1"></span>  <span class="nx">fastrand</span>      <span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="kt">uint32</span>
+<span class="ln">37</span>  <span class="nx">needextram</span>    <span class="kt">bool</span>
+<span class="ln">38</span>  <span class="nx">traceback</span>     <span class="kt">uint8</span>
+<span class="ln">39</span>  <span class="nx">ncgocall</span>      <span class="kt">uint64</span>      <span class="c1">// number of cgo calls in total
+</span><span class="ln">40</span><span class="c1"></span>  <span class="nx">ncgo</span>          <span class="kt">int32</span>       <span class="c1">// number of cgo calls currently in progress
+</span><span class="ln">41</span><span class="c1"></span>  <span class="nx">cgoCallersUse</span> <span class="kt">uint32</span>      <span class="c1">// if non-zero, cgoCallers in use temporarily
+</span><span class="ln">42</span><span class="c1"></span>  <span class="nx">cgoCallers</span>    <span class="o">*</span><span class="nx">cgoCallers</span> <span class="c1">// cgo traceback if crashing in cgo call
+</span><span class="ln">43</span><span class="c1"></span>  <span class="nx">park</span>          <span class="nx">note</span>
+<span class="ln">44</span>  <span class="nx">alllink</span>       <span class="o">*</span><span class="nx">m</span> <span class="c1">// on allm
+</span><span class="ln">45</span><span class="c1"></span>  <span class="nx">schedlink</span>     <span class="nx">muintptr</span>
+<span class="ln">46</span>  <span class="nx">mcache</span>        <span class="o">*</span><span class="nx">mcache</span>
+<span class="ln">47</span>  <span class="nx">lockedg</span>       <span class="nx">guintptr</span>
+<span class="ln">48</span>  <span class="nx">createstack</span>   <span class="p">[</span><span class="mi">32</span><span class="p">]</span><span class="kt">uintptr</span> <span class="c1">// stack that created this thread.
+</span><span class="ln">49</span><span class="c1"></span>  <span class="nx">lockedExt</span>     <span class="kt">uint32</span>      <span class="c1">// tracking for external LockOSThread
+</span><span class="ln">50</span><span class="c1"></span>  <span class="nx">lockedInt</span>     <span class="kt">uint32</span>      <span class="c1">// tracking for internal lockOSThread
+</span><span class="ln">51</span><span class="c1"></span>  <span class="nx">nextwaitm</span>     <span class="nx">muintptr</span>    <span class="c1">// next m waiting for lock
+</span><span class="ln">52</span><span class="c1"></span>  <span class="nx">waitunlockf</span>   <span class="kd">func</span><span class="p">(</span><span class="o">*</span><span class="nx">g</span><span class="p">,</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">)</span> <span class="kt">bool</span>
+<span class="ln">53</span>  <span class="nx">waitlock</span>      <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span>
+<span class="ln">54</span>  <span class="nx">waittraceev</span>   <span class="kt">byte</span>
+<span class="ln">55</span>  <span class="nx">waittraceskip</span> <span class="kt">int</span>
+<span class="ln">56</span>  <span class="nx">startingtrace</span> <span class="kt">bool</span>
+<span class="ln">57</span>  <span class="nx">syscalltick</span>   <span class="kt">uint32</span>
+<span class="ln">58</span>  <span class="nx">freelink</span>      <span class="o">*</span><span class="nx">m</span> <span class="c1">// on sched.freem
+</span><span class="ln">59</span><span class="c1"></span>
+<span class="ln">60</span>  <span class="c1">// these are here because they are too large to be on the stack
+</span><span class="ln">61</span><span class="c1"></span>  <span class="c1">// of low-level NOSPLIT functions.
+</span><span class="ln">62</span><span class="c1"></span>  <span class="nx">libcall</span>   <span class="nx">libcall</span>
+<span class="ln">63</span>  <span class="nx">libcallpc</span> <span class="kt">uintptr</span> <span class="c1">// for cpu profiler
+</span><span class="ln">64</span><span class="c1"></span>  <span class="nx">libcallsp</span> <span class="kt">uintptr</span>
+<span class="ln">65</span>  <span class="nx">libcallg</span>  <span class="nx">guintptr</span>
+<span class="ln">66</span>  <span class="nx">syscall</span>   <span class="nx">libcall</span> <span class="c1">// stores syscall parameters on windows
+</span><span class="ln">67</span><span class="c1"></span>
+<span class="ln">68</span>  <span class="c1">// 寄存器信息，用于恢复现场
+</span><span class="ln">69</span><span class="c1"></span>  <span class="nx">vdsoSP</span> <span class="kt">uintptr</span> <span class="c1">// SP for traceback while in VDSO call (0 if not in call)
+</span><span class="ln">70</span><span class="c1"></span>  <span class="nx">vdsoPC</span> <span class="kt">uintptr</span> <span class="c1">// PC for traceback while in VDSO call
+</span><span class="ln">71</span><span class="c1"></span>
+<span class="ln">72</span>  <span class="c1">// preemptGen counts the number of completed preemption
+</span><span class="ln">73</span><span class="c1"></span>  <span class="c1">// signals. This is used to detect when a preemption is
+</span><span class="ln">74</span><span class="c1"></span>  <span class="c1">// requested, but fails. Accessed atomically.
+</span><span class="ln">75</span><span class="c1"></span>  <span class="nx">preemptGen</span> <span class="kt">uint32</span>
+<span class="ln">76</span>
+<span class="ln">77</span>  <span class="c1">// Whether this is a pending preemption signal on this M.
+</span><span class="ln">78</span><span class="c1"></span>  <span class="c1">// Accessed atomically.
+</span><span class="ln">79</span><span class="c1"></span>  <span class="nx">signalPending</span> <span class="kt">uint32</span>
+<span class="ln">80</span>
+<span class="ln">81</span>  <span class="nx">dlogPerM</span>
+<span class="ln">82</span>
+<span class="ln">83</span>  <span class="nx">mOS</span>
+<span class="ln">84</span><span class="p">}</span>
+</code></pre></div><h2 id="go-func到底做了什么">go func()到底做了什么</h2>
+<blockquote>
+<p>源码中的 _StackMin 指明了栈的大小为2k</p>
+</blockquote>
+<ul>
+<li>首选创建G对象，G对象保存到P本地队列（超出256）或者全局队列</li>
+<li>P此时去唤醒一个M。</li>
+<li>P继续执行</li>
+<li>M寻找是否有可以执行的P，如果有则将G挂到P上</li>
+<li>接下来M执行调度循环
+<ul>
+<li>调用G</li>
+<li>执行</li>
+<li>清理现场</li>
+<li>继续找新的G</li>
+</ul>
+</li>
+<li>M执行过程中，会进行上下文切换，切换时将现场寄存器信息保存到G对象的成员里</li>
+<li>G下次被调度到执行时，从自身对象上恢复寄存器信息继续执行</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">  1</span><span class="c1">// 源码位置：sr/runtime/proc.go
+</span><span class="ln">  2</span><span class="c1"></span><span class="kd">func</span> <span class="nf">newproc</span><span class="p">(</span><span class="nx">siz</span> <span class="kt">int32</span><span class="p">,</span> <span class="nx">fn</span> <span class="o">*</span><span class="nx">funcval</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">  3</span>  <span class="nx">argp</span> <span class="o">:=</span> <span class="nf">add</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">fn</span><span class="p">),</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span><span class="p">)</span>
+<span class="ln">  4</span>  <span class="nx">gp</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln">  5</span>  <span class="nx">pc</span> <span class="o">:=</span> <span class="nf">getcallerpc</span><span class="p">()</span>
+<span class="ln">  6</span>  <span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">  7</span>    <span class="c1">// 内部调用了newproc1函数
+</span><span class="ln">  8</span><span class="c1"></span>    <span class="nf">newproc1</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">argp</span><span class="p">,</span> <span class="nx">siz</span><span class="p">,</span> <span class="nx">gp</span><span class="p">,</span> <span class="nx">pc</span><span class="p">)</span>
+<span class="ln">  9</span>  <span class="p">})</span>
+<span class="ln"> 10</span><span class="p">}</span>
+<span class="ln"> 11</span>
+<span class="ln"> 12</span><span class="c1">// _StackMin = 2048 默认栈大小为2k
+</span><span class="ln"> 13</span><span class="c1">// newg = malg(_StackMin) 初始化栈大小
+</span><span class="ln"> 14</span><span class="c1"></span><span class="kd">func</span> <span class="nf">newproc1</span><span class="p">(</span><span class="nx">fn</span> <span class="o">*</span><span class="nx">funcval</span><span class="p">,</span> <span class="nx">argp</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">,</span> <span class="nx">narg</span> <span class="kt">int32</span><span class="p">,</span> <span class="nx">callergp</span> <span class="o">*</span><span class="nx">g</span><span class="p">,</span> <span class="nx">callerpc</span> <span class="kt">uintptr</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 15</span>  <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln"> 16</span>
+<span class="ln"> 17</span>  <span class="k">if</span> <span class="nx">fn</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 18</span>    <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">throwing</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1">// do not dump full stacks
+</span><span class="ln"> 19</span><span class="c1"></span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;go of nil func value&#34;</span><span class="p">)</span>
+<span class="ln"> 20</span>  <span class="p">}</span>
+<span class="ln"> 21</span>  <span class="nf">acquirem</span><span class="p">()</span> <span class="c1">// disable preemption because it can be holding p in a local var
+</span><span class="ln"> 22</span><span class="c1"></span>  <span class="nx">siz</span> <span class="o">:=</span> <span class="nx">narg</span>
+<span class="ln"> 23</span>  <span class="nx">siz</span> <span class="p">=</span> <span class="p">(</span><span class="nx">siz</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;^</span> <span class="mi">7</span>
+<span class="ln"> 24</span>
+<span class="ln"> 25</span>  <span class="c1">// We could allocate a larger initial stack if necessary.
+</span><span class="ln"> 26</span><span class="c1"></span>  <span class="c1">// Not worth it: this is almost always an error.
+</span><span class="ln"> 27</span><span class="c1"></span>  <span class="c1">// 4*sizeof(uintreg): extra space added below
+</span><span class="ln"> 28</span><span class="c1"></span>  <span class="c1">// sizeof(uintreg): caller&#39;s LR (arm) or return address (x86, in gostartcall).
+</span><span class="ln"> 29</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">siz</span> <span class="o">&gt;=</span> <span class="nx">_StackMin</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="nx">sys</span><span class="p">.</span><span class="nx">RegSize</span><span class="o">-</span><span class="nx">sys</span><span class="p">.</span><span class="nx">RegSize</span> <span class="p">{</span>
+<span class="ln"> 30</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;newproc: function arguments too large for new goroutine&#34;</span><span class="p">)</span>
+<span class="ln"> 31</span>  <span class="p">}</span>
+<span class="ln"> 32</span>
+<span class="ln"> 33</span>  <span class="nx">_p_</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+<span class="ln"> 34</span>  <span class="nx">newg</span> <span class="o">:=</span> <span class="nf">gfget</span><span class="p">(</span><span class="nx">_p_</span><span class="p">)</span>
+<span class="ln"> 35</span>  <span class="c1">// 初始化栈大小
+</span><span class="ln"> 36</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">newg</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 37</span>    <span class="nx">newg</span> <span class="p">=</span> <span class="nf">malg</span><span class="p">(</span><span class="nx">_StackMin</span><span class="p">)</span>
+<span class="ln"> 38</span>    <span class="nf">casgstatus</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="nx">_Gidle</span><span class="p">,</span> <span class="nx">_Gdead</span><span class="p">)</span>
+<span class="ln"> 39</span>    <span class="nf">allgadd</span><span class="p">(</span><span class="nx">newg</span><span class="p">)</span> <span class="c1">// publishes with a g-&gt;status of Gdead so GC scanner doesn&#39;t look at uninitialized stack.
+</span><span class="ln"> 40</span><span class="c1"></span>  <span class="p">}</span>
+<span class="ln"> 41</span>  <span class="k">if</span> <span class="nx">newg</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 42</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;newproc1: newg missing stack&#34;</span><span class="p">)</span>
+<span class="ln"> 43</span>  <span class="p">}</span>
+<span class="ln"> 44</span>
+<span class="ln"> 45</span>  <span class="k">if</span> <span class="nf">readgstatus</span><span class="p">(</span><span class="nx">newg</span><span class="p">)</span> <span class="o">!=</span> <span class="nx">_Gdead</span> <span class="p">{</span>
+<span class="ln"> 46</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;newproc1: new g is not Gdead&#34;</span><span class="p">)</span>
+<span class="ln"> 47</span>  <span class="p">}</span>
+<span class="ln"> 48</span>
+<span class="ln"> 49</span>  <span class="nx">totalSize</span> <span class="o">:=</span> <span class="mi">4</span><span class="o">*</span><span class="nx">sys</span><span class="p">.</span><span class="nx">RegSize</span> <span class="o">+</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">siz</span><span class="p">)</span> <span class="o">+</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">MinFrameSize</span> <span class="c1">// extra space in case of reads slightly beyond frame
+</span><span class="ln"> 50</span><span class="c1"></span>  <span class="nx">totalSize</span> <span class="o">+=</span> <span class="o">-</span><span class="nx">totalSize</span> <span class="o">&amp;</span> <span class="p">(</span><span class="nx">sys</span><span class="p">.</span><span class="nx">SpAlign</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>                  <span class="c1">// align to spAlign
+</span><span class="ln"> 51</span><span class="c1"></span>  <span class="nx">sp</span> <span class="o">:=</span> <span class="nx">newg</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span> <span class="o">-</span> <span class="nx">totalSize</span>
+<span class="ln"> 52</span>  <span class="nx">spArg</span> <span class="o">:=</span> <span class="nx">sp</span>
+<span class="ln"> 53</span>  <span class="k">if</span> <span class="nx">usesLR</span> <span class="p">{</span>
+<span class="ln"> 54</span>    <span class="c1">// caller&#39;s LR
+</span><span class="ln"> 55</span><span class="c1"></span>    <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="kt">uintptr</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">sp</span><span class="p">))</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln"> 56</span>    <span class="nf">prepGoExitFrame</span><span class="p">(</span><span class="nx">sp</span><span class="p">)</span>
+<span class="ln"> 57</span>    <span class="nx">spArg</span> <span class="o">+=</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">MinFrameSize</span>
+<span class="ln"> 58</span>  <span class="p">}</span>
+<span class="ln"> 59</span>  <span class="k">if</span> <span class="nx">narg</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 60</span>    <span class="nf">memmove</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">spArg</span><span class="p">),</span> <span class="nx">argp</span><span class="p">,</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">narg</span><span class="p">))</span>
+<span class="ln"> 61</span>    <span class="c1">// This is a stack-to-stack copy. If write barriers
+</span><span class="ln"> 62</span><span class="c1"></span>    <span class="c1">// are enabled and the source stack is grey (the
+</span><span class="ln"> 63</span><span class="c1"></span>    <span class="c1">// destination is always black), then perform a
+</span><span class="ln"> 64</span><span class="c1"></span>    <span class="c1">// barrier copy. We do this *after* the memmove
+</span><span class="ln"> 65</span><span class="c1"></span>    <span class="c1">// because the destination stack may have garbage on
+</span><span class="ln"> 66</span><span class="c1"></span>    <span class="c1">// it.
+</span><span class="ln"> 67</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">writeBarrier</span><span class="p">.</span><span class="nx">needed</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">curg</span><span class="p">.</span><span class="nx">gcscandone</span> <span class="p">{</span>
+<span class="ln"> 68</span>      <span class="nx">f</span> <span class="o">:=</span> <span class="nf">findfunc</span><span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">fn</span><span class="p">)</span>
+<span class="ln"> 69</span>      <span class="nx">stkmap</span> <span class="o">:=</span> <span class="p">(</span><span class="o">*</span><span class="nx">stackmap</span><span class="p">)(</span><span class="nf">funcdata</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">_FUNCDATA_ArgsPointerMaps</span><span class="p">))</span>
+<span class="ln"> 70</span>      <span class="k">if</span> <span class="nx">stkmap</span><span class="p">.</span><span class="nx">nbit</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 71</span>        <span class="c1">// We&#39;re in the prologue, so it&#39;s always stack map index 0.
+</span><span class="ln"> 72</span><span class="c1"></span>        <span class="nx">bv</span> <span class="o">:=</span> <span class="nf">stackmapdata</span><span class="p">(</span><span class="nx">stkmap</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="ln"> 73</span>        <span class="nf">bulkBarrierBitmap</span><span class="p">(</span><span class="nx">spArg</span><span class="p">,</span> <span class="nx">spArg</span><span class="p">,</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">bv</span><span class="p">.</span><span class="nx">n</span><span class="p">)</span><span class="o">*</span><span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">bv</span><span class="p">.</span><span class="nx">bytedata</span><span class="p">)</span>
+<span class="ln"> 74</span>      <span class="p">}</span>
+<span class="ln"> 75</span>    <span class="p">}</span>
+<span class="ln"> 76</span>  <span class="p">}</span>
+<span class="ln"> 77</span>
+<span class="ln"> 78</span>  <span class="nf">memclrNoHeapPointers</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">),</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nf">Sizeof</span><span class="p">(</span><span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">))</span>
+<span class="ln"> 79</span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">.</span><span class="nx">sp</span> <span class="p">=</span> <span class="nx">sp</span>
+<span class="ln"> 80</span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">stktopsp</span> <span class="p">=</span> <span class="nx">sp</span>
+<span class="ln"> 81</span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">.</span><span class="nx">pc</span> <span class="p">=</span> <span class="nf">funcPC</span><span class="p">(</span><span class="nx">goexit</span><span class="p">)</span> <span class="o">+</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PCQuantum</span> <span class="c1">// +PCQuantum so that previous instruction is in same function
+</span><span class="ln"> 82</span><span class="c1"></span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">.</span><span class="nx">g</span> <span class="p">=</span> <span class="nf">guintptr</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">newg</span><span class="p">))</span>
+<span class="ln"> 83</span>  <span class="nf">gostartcallfn</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">newg</span><span class="p">.</span><span class="nx">sched</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span>
+<span class="ln"> 84</span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">gopc</span> <span class="p">=</span> <span class="nx">callerpc</span>
+<span class="ln"> 85</span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">ancestors</span> <span class="p">=</span> <span class="nf">saveAncestors</span><span class="p">(</span><span class="nx">callergp</span><span class="p">)</span>
+<span class="ln"> 86</span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">startpc</span> <span class="p">=</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">fn</span>
+<span class="ln"> 87</span>  <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">curg</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 88</span>    <span class="nx">newg</span><span class="p">.</span><span class="nx">labels</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">curg</span><span class="p">.</span><span class="nx">labels</span>
+<span class="ln"> 89</span>  <span class="p">}</span>
+<span class="ln"> 90</span>  <span class="k">if</span> <span class="nf">isSystemGoroutine</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 91</span>    <span class="nx">atomic</span><span class="p">.</span><span class="nf">Xadd</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">ngsys</span><span class="p">,</span> <span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="ln"> 92</span>  <span class="p">}</span>
+<span class="ln"> 93</span>  <span class="nf">casgstatus</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="nx">_Gdead</span><span class="p">,</span> <span class="nx">_Grunnable</span><span class="p">)</span>
+<span class="ln"> 94</span>
+<span class="ln"> 95</span>  <span class="k">if</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="o">==</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcacheend</span> <span class="p">{</span>
+<span class="ln"> 96</span>    <span class="c1">// Sched.goidgen is the last allocated id,
+</span><span class="ln"> 97</span><span class="c1"></span>    <span class="c1">// this batch must be [sched.goidgen+1, sched.goidgen+GoidCacheBatch].
+</span><span class="ln"> 98</span><span class="c1"></span>    <span class="c1">// At startup sched.goidgen=0, so main goroutine receives goid=1.
+</span><span class="ln"> 99</span><span class="c1"></span>    <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="p">=</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Xadd64</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">goidgen</span><span class="p">,</span> <span class="nx">_GoidCacheBatch</span><span class="p">)</span>
+<span class="ln">100</span>    <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="o">-=</span> <span class="nx">_GoidCacheBatch</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="ln">101</span>    <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcacheend</span> <span class="p">=</span> <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span> <span class="o">+</span> <span class="nx">_GoidCacheBatch</span>
+<span class="ln">102</span>  <span class="p">}</span>
+<span class="ln">103</span>  <span class="nx">newg</span><span class="p">.</span><span class="nx">goid</span> <span class="p">=</span> <span class="nb">int64</span><span class="p">(</span><span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span><span class="p">)</span>
+<span class="ln">104</span>  <span class="nx">_p_</span><span class="p">.</span><span class="nx">goidcache</span><span class="o">++</span>
+<span class="ln">105</span>  <span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+<span class="ln">106</span>    <span class="nx">newg</span><span class="p">.</span><span class="nx">racectx</span> <span class="p">=</span> <span class="nf">racegostart</span><span class="p">(</span><span class="nx">callerpc</span><span class="p">)</span>
+<span class="ln">107</span>  <span class="p">}</span>
+<span class="ln">108</span>  <span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">{</span>
+<span class="ln">109</span>    <span class="nf">traceGoCreate</span><span class="p">(</span><span class="nx">newg</span><span class="p">,</span> <span class="nx">newg</span><span class="p">.</span><span class="nx">startpc</span><span class="p">)</span>
+<span class="ln">110</span>  <span class="p">}</span>
+<span class="ln">111</span>  <span class="nf">runqput</span><span class="p">(</span><span class="nx">_p_</span><span class="p">,</span> <span class="nx">newg</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+<span class="ln">112</span>
+<span class="ln">113</span>  <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">npidle</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">nmspinning</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">mainStarted</span> <span class="p">{</span>
+<span class="ln">114</span>    <span class="nf">wakep</span><span class="p">()</span>
+<span class="ln">115</span>  <span class="p">}</span>
+<span class="ln">116</span>  <span class="nf">releasem</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">)</span>
+<span class="ln">117</span><span class="p">}</span>
+</code></pre></div><h2 id="全局调度器">全局调度器</h2>
+<ul>
+<li>通过lock来全局管控一些全局操作</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">schedt</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// accessed atomically. keep at top to ensure alignment on 32-bit systems.
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nx">goidgen</span>   <span class="kt">uint64</span>
+<span class="ln"> 4</span>  <span class="nx">lastpoll</span>  <span class="kt">uint64</span> <span class="c1">// time of last network poll, 0 if currently polling
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">pollUntil</span> <span class="kt">uint64</span> <span class="c1">// time to which current poll is sleeping
+</span><span class="ln"> 6</span><span class="c1"></span>
+<span class="ln"> 7</span>  <span class="nx">lock</span> <span class="nx">mutex</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="c1">// When increasing nmidle, nmidlelocked, nmsys, or nmfreed, be
+</span><span class="ln">10</span><span class="c1"></span>  <span class="c1">// sure to call checkdead().
+</span><span class="ln">11</span><span class="c1"></span>
+<span class="ln">12</span>  <span class="nx">midle</span>        <span class="nx">muintptr</span> <span class="c1">// idle m&#39;s waiting for work
+</span><span class="ln">13</span><span class="c1"></span>  <span class="nx">nmidle</span>       <span class="kt">int32</span>    <span class="c1">// number of idle m&#39;s waiting for work
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">nmidlelocked</span> <span class="kt">int32</span>    <span class="c1">// number of locked m&#39;s waiting for work
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">mnext</span>        <span class="kt">int64</span>    <span class="c1">// number of m&#39;s that have been created and next M ID
+</span><span class="ln">16</span><span class="c1"></span>  <span class="nx">maxmcount</span>    <span class="kt">int32</span>    <span class="c1">// maximum number of m&#39;s allowed (or die)
+</span><span class="ln">17</span><span class="c1"></span>  <span class="nx">nmsys</span>        <span class="kt">int32</span>    <span class="c1">// number of system m&#39;s not counted for deadlock
+</span><span class="ln">18</span><span class="c1"></span>  <span class="nx">nmfreed</span>      <span class="kt">int64</span>    <span class="c1">// cumulative number of freed m&#39;s
+</span><span class="ln">19</span><span class="c1"></span>
+<span class="ln">20</span>  <span class="c1">// 系统中所有Groutine的数量
+</span><span class="ln">21</span><span class="c1"></span>  <span class="nx">ngsys</span> <span class="kt">uint32</span> <span class="c1">// number of system goroutines; updated atomically
+</span><span class="ln">22</span><span class="c1"></span>
+<span class="ln">23</span>  <span class="nx">pidle</span>      <span class="nx">puintptr</span> <span class="c1">// idle p&#39;s
+</span><span class="ln">24</span><span class="c1"></span>  <span class="nx">npidle</span>     <span class="kt">uint32</span>
+<span class="ln">25</span>  <span class="nx">nmspinning</span> <span class="kt">uint32</span> <span class="c1">// See &#34;Worker thread parking/unparking&#34; comment in proc.go.
+</span><span class="ln">26</span><span class="c1"></span>
+<span class="ln">27</span>  <span class="c1">// Global runnable queue.
+</span><span class="ln">28</span><span class="c1"></span>  <span class="c1">// 全局G队列
+</span><span class="ln">29</span><span class="c1"></span>  <span class="nx">runq</span>     <span class="nx">gQueue</span>
+<span class="ln">30</span>  <span class="nx">runqsize</span> <span class="kt">int32</span>
+<span class="ln">31</span>
+<span class="ln">32</span>  <span class="c1">// disable controls selective disabling of the scheduler.
+</span><span class="ln">33</span><span class="c1"></span>  <span class="c1">//
+</span><span class="ln">34</span><span class="c1"></span>  <span class="c1">// Use schedEnableUser to control this.
+</span><span class="ln">35</span><span class="c1"></span>  <span class="c1">//
+</span><span class="ln">36</span><span class="c1"></span>  <span class="c1">// disable is protected by sched.lock.
+</span><span class="ln">37</span><span class="c1"></span>  <span class="nx">disable</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">38</span>    <span class="c1">// user disables scheduling of user goroutines.
+</span><span class="ln">39</span><span class="c1"></span>    <span class="nx">user</span>     <span class="kt">bool</span>
+<span class="ln">40</span>    <span class="nx">runnable</span> <span class="nx">gQueue</span> <span class="c1">// pending runnable Gs
+</span><span class="ln">41</span><span class="c1"></span>    <span class="nx">n</span>        <span class="kt">int32</span>  <span class="c1">// length of runnable
+</span><span class="ln">42</span><span class="c1"></span>  <span class="p">}</span>
+<span class="ln">43</span>
+<span class="ln">44</span>  <span class="c1">// Global cache of dead G&#39;s.
+</span><span class="ln">45</span><span class="c1"></span>  <span class="nx">gFree</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">46</span>    <span class="nx">lock</span>    <span class="nx">mutex</span>
+<span class="ln">47</span>    <span class="nx">stack</span>   <span class="nx">gList</span> <span class="c1">// Gs with stacks
+</span><span class="ln">48</span><span class="c1"></span>    <span class="nx">noStack</span> <span class="nx">gList</span> <span class="c1">// Gs without stacks
+</span><span class="ln">49</span><span class="c1"></span>    <span class="nx">n</span>       <span class="kt">int32</span>
+<span class="ln">50</span>  <span class="p">}</span>
+<span class="ln">51</span>
+<span class="ln">52</span>  <span class="c1">// Central cache of sudog structs.
+</span><span class="ln">53</span><span class="c1"></span>  <span class="nx">sudoglock</span>  <span class="nx">mutex</span>
+<span class="ln">54</span>  <span class="nx">sudogcache</span> <span class="o">*</span><span class="nx">sudog</span>
+<span class="ln">55</span>
+<span class="ln">56</span>  <span class="c1">// Central pool of available defer structs of different sizes.
+</span><span class="ln">57</span><span class="c1"></span>  <span class="nx">deferlock</span> <span class="nx">mutex</span>
+<span class="ln">58</span>  <span class="nx">deferpool</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">*</span><span class="nx">_defer</span>
+<span class="ln">59</span>
+<span class="ln">60</span>  <span class="c1">// freem is the list of m&#39;s waiting to be freed when their
+</span><span class="ln">61</span><span class="c1"></span>  <span class="c1">// m.exited is set. Linked through m.freelink.
+</span><span class="ln">62</span><span class="c1"></span>  <span class="nx">freem</span> <span class="o">*</span><span class="nx">m</span>
+<span class="ln">63</span>
+<span class="ln">64</span>  <span class="nx">gcwaiting</span>  <span class="kt">uint32</span> <span class="c1">// gc is waiting to run
+</span><span class="ln">65</span><span class="c1"></span>  <span class="nx">stopwait</span>   <span class="kt">int32</span>
+<span class="ln">66</span>  <span class="nx">stopnote</span>   <span class="nx">note</span>
+<span class="ln">67</span>  <span class="nx">sysmonwait</span> <span class="kt">uint32</span>
+<span class="ln">68</span>  <span class="nx">sysmonnote</span> <span class="nx">note</span>
+<span class="ln">69</span>
+<span class="ln">70</span>  <span class="c1">// safepointFn should be called on each P at the next GC
+</span><span class="ln">71</span><span class="c1"></span>  <span class="c1">// safepoint if p.runSafePointFn is set.
+</span><span class="ln">72</span><span class="c1"></span>  <span class="nx">safePointFn</span>   <span class="kd">func</span><span class="p">(</span><span class="o">*</span><span class="nx">p</span><span class="p">)</span>
+<span class="ln">73</span>  <span class="nx">safePointWait</span> <span class="kt">int32</span>
+<span class="ln">74</span>  <span class="nx">safePointNote</span> <span class="nx">note</span>
+<span class="ln">75</span>
+<span class="ln">76</span>  <span class="nx">profilehz</span> <span class="kt">int32</span> <span class="c1">// cpu profiling rate
+</span><span class="ln">77</span><span class="c1"></span>
+<span class="ln">78</span>  <span class="nx">procresizetime</span> <span class="kt">int64</span> <span class="c1">// nanotime() of last change to gomaxprocs
+</span><span class="ln">79</span><span class="c1"></span>  <span class="nx">totaltime</span>      <span class="kt">int64</span> <span class="c1">// ∫gomaxprocs dt up to procresizetime
+</span><span class="ln">80</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div>
   </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
@@ -215,7 +824,7 @@ GOOS：目标操作系统</p>
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/" class="nav-link">channel原理分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">channel源码分析</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/" class="nav-link">dmp文件分析（四）- 调用栈分析</a>
@@ -272,13 +881,13 @@ GOOS：目标操作系统</p>
     <div>
       <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
       <nav class="tags_nav">
-        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
-          BREAKPAD
-          <span class='button_tally'>11</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
           <span class='button_tally'>11</span>
         </a>
         

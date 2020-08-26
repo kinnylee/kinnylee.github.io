@@ -204,6 +204,7 @@
       </ul>
     </li>
     <li><a href="#select">select</a></li>
+    <li><a href="#协程调度">协程调度</a></li>
   </ul>
 </nav>
     <h1 id="协程在手说go就go">协程在手，说Go就Go</h1>
@@ -296,49 +297,49 @@
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
 <span class="ln"> 2</span>
 <span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
-<span class="ln"> 4</span>	<span class="s">&#34;fmt&#34;</span>
-<span class="ln"> 5</span>	<span class="s">&#34;time&#34;</span>
+<span class="ln"> 4</span>  <span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 5</span>  <span class="s">&#34;time&#34;</span>
 <span class="ln"> 6</span><span class="p">)</span>
 <span class="ln"> 7</span>
 <span class="ln"> 8</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
-<span class="ln"> 9</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
-<span class="ln">10</span>	<span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
+<span class="ln"> 9</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln">10</span>  <span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
 <span class="ln">11</span><span class="p">}</span>
 <span class="ln">12</span>
 <span class="ln">13</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
-<span class="ln">14</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
-<span class="ln">15</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">14</span>  <span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">15</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
 <span class="ln">16</span><span class="p">}</span>
 <span class="ln">17</span>
 <span class="ln">18</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
-<span class="ln">19</span>	<span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
-<span class="ln">20</span>	<span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
-<span class="ln">21</span>	<span class="k">go</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
-<span class="ln">22</span>	<span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
+<span class="ln">19</span>  <span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
+<span class="ln">20</span>  <span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">21</span>  <span class="k">go</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">22</span>  <span class="nx">time</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>
 <span class="ln">23</span><span class="p">}</span>
 </code></pre></div><p>将main函数本身也看成协程，不用sleep实现同步</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
 <span class="ln"> 2</span>
 <span class="ln"> 3</span><span class="kn">import</span> <span class="p">(</span>
-<span class="ln"> 4</span>	<span class="s">&#34;fmt&#34;</span>
+<span class="ln"> 4</span>  <span class="s">&#34;fmt&#34;</span>
 <span class="ln"> 5</span><span class="p">)</span>
 <span class="ln"> 6</span>
 <span class="ln"> 7</span><span class="kd">func</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
-<span class="ln"> 8</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
-<span class="ln"> 9</span>	<span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
+<span class="ln"> 8</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">)</span>
+<span class="ln"> 9</span>  <span class="nx">ch</span> <span class="o">&lt;-</span> <span class="mi">1</span>
 <span class="ln">10</span><span class="p">}</span>
 <span class="ln">11</span>
 <span class="ln">12</span><span class="kd">func</span> <span class="nf">Two</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">){</span>
-<span class="ln">13</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
-<span class="ln">14</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
+<span class="ln">13</span>  <span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">14</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">)</span>
 <span class="ln">15</span><span class="p">}</span>
 <span class="ln">16</span>
 <span class="ln">17</span><span class="kd">func</span> <span class="nf">main</span><span class="p">(){</span>
-<span class="ln">18</span>	<span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
-<span class="ln">19</span>	<span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
-<span class="ln">20</span>	<span class="o">&lt;-</span> <span class="nx">ch</span>
-<span class="ln">21</span>	<span class="c1">//go Two(ch)
-</span><span class="ln">22</span><span class="c1"></span>	<span class="c1">//time.Sleep(5 * 1e9)
+<span class="ln">18</span>  <span class="nx">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span>
+<span class="ln">19</span>  <span class="k">go</span> <span class="nf">One</span><span class="p">(</span><span class="nx">ch</span><span class="p">)</span>
+<span class="ln">20</span>  <span class="o">&lt;-</span> <span class="nx">ch</span>
+<span class="ln">21</span>  <span class="c1">//go Two(ch)
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">//time.Sleep(5 * 1e9)
 </span><span class="ln">23</span><span class="c1"></span><span class="p">}</span>
 </code></pre></div><h2 id="range">range</h2>
 <blockquote>
@@ -365,31 +366,31 @@
 <span class="ln"> 7</span>  <span class="nx">exitChan</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 <span class="ln"> 8</span>  <span class="nx">c</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 <span class="ln"> 9</span>
-<span class="ln">10</span>	<span class="c1">// 这里任务数刚好是channel的大小，不会报错
-</span><span class="ln">11</span><span class="c1"></span>	<span class="c1">// 如果改成比chanel大，就会报错。但是如果把这段代码放到consumer后面，就不会报错
-</span><span class="ln">12</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">50</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-<span class="ln">13</span>		<span class="nx">c</span> <span class="o">&lt;-</span> <span class="nx">i</span>
-<span class="ln">14</span>	<span class="p">}</span>
+<span class="ln">10</span>  <span class="c1">// 这里任务数刚好是channel的大小，不会报错
+</span><span class="ln">11</span><span class="c1"></span>  <span class="c1">// 如果改成比chanel大，就会报错。但是如果把这段代码放到consumer后面，就不会报错
+</span><span class="ln">12</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">50</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">13</span>    <span class="nx">c</span> <span class="o">&lt;-</span> <span class="nx">i</span>
+<span class="ln">14</span>  <span class="p">}</span>
 <span class="ln">15</span>
-<span class="ln">16</span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-<span class="ln">17</span>		<span class="k">go</span> <span class="nf">Consumer</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">exitChan</span><span class="p">)</span>
-<span class="ln">18</span>	<span class="p">}</span>
-<span class="ln">19</span>	<span class="c1">// 这里关闭任务channel，让调用Consumer函数的协程知道：自己的任务完成了，协程可以退出了
-</span><span class="ln">20</span><span class="c1"></span>	<span class="c1">// 如果不关闭，协程将不退出
-</span><span class="ln">21</span><span class="c1"></span>	<span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
-<span class="ln">22</span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-<span class="ln">23</span>		<span class="o">&lt;-</span><span class="nx">exitChan</span>
-<span class="ln">24</span>	<span class="p">}</span>
-<span class="ln">25</span>	<span class="nb">close</span><span class="p">(</span><span class="nx">exitChan</span><span class="p">)</span>
-<span class="ln">26</span>	<span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span>
+<span class="ln">16</span>  <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">17</span>    <span class="k">go</span> <span class="nf">Consumer</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">exitChan</span><span class="p">)</span>
+<span class="ln">18</span>  <span class="p">}</span>
+<span class="ln">19</span>  <span class="c1">// 这里关闭任务channel，让调用Consumer函数的协程知道：自己的任务完成了，协程可以退出了
+</span><span class="ln">20</span><span class="c1"></span>  <span class="c1">// 如果不关闭，协程将不退出
+</span><span class="ln">21</span><span class="c1"></span>  <span class="nb">close</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+<span class="ln">22</span>  <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">5</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">23</span>    <span class="o">&lt;-</span><span class="nx">exitChan</span>
+<span class="ln">24</span>  <span class="p">}</span>
+<span class="ln">25</span>  <span class="nb">close</span><span class="p">(</span><span class="nx">exitChan</span><span class="p">)</span>
+<span class="ln">26</span>  <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span>
 <span class="ln">27</span><span class="p">}</span>
 <span class="ln">28</span><span class="kd">func</span> <span class="nf">Consumer</span><span class="p">(</span><span class="nx">index</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">c</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">exitChan</span> <span class="kd">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">29</span>	<span class="k">for</span> <span class="nx">target</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">c</span> <span class="p">{</span>
-<span class="ln">30</span>		<span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;no.%d:%d\n&#34;</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">target</span><span class="p">)</span>
-<span class="ln">31</span>		<span class="nx">count</span><span class="o">++</span>
-<span class="ln">32</span>	<span class="p">}</span>
-<span class="ln">33</span>	<span class="c1">// 执行close(c)后，协程会走到这里
-</span><span class="ln">34</span><span class="c1"></span>	<span class="nx">exitChan</span> <span class="o">&lt;-</span> <span class="nx">index</span>
+<span class="ln">29</span>  <span class="k">for</span> <span class="nx">target</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">c</span> <span class="p">{</span>
+<span class="ln">30</span>    <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;no.%d:%d\n&#34;</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">target</span><span class="p">)</span>
+<span class="ln">31</span>    <span class="nx">count</span><span class="o">++</span>
+<span class="ln">32</span>  <span class="p">}</span>
+<span class="ln">33</span>  <span class="c1">// 执行close(c)后，协程会走到这里
+</span><span class="ln">34</span><span class="c1"></span>  <span class="nx">exitChan</span> <span class="o">&lt;-</span> <span class="nx">index</span>
 <span class="ln">35</span><span class="p">}</span>
 </code></pre></div><h2 id="select">select</h2>
 <p>在UNIX中，select()函数用来监控一组描述符，该机制常被用于实现高并发的socket服务器程序。Go语言直接在语言级别支持select关键字，用于处理异步IO问题。</p>
@@ -414,7 +415,15 @@
 <span class="ln">13</span>    <span class="k">case</span> <span class="o">&lt;-</span> <span class="nx">timeout</span><span class="p">:</span>
 <span class="ln">14</span>    <span class="c1">// 没有从ch中读取到数据，但从timeout中读取到了数据
 </span><span class="ln">15</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div>
+</code></pre></div><h2 id="协程调度">协程调度</h2>
+<p>go中的runtime包，提供了调度器的功能，runtime包提供了以下几个方法：</p>
+<p>Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当前线程，因此当前线程未来会继续执行
+NumCPU：返回当前系统的 CPU 核数量
+GOMAXPROCS：设置最大的可同时使用的 CPU 核数
+Goexit：退出当前 goroutine(但是defer语句会照常执行)
+NumGoroutine：返回正在执行和排队的任务总数
+GOOS：目标操作系统</p>
+
   </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
@@ -431,7 +440,7 @@
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/" class="nav-link">channel原理分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">channel源码分析</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程</a>
@@ -488,13 +497,13 @@
     <div>
       <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
       <nav class="tags_nav">
-        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
-          BREAKPAD
-          <span class='button_tally'>11</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
           <span class='button_tally'>11</span>
         </a>
         

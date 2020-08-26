@@ -143,25 +143,28 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/'>channel原理分析</a>
+        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>channel源码分析</a>
       </h3>
       <div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Aug 25, 2020</span>
+    Aug 26, 2020</span>
   <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
   </a>
   <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
   </a>
 </div>
 
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  源码分析  位置：src/runtime/chan.go  chan数据结构 1type hchan struct { 2 // 当前队列中总元素个数 3 qcount uint // total data in the queue 4 // 环形队列长度，即缓冲区大小（申明channel时指定的大小） 5 dataqsiz uint // size of the circular queue 6 // 环形队列指针 7 buf unsafe.Pointer // points to …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/' class='excerpt_more button'>Read More</a>
+          <p class = 'pale'>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
+1package main 2import &#34;fmt&#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &lt;- 1 9 }() 10 // 从channel取出数据 11 x := &lt;- c 12 close(c) 13 fmt.Println(x) 14} channel源码入口 channel使用 …</p>
+          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
     </div>
@@ -184,13 +187,14 @@
   </a>
   <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
   </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
 </div>
 
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>协程原理 协程调度 go中的runtime包，提供了调度器的功能，runtime包提供了以下几个方法：
-Gosched：让当前线程让出 cpu 以让其它线程运行,它不会挂起当前线程，因此当前线程未来会继续执行 NumCPU：返回当前系统的 CPU 核数量 GOMAXPROCS：设置最大的可同时使用的 CPU 核数 Goexit：退出当前 goroutine(但是defer语句会照常执行) NumGoroutine：返回正在执行和排队的任务总数 GOOS：目标操作系统</p>
+          <p class = 'pale'>协程原理 CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名消息传递使之解耦，在语言层面实现了自动调度，这样屏蔽了很多内部细节 对外提供简单的语法关键字，大大简化了 …</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -507,7 +511,7 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E5%8E%9F%E7%90%86%E4%BB%8B%E7%BB%8D/" class="nav-link">channel原理分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">channel源码分析</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程</a>
@@ -567,13 +571,13 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
     <div>
       <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
       <nav class="tags_nav">
-        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
-          BREAKPAD
-          <span class='button_tally'>11</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
           <span class='button_tally'>11</span>
         </a>
         
