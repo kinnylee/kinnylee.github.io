@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>go协程 | kinnylee</title>
+  <head>  <title>go协程原理 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -18,9 +18,9 @@
 <meta name="description" content="协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating …">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go协程" />
+<meta name = "twitter:title" content = "go协程原理" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" />
-<meta property = "og:title" content = "go协程" />
+<meta property = "og:title" content = "go协程原理" />
 <meta property = "og:description" content = "协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating …" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
@@ -136,7 +136,7 @@
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content'>
-    <h1 class='post_title'>go协程</h1><div class = 'post_meta'>
+    <h1 class='post_title'>go协程原理</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
@@ -152,13 +152,13 @@
 
     <div class='post_share'>
   Share on:
-  <a href="https://twitter.com/intent/tweet?text=go%e5%8d%8f%e7%a8%8b&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%258D%258F%25E7%25A8%258B%25E5%258E%259F%25E7%2590%2586%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+  <a href="https://twitter.com/intent/tweet?text=go%e5%8d%8f%e7%a8%8b%e5%8e%9f%e7%90%86&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%258D%258F%25E7%25A8%258B%25E5%258E%259F%25E7%2590%2586%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
     <svg class="icon">
       <use xlink:href="#twitter"></use>
     </svg>
   </a>
   
-  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%258D%258F%25E7%25A8%258B%25E5%258E%259F%25E7%2590%2586%2f&t=go%e5%8d%8f%e7%a8%8b" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E5%258D%258F%25E7%25A8%258B%25E5%258E%259F%25E7%2590%2586%2f&t=go%e5%8d%8f%e7%a8%8b%e5%8e%9f%e7%90%86" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
     <svg class="icon">
       <use xlink:href="#facebook"></use>
     </svg>
