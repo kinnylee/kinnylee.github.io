@@ -235,7 +235,7 @@
 <span class="ln">2</span>0x006a 00106 (main.go:44) CALL  runtime.newproc(SB)
 <span class="ln">3</span>0x008b 00139 (main.go:47) CALL  runtime.chanrecv1(SB)
 <span class="ln">4</span>0x0032 00050 (main.go:45) CALL  runtime.chansend1(SB)
-<span class="ln">5</span>0x00a3 00163 (main.go:48)	CALL	runtime.closechan(SB)
+<span class="ln">5</span>0x00a3 00163 (main.go:48) CALL  runtime.closechan(SB)
 </code></pre></div><p>可以猜测对应关系：</p>
 <ul>
 <li>make(chan int)对应：runtime.makechan函数</li>
