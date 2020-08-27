@@ -6,10 +6,24 @@
     <description>Recent content in Posts on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Wed, 26 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 27 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>go-select源码分析</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <pubDate>Thu, 27 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <description>select简介 select使用 下面是select的最简单的用法：
+1 select源码入口 select在源码中也没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
+1go tool compile -N -l -S main.go&amp;gt;hello.s 查看部分带有CALL指令的核心内容如下：
+10x0102 00258 (main.go:64) CALL runtime.selectgo(SB) 可以猜测对应关系：
+ select语句对应：runtime.selectgo函数  相关源码只需要到runtime包下，全局搜索就可以找到在文件runtime/chan.go下
+1func selectgo(cas0 *scase, order0 *uint16, ncases int) (int, bool) {} 源码分析 case数据结构 1type scase struct { 2 c *hchan // chan 3 elem unsafe.Pointer // data element 4 kind uint16 5 pc uintptr // race pc (for race detector / msan) 6 releasetime int64 7} </description>
+    </item>
     
     <item>
       <title>go-channel源码分析</title>
@@ -17,7 +31,7 @@
       <pubDate>Wed, 26 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
-      <description>channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
+      <description>go-channel源码分析 channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
 1package main 2import &amp;#34;fmt&amp;#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &amp;lt;- 1 9 }() 10 // 从channel取出数据 11 x := &amp;lt;- c 12 close(c) 13 fmt.Println(x) 14} channel源码入口 channel使用的make、&amp;lt;- 等符号，在源码中没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
 1go tool compile -N -l -S main.go&amp;gt;hello.s 查看部分带有CALL指令的核心内容如下：
 10x0043 00067 (main.go:42) CALL runtime.makechan(SB) 20x006a 00106 (main.go:44) CALL runtime.newproc(SB) 30x008b 00139 (main.</description>
@@ -220,15 +234,6 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
 go语言覆盖范围  容器：docker 容器编排：k8s 监控：prometheus 数据库：etcd、tidb、influxdb 服务治理：istio 区块链：Fabric 存储：minio 基础设施管理：terraform 注册中心：consul k8s管理平台：rancher &amp;hellip;  hello world 1package main 2import &amp;#34;fmt&amp;#34; 3func main() { 4 fmt.Println(&amp;#34;hello world\n&amp;#34;) 5} 1go run hello.go 基本语法 数组、字符串、切片 go语言中，三者是密切相关的数据结构。底层原始数据有着相同的内存结构，上层因为语法限制，有不同的行为表现
  数据传值，而不传引用，是go语言编程的一个哲学。传值有一定代价，但是换取的好处是切断了对原始数据的依赖（垃圾回收也方便）。即使是传递的切片，也是给切片的指针传值。但是给人一种假象好像是传的引用
     对比项 数组 字符串 切片     特性 定长 只读 长度可伸缩，每个切片有独立的长度和容量信息   元素是否可修改 是 否 是   赋值和传参 整体复制 只复制数据地址和对应的长度，不会导致底层数据复制 复制切片头信息，不会导致底层数据复制    数组  数组是值语义，一个数组变量即表示整个数组，并不隐式指向第一个元素（C语言的特性） 数组赋值时，是复制整个数组底层数据 为了避免复制数组的开销，可以传递一个数组指针 数组指针 !</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
-      <description></description>
     </item>
     
     <item>
