@@ -161,8 +161,7 @@
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的stream：memory stream
-Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中memory列表的stream类型为MD_MEMORY_LIST_STREAM，枚举值是5 memory分为很多的区域（region），每个区域使用MinidumpMemoryRegion对象表示  Memory Stream读取入口  dump的GetMemoryList方法，获取dmp文件中的内存信息 读取的模块列表信息保存 …</p>
+          <p class = 'pale'>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的str</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -195,8 +194,7 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取
-Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场的基本信息 崩溃信息包括：  崩溃时的线程id 异常状态码 异常标识 异常的内存地址 寄存器信息 其他信息   以上信息都保存在MDRawExceptionStream中  Exception Stream读取入口  dump的GetException方法，获取dmp文件中的崩溃信息 读取的模块列表信息保存在MinidumpException …</p>
+          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exce</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -225,7 +223,7 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>概述 静态链接库  windows: .lib文件 linux：.a文件  动态链接库  windows：.dll文件 linux：.so文件  </p>
+          <p class = 'pale'>概述 静态链接库 windows: .lib文件 linux：.a文件 动态链接库 windows：.dll文件 linux：.so文件</p>
           <a href='https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -258,8 +256,7 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。
-module stream概述  module信息记录了应用程序（exe）在运行时，加载了哪些dll 每个dll相关的信息，在dmp中称为module dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4 每个module使用MinidumpModule对象表示 每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址， …</p>
+          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -292,9 +289,7 @@ module stream概述  module信息记录了应用程序（exe）在运行时，�
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信息、异常信息、模块信息等。
-breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位置：src/google_breakpad/common/minidump_format.h
-1typedef enum { 2 MD_UNUSED_STREAM = 0, 3 MD_RESERVED_STREAM_0 = 1, 4 MD_RESERVED_STREAM_1 = 2, 5 MD_THREAD_LIST_STREAM = 3, /* MDRawThreadList …</p>
+          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -327,9 +322,7 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件解析 dmp读取源码分析（一） 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数
-1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体流程： Minidump对象用于保存dmp文件流内容，核心代码
-1PrintMinidumpProcess(...) { 2 ... 3 // 第一步：读取dmp文件内容 4 Minidump dump(minidump_file); 5 if …</p>
+          <p class = 'pale'>dmp文件解析 dmp读取源码分析（一） 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数 1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -360,7 +353,7 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&#39;v2_playbook_on_start&#39;, pb) 8 # 遍历单个 playbook 下所有的 play(entries对象) 9 plays = pb.get_plays() 10 for …</p>
+          <p class = 'pale'>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&#39;v2_playbook_on_start&#39;, pb) 8 # 遍历单个 playbook 下所有的 p</p>
           <a href='https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>

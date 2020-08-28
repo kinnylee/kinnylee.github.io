@@ -5,6 +5,7 @@
     <link>https://kinnylee.github.io/categories/python/</link>
     <description>Recent content in python on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
     <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
     
@@ -17,7 +18,7 @@
       <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/</guid>
-      <description>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&amp;#39;v2_playbook_on_start&amp;#39;, pb) 8 # 遍历单个 playbook 下所有的 play(entries对象) 9 plays = pb.get_plays() 10 for play in plays: 11 # 获取主机列表 12 batches = self._get_serialized_batches(play) 13 for batch in batches: 14 # 执行单个 play 逻辑, 调用 task_queue_manager.run() 15 result = self._tqm.run(play=play) 16 # 触发 统计 的回调函数 17 self.</description>
+      <description>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&amp;#39;v2_playbook_on_start&amp;#39;, pb) 8 # 遍历单个 playbook 下所有的 p</description>
     </item>
     
   </channel>

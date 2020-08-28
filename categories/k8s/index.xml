@@ -5,6 +5,7 @@
     <link>https://kinnylee.github.io/categories/k8s/</link>
     <description>Recent content in k8s on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
     <lastBuildDate>Sun, 28 Jun 2020 00:00:00 +0000</lastBuildDate>
     
@@ -17,8 +18,7 @@
       <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/</guid>
-      <description>分享的内容包括  k8s demo部署示例 k8s基本架构和原理 k8s资源对象 k8s网络模型 总结   k8s就像图中的货船，管理各种集装箱（容器）
- 一. k8s demo部署示例 说明  先通过一个hello world程序直观感受一下k8s 程序部署在宿主机，容器和k8s三种环境，对比他们的差异 代码大致是这个样子 1@RestController 2public class K8sDemoController { 3 4 @GetMapping(&amp;#34;/hello&amp;#34;) 5 public String hello(){ 6 return &amp;#34;hello k8s demo.&amp;#34;; 7 } 8}   1. 宿主机上如何运行  mvn编译代码打成jar包 执行java -jar k8s-demo.jar &amp;amp; 浏览器中输入 http://10.1.69.101:8080/hello 地址访问服务  2. Docker容器上如何运行  mvn编译代码打成jar包 将jar包打成docker镜像 执行docker run --name k8s-demo -d -p 8080:8080 k8s-demo:0.0.1-SNAPSHOT 浏览器中输入 http://10.1.69.101:8080/hello 地址访问服务  3.</description>
+      <description>分享的内容包括 k8s demo部署示例 k8s基本架构和原理 k8s资源对象 k8s网络模型 总结 k8s就像图中的货船，管理各种集装箱（容器） 一. k8s dem</description>
     </item>
     
   </channel>

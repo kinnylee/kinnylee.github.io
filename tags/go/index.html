@@ -190,8 +190,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是由runtime.main函数启动的 go进程启动后，会调用runtime·rt0_go来执行程序的初始化和启动系统调度  go进程启动的四大步骤
- runtime.osinit：获取系统cpu个数 runtime.schedinit：初始化调度系统，p初始化，m0和某个绑定 runtime.newproc：新 …</p>
+          <p class = 'pale'>Go进程启动分析 我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -222,12 +221,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>select简介 select使用 下面是select的最简单的用法：
-1 select源码入口 select在源码中也没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
-1go tool compile -N -l -S main.go&gt;hello.s 查看部分带有CALL指令的核心内容如下：
-10x0102 00258 (main.go:64) CALL runtime.selectgo(SB) 可以猜测对应关系：
- select语句对应：runtime.selectgo函数  相关源码只需要到runtime包下，全局搜索就可以找到在文件runtime/chan.go下
-1func …</p>
+          <p class = 'pale'>select简介 select使用 下面是select的最简单的用法： 1 select源码入口 select在源码中也没有对应的实现，而是通过编译器</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -258,8 +252,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>go-channel源码分析 channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
-1package main 2import &#34;fmt&#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &lt;- 1 9 }() 10 // 从channel取出数据 11 x := &lt;- c 12 close(c) 13 fmt.Println(x) 14} …</p>
+          <p class = 'pale'>go-channel源码分析 channel简介 channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -290,7 +283,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名 …</p>
+          <p class = 'pale'>协程原理 并发编程模型 从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性 CSP模型 go语言的并发特性是由197</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -319,7 +312,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>协程在手，说Go就Go 协程概述  协程：轻量级、用户级线程。 协程的调度：  由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度   协程的优势：  占用空间少(只需2k，系统线程为2M) 线程上下文切换成本少   go：语言层面提出了Groutine的概念，支持协程  简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 fmt.Println(&#34;1&#34;) 10} 11 12func Two(){ 13 fmt.Println(&#34;2&#34;) …</p>
+          <p class = 'pale'>协程在手，说Go就Go 协程概述 协程：轻量级、用户级线程。 协程的调度： 由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度 协程的优势：</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -346,9 +339,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>go高级编程（一）- 概述 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
-go语言的诞生  google的三位大咖与2007年开始发明设计，称为21世纪的C语言 动力：对超级复杂的C++11特性的吹捧报告的鄙视 目标：设计网络和多核时代的C语言 发布：2010年9月正式发布，并开源源代码  语言基因 go语言继承了贝尔实验室半个世纪的软件设计基因
- 并发特性：由1978年发布的CSP理论演化而来（ErLang语言也实现了该理论） 面向对象和包特性：继承自pascal语言 C语言特性：继承了C语言的优点，并抛弃了危险的指针操作等缺点 嵌套函数：schema语言 itoa语法：APL语言 新的语法：defer …</p>
+          <p class = 'pale'>go高级编程（一）- 概述 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言 go语言的诞生 google的三位大咖与2007</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
         </div>
       </div>

@@ -5,6 +5,7 @@
     <link>https://kinnylee.github.io/tags/go/</link>
     <description>Recent content in go on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
     <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0000</lastBuildDate>
     
@@ -26,11 +27,7 @@
       <pubDate>Fri, 28 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/</guid>
-      <description>Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是由runtime.main函数启动的 go进程启动后，会调用runtime·rt0_go来执行程序的初始化和启动系统调度  go进程启动的四大步骤
- runtime.osinit：获取系统cpu个数 runtime.schedinit：初始化调度系统，p初始化，m0和某个绑定 runtime.newproc：新建groutine，执行runtime.main，建好后插入p的本地队列 runtime.mstart：启动m，进入启动调度系统  概念介绍 m0 表示进程启动的第一个线程，也叫主线程。它是进程启动通过汇编复制的，是个全局变量
-g0  每个m都有一个g0，因为每个线程都有一个系统堆栈。 和其他g的区别是栈的区别。 g0上的栈是系统分配的，在linux上默认大小为8M，不能扩展也不能缩小。而普通g默认2k，可扩展 g0上没有任何任务函数，也没有任何状态，它不能被调度程序抢占。 调度是在g0上跑的  源码位置：src/runtime/proc.go
-1// 全局变量，赋值是汇编实现的 2var ( 3 // 主线程 4 m0 m 5 // 和m0绑定的g0，也可以理解成m0的堆栈 6 g0 g 7 raceprocctx0 uintptr 8) 汇编入口 源码位置：src/runtime/asm_arm64.s
-1TEXT runtime·rt0_go(SB),NOSPLIT,$0 2 3 // 进程启动时的主线程 4 // 当前栈和资源保存在全局变量runtime.g0中 5 MOVD	$runtime·g0(SB), g 6 7 // 当前线程保存在m0 8 MOVD	$runtime·m0(SB), R0 9 10 // g0绑定到m0 11 MOVD	g, m_g0(R0) 12 13 // m0绑定到g0 14 MOVD	R0, g_m(g) 15 16 // os初始化，获取cpu数量 17 BL	runtime·osinit(SB) 18 19 // 调度器初始化 20 BL	runtime·schedinit(SB) 21 22 // 这里进入runtime.</description>
+      <description>Go进程启动分析 我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇</description>
     </item>
     
     <item>
@@ -39,12 +36,7 @@ g0  每个m都有一个g0，因为每个线程都有一个系统堆栈。 和其
       <pubDate>Thu, 27 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
-      <description>select简介 select使用 下面是select的最简单的用法：
-1 select源码入口 select在源码中也没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
-1go tool compile -N -l -S main.go&amp;gt;hello.s 查看部分带有CALL指令的核心内容如下：
-10x0102 00258 (main.go:64) CALL runtime.selectgo(SB) 可以猜测对应关系：
- select语句对应：runtime.selectgo函数  相关源码只需要到runtime包下，全局搜索就可以找到在文件runtime/chan.go下
-1func selectgo(cas0 *scase, order0 *uint16, ncases int) (int, bool) {} 源码分析 case数据结构 1type scase struct { 2 c *hchan // chan 3 elem unsafe.Pointer // data element 4 kind uint16 5 pc uintptr // race pc (for race detector / msan) 6 releasetime int64 7} </description>
+      <description>select简介 select使用 下面是select的最简单的用法： 1 select源码入口 select在源码中也没有对应的实现，而是通过编译器</description>
     </item>
     
     <item>
@@ -53,10 +45,7 @@ g0  每个m都有一个g0，因为每个线程都有一个系统堆栈。 和其
       <pubDate>Wed, 26 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
-      <description>go-channel源码分析 channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
-1package main 2import &amp;#34;fmt&amp;#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &amp;lt;- 1 9 }() 10 // 从channel取出数据 11 x := &amp;lt;- c 12 close(c) 13 fmt.Println(x) 14} channel源码入口 channel使用的make、&amp;lt;- 等符号，在源码中没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
-1go tool compile -N -l -S main.go&amp;gt;hello.s 查看部分带有CALL指令的核心内容如下：
-10x0043 00067 (main.go:42) CALL runtime.makechan(SB) 20x006a 00106 (main.go:44) CALL runtime.newproc(SB) 30x008b 00139 (main.</description>
+      <description>go-channel源码分析 channel简介 channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的</description>
     </item>
     
     <item>
@@ -65,9 +54,7 @@ g0  每个m都有一个g0，因为每个线程都有一个系统堆栈。 和其
       <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</guid>
-      <description>协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名消息传递使之解耦，在语言层面实现了自动调度，这样屏蔽了很多内部细节 对外提供简单的语法关键字，大大简化了并发编程的思维转换和管理线程的复杂性。 通过GMP调度模型实现语言层面的调度  并发调度原理 go语言的线程MPG调度模型
-M：machine，一个M直接关联一个内核线程 P：processor，代表M所需的上下文环境，也是处理用户级代码逻辑的处理器 G：groutine，协程，本质上是一种轻量级的线程
- 一个M对应一个内核线程，也会连接一个上下文P 一个上下文P，相当于一个处理器。 p的数量是在启动时被设置为环境变量GOMAXPROCS，意味着运行的线程数量是固定的 一个上下文连接一个或多个groutine p正在执行的Groutine为蓝色的，处于待执行的Groutine为灰色（保存在一个队列中）  G 数据结构  G对应Groutine  1// 源码位置：src/runtime/runtime2.go 2type g struct { 3 // 栈变量，保存运行时的堆栈内存信息 4 // 内部包含两个指针：lo和hi，分别指向栈的上下界 5 stack stack // offset known to runtime/cgo 6 stackguard0 uintptr // offset known to liblink 7 stackguard1 uintptr // offset known to liblink 8 .</description>
+      <description>协程原理 并发编程模型 从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性 CSP模型 go语言的并发特性是由197</description>
     </item>
     
     <item>
@@ -76,8 +63,7 @@ M：machine，一个M直接关联一个内核线程 P：processor，代表M所�
       <pubDate>Mon, 17 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/</guid>
-      <description>协程在手，说Go就Go 协程概述  协程：轻量级、用户级线程。 协程的调度：  由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度   协程的优势：  占用空间少(只需2k，系统线程为2M) 线程上下文切换成本少   go：语言层面提出了Groutine的概念，支持协程  简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &amp;#34;fmt&amp;#34; 5 &amp;#34;time&amp;#34; 6) 7 8func One(){ 9 fmt.Println(&amp;#34;1&amp;#34;) 10} 11 12func Two(){ 13 fmt.Println(&amp;#34;2&amp;#34;) 14} 15 16func main(){ 17 go One() 18 go Two() 19}  上面的代码执行后，并不会如期打印结果，原因在于协程是并发的，协程调用前，主函数已经退出，协程也被销毁了。
- 1func main(){ 2 go gorouting() 3 // 可通过简单的sleep，让主线程等待协程执行完 4 // 但是执行顺序不一定是按照1，2顺序输出 5 time.Sleep(5 * 1e9) 6} 7 前面的例子，可看到协程使用需要考虑：</description>
+      <description>协程在手，说Go就Go 协程概述 协程：轻量级、用户级线程。 协程的调度： 由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度 协程的优势：</description>
     </item>
     
     <item>
@@ -86,12 +72,7 @@ M：machine，一个M直接关联一个内核线程 P：processor，代表M所�
       <pubDate>Fri, 10 Jul 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B8%80-%E6%A6%82%E8%BF%B0/</guid>
-      <description>go高级编程（一）- 概述 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言
-go语言的诞生  google的三位大咖与2007年开始发明设计，称为21世纪的C语言 动力：对超级复杂的C++11特性的吹捧报告的鄙视 目标：设计网络和多核时代的C语言 发布：2010年9月正式发布，并开源源代码  语言基因 go语言继承了贝尔实验室半个世纪的软件设计基因
- 并发特性：由1978年发布的CSP理论演化而来（ErLang语言也实现了该理论） 面向对象和包特性：继承自pascal语言 C语言特性：继承了C语言的优点，并抛弃了危险的指针操作等缺点 嵌套函数：schema语言 itoa语法：APL语言 新的语法：defer等  并发特性 并发是go语言的标志性特性，来源于CSP论文，Communicating Sequential Processes(顺序通信进程)
-go语言覆盖范围  容器：docker 容器编排：k8s 监控：prometheus 数据库：etcd、tidb、influxdb 服务治理：istio 区块链：Fabric 存储：minio 基础设施管理：terraform 注册中心：consul k8s管理平台：rancher &amp;hellip;  hello world 1package main 2import &amp;#34;fmt&amp;#34; 3func main() { 4 fmt.Println(&amp;#34;hello world\n&amp;#34;) 5} 1go run hello.go 基本语法 数组、字符串、切片 go语言中，三者是密切相关的数据结构。底层原始数据有着相同的内存结构，上层因为语法限制，有不同的行为表现
- 数据传值，而不传引用，是go语言编程的一个哲学。传值有一定代价，但是换取的好处是切断了对原始数据的依赖（垃圾回收也方便）。即使是传递的切片，也是给切片的指针传值。但是给人一种假象好像是传的引用
-    对比项 数组 字符串 切片     特性 定长 只读 长度可伸缩，每个切片有独立的长度和容量信息   元素是否可修改 是 否 是   赋值和传参 整体复制 只复制数据地址和对应的长度，不会导致底层数据复制 复制切片头信息，不会导致底层数据复制    数组  数组是值语义，一个数组变量即表示整个数组，并不隐式指向第一个元素（C语言的特性） 数组赋值时，是复制整个数组底层数据 为了避免复制数组的开销，可以传递一个数组指针 数组指针 !</description>
+      <description>go高级编程（一）- 概述 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言 go语言的诞生 google的三位大咖与2007</description>
     </item>
     
   </channel>

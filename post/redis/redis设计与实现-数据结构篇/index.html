@@ -15,13 +15,13 @@
   
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="前言  redis性能为什么这么出色？它与其他缓存中间件有什么区别？ redis底层使用了哪些数据结构支撑它如此高效的性能？ 内部丰富的数据类型底层为什么都使用至少两种数据结构实现？分别是什么？ 如果合理的使用redis才能发挥它最大的优势？  学习完《redis设计与实现》前面关于数据结构与对象的章节，以上问题都能得 …">
+<meta name="description" content="前言 redis性能为什么这么出色？它与其他缓存中间件有什么区别？ redis底层使用了哪些数据结构支撑它如此高效的性能？ 内部丰富的数据类型底层">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "K8s基本入门" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/redis/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AF%87/" />
 <meta property = "og:title" content = "K8s基本入门" />
-<meta property = "og:description" content = "前言  redis性能为什么这么出色？它与其他缓存中间件有什么区别？ redis底层使用了哪些数据结构支撑它如此高效的性能？ 内部丰富的数据类型底层为什么都使用至少两种数据结构实现？分别是什么？ 如果合理的使用redis才能发挥它最大的优势？  学习完《redis设计与实现》前面关于数据结构与对象的章节，以上问题都能得 …" />
+<meta property = "og:description" content = "前言 redis性能为什么这么出色？它与其他缓存中间件有什么区别？ redis底层使用了哪些数据结构支撑它如此高效的性能？ 内部丰富的数据类型底层" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -147,7 +147,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 912 字</span>，阅读约<span class="more-meta"> 5 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 7725 字</span>，阅读约<span class="more-meta"> 16 分钟</span>
     <div class='post_share'>
   Share on:
   <a href="https://twitter.com/intent/tweet?text=K8s%e5%9f%ba%e6%9c%ac%e5%85%a5%e9%97%a8&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fredis%2fredis%25E8%25AE%25BE%25E8%25AE%25A1%25E4%25B8%258E%25E5%25AE%259E%25E7%258E%25B0-%25E6%2595%25B0%25E6%258D%25AE%25E7%25BB%2593%25E6%259E%2584%25E7%25AF%2587%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">

@@ -191,8 +191,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是由runtime.main函数启动的 go进程启动后，会调用runtime·rt0_go来执行程序的初始化和启动系统调度  go进程启动的四大步骤
- runtime.osinit：获取系统cpu个数 runtime.schedinit：初始化调度系统，p初始化，m0和某个绑定 runtime.newproc：新 …</p>
+          <p class = 'pale'>Go进程启动分析 我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -223,12 +222,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>select简介 select使用 下面是select的最简单的用法：
-1 select源码入口 select在源码中也没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
-1go tool compile -N -l -S main.go&gt;hello.s 查看部分带有CALL指令的核心内容如下：
-10x0102 00258 (main.go:64) CALL runtime.selectgo(SB) 可以猜测对应关系：
- select语句对应：runtime.selectgo函数  相关源码只需要到runtime包下，全局搜索就可以找到在文件runtime/chan.go下
-1func …</p>
+          <p class = 'pale'>select简介 select使用 下面是select的最简单的用法： 1 select源码入口 select在源码中也没有对应的实现，而是通过编译器</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -253,10 +247,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>如何搭建自己的博客系统  静态网页搭建 集成评论功能  静态网页搭建 选型对比：
-名称 | 优势 | 劣势 | 开发语言
-   | - | - | -    hexo | hugo |
-访问数、字数、阅读数集成集成  不蒜子  theme的header中添加js文件  themes/你的主题/layout/partial/footer.html添加上述脚本即可，当然你也可以添加到 header 中  1&lt;script async src=&#34;//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js&#34;&gt; 2&lt;/script&gt; 文章标题后面添 …</p>
+          <p class = 'pale'>如何搭建自己的博客系统 静态网页搭建 集成评论功能 静态网页搭建 选型对比： 名称 | 优势 | 劣势 | 开发语言 | - | - | - hexo | hugo | 访问数、字数、阅读数集成集</p>
           <a href='https://kinnylee.github.io/post/hugo/%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -287,8 +278,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>go-channel源码分析 channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
-1package main 2import &#34;fmt&#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &lt;- 1 9 }() 10 // 从channel取出数据 11 x := &lt;- c 12 close(c) 13 fmt.Println(x) 14} …</p>
+          <p class = 'pale'>go-channel源码分析 channel简介 channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -319,7 +309,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名 …</p>
+          <p class = 'pale'>协程原理 并发编程模型 从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性 CSP模型 go语言的并发特性是由197</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -352,11 +342,7 @@
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件分析（四）- 调用栈分析 前面的章节我们介绍过，分析dmp的一个调用栈的过程，以及获取上一个栈帧的公式。今天介绍这个公式在breakpad中的源码调用。调用栈分析有三种途径，里面很多细节还不是完全理解，只是大概罗列一下代码的框架
-获取调用者的栈帧 前面介绍过Stackwalker方法是基类，每种不同的cpu架构都有自己的实现类，都需要重写几个方法，其中很重要的一个是GetCallerFrame方法，用于获取调用栈的上一个栈帧
- caller: 调用者（父函数）; callee：被调用者（子函数）
- 这里以常用的amd64架构cpu介绍源码实现。实现类为 StackwalkerAMD64
-1StackFrame* …</p>
+          <p class = 'pale'>dmp文件分析（四）- 调用栈分析 前面的章节我们介绍过，分析dmp的一个调用栈的过程，以及获取上一个栈帧的公式。今天介绍这个公式在breakp</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -389,9 +375,7 @@
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件分析（三）- 寄存器与栈帧结构 上一篇文件讲解了一个崩溃调用栈中第一个栈帧的分析过程：
- 获取指令寄存器eip的地址，通过该地址去模块列表中匹配，找到符合的模块，确定崩溃在哪个模块了 通过模块信息，根据一定路径拼接规则去查找给定模块的符号文件是否存在 解析符号文件，并保存 将符号文件的内存地址和模块的内存地址做匹配，得到崩溃模块的源码信息  分析完一个栈帧后，会根据栈帧结构，查找上层调用函数的eip，继续分析下一个栈帧，再继续分析源码之前，先介绍一下栈帧结构和寄存器相关知识，breakpad中主要用到eip、ebp、esp
-寄存器 寄存器是CPU内部用来存放数据的一些小型存储区域，包括通用寄存器、专用寄存器和控制寄存器。寄 …</p>
+          <p class = 'pale'>dmp文件分析（三）- 寄存器与栈帧结构 上一篇文件讲解了一个崩溃调用栈中第一个栈帧的分析过程： 获取指令寄存器eip的地址，通过该地址去模块列表</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -424,9 +408,7 @@
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件分析（二）- symbol 上一篇回顾了dmp的解析，并介绍了dmp分析的入口，通过不同的cpu架构，构造Stackwalker的不同子类，并调用Walk方法分析调用栈，其中Walk方法中包含两步：
- 读取寄存器中的eip，构造初始化栈帧 提取symbol信息，用于协助分析，使分析结果能准确到代码行数级别 根据eip，分析顶层栈调用情况 根据栈帧查找原理，获取caller（上层调用者）的栈帧信息，直到栈帧结束  第一步上一篇已经介绍过，这篇文章主要介绍内容包括：
- symbol是什么 symbol文件格式以及存储格式规范 如何通过寄存器eip，快速定位到哪个模块崩溃 如何通过某种查找规则，找到模块对应的symbol …</p>
+          <p class = 'pale'>dmp文件分析（二）- symbol 上一篇回顾了dmp的解析，并介绍了dmp分析的入口，通过不同的cpu架构，构造Stackwalker的不同子类，并调</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -459,9 +441,7 @@
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件分析（一） 前面的章节已经将dmp文件读取分析完成，读取过程将dmp中的信息加载到对象中，用于后续分析，这篇文章开始介绍分析流程。
-dmp读取流程回顾 如下源码已经做了详细注释，总结如下：
- 读取头文件中的文件创建时间 读取进程运行时长 读取cpu信息 读取操作系统信息 读取崩溃的线程id 读取崩溃原因 读取断言信息 读取模块信息，并拷贝一份，用于后续分析（分析时会修改原始数据） 读取内存信息 读取线程信息 for循环，依次分析每个线程的调用栈  分析调用栈需要的数据  操作系统信息 上下文信息 线程内存信息 模块列表 符号相关参数信息  1ProcessResult MinidumpProcessor::Process( …</p>
+          <p class = 'pale'>dmp文件分析（一） 前面的章节已经将dmp文件读取分析完成，读取过程将dmp中的信息加载到对象中，用于后续分析，这篇文章开始介绍分析流程。 d</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
         </div>
       </div>

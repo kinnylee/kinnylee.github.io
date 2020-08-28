@@ -15,17 +15,13 @@
   
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="select简介 select使用 下面是select的最简单的用法：
-1 select源码入口 select在源码中也没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
-1go tool compile -N -l -S main.go&gt;hello.s 查看部分带 …">
+<meta name="description" content="select简介 select使用 下面是select的最简单的用法： 1 select源码入口 select在源码中也没有对应的实现，而是通过编译器">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "go-select源码分析" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" />
 <meta property = "og:title" content = "go-select源码分析" />
-<meta property = "og:description" content = "select简介 select使用 下面是select的最简单的用法：
-1 select源码入口 select在源码中也没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
-1go tool compile -N -l -S main.go&gt;hello.s 查看部分带 …" />
+<meta property = "og:description" content = "select简介 select使用 下面是select的最简单的用法： 1 select源码入口 select在源码中也没有对应的实现，而是通过编译器" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -155,7 +151,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 68 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 270 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
     <div class='post_share'>
   Share on:
   <a href="https://twitter.com/intent/tweet?text=go-select%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo-select%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">

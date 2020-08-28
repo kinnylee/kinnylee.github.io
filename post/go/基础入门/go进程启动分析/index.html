@@ -15,13 +15,13 @@
   
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是 …">
+<meta name="description" content="Go进程启动分析 我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "go进程启动分析" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" />
 <meta property = "og:title" content = "go进程启动分析" />
-<meta property = "og:description" content = "Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是 …" />
+<meta property = "og:description" content = "Go进程启动分析 我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -151,7 +151,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1957 字</span>，阅读约<span class="more-meta"> 10 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 3732 字</span>，阅读约<span class="more-meta"> 8 分钟</span>
     <div class='post_share'>
   Share on:
   <a href="https://twitter.com/intent/tweet?text=go%e8%bf%9b%e7%a8%8b%e5%90%af%e5%8a%a8%e5%88%86%e6%9e%90&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E8%25BF%259B%25E7%25A8%258B%25E5%2590%25AF%25E5%258A%25A8%25E5%2588%2586%25E6%259E%2590%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">

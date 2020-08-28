@@ -162,8 +162,7 @@
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件读取（六） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常、内存这四种stream的读取，至此，核心的stream读取已经介绍完，本章介绍其他的stream读取，这些stream不是不重要，而是代码比较简单，这些stream包括：
- MD_SYSTEM_INFO_STREAM MD_MISC_INFO_STREAM MD_BREAKPAD_INFO_STREAM MD_ASSERTION_INFO_STREAM  MD_SYSTEM_INFO_STREAM  包含cpu架构 包含操作系统信息 MDRawSystemInfo  system stream 读取入口 1ProcessResult …</p>
+          <p class = 'pale'>dmp文件读取（六） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常、内存这四种stream的读取，至此，核心的stream</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -192,7 +191,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>协程在手，说Go就Go 协程概述  协程：轻量级、用户级线程。 协程的调度：  由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度   协程的优势：  占用空间少(只需2k，系统线程为2M) 线程上下文切换成本少   go：语言层面提出了Groutine的概念，支持协程  简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 fmt.Println(&#34;1&#34;) 10} 11 12func Two(){ 13 fmt.Println(&#34;2&#34;) …</p>
+          <p class = 'pale'>协程在手，说Go就Go 协程概述 协程：轻量级、用户级线程。 协程的调度： 由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度 协程的优势：</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -219,8 +218,7 @@
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>Go-cli 简介  A simple, fast, and fun package for building command line apps in Go 一个简单的、快速的、并且有趣的用于构建go应用程序的包 github地址 目标是帮助开发人员快速构建易于表达的命令行程序 目前存在两个版本v1、v2（新版本）  快速上手 v2官方使用说明
-   添加模块依赖    1GO111MODULE=on go get github.com/urfave/cli/v2   使用    1package main 2 3import ( 4 &#34;os&#34; 5 …</p>
+          <p class = 'pale'>Go-cli 简介 A simple, fast, and fun package for building command line apps in Go 一个简单的、快速的、并且有趣的用于构建go应用程序的包 github地址 目标是帮助开发人员快速构建易于表达的命</p>
           <a href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -253,8 +251,7 @@
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的stream：memory stream
-Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中memory列表的stream类型为MD_MEMORY_LIST_STREAM，枚举值是5 memory分为很多的区域（region），每个区域使用MinidumpMemoryRegion对象表示  Memory Stream读取入口  dump的GetMemoryList方法，获取dmp文件中的内存信息 读取的模块列表信息保存 …</p>
+          <p class = 'pale'>dmp文件读取（五） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常这三种stream的读取，本章介绍另外一个很重要的str</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%94-memory/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -283,7 +280,7 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>breakpad是什么  google开源的一套实现崩溃报告系统的客户端和服务端组件 C++语言实现 现在已经被广泛运用在google的一系列产品及其它公司的桌面程序上，如chrome，piscal，firefox等。 github地址 官方网站  功能特性  崩溃转储 崩溃分析 跨平台：windows、mac、linux 可以运行于一系列架构的cpu上  主要组件  client：集成到应用程序源码中，用于抓取崩溃信息，并生成minidmp文件 symbol dumper：读取编译器生成的调试信息（pdb），生成symbol文件 processor：读取minidump文件，并结合symbol文件，生成可读的堆栈调用信息  各组件 …</p>
+          <p class = 'pale'>breakpad是什么 google开源的一套实现崩溃报告系统的客户端和服务端组件 C++语言实现 现在已经被广泛运用在google的一系列产品及</p>
           <a href='https://kinnylee.github.io/post/breakpad/breakpad%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -316,8 +313,7 @@ Memory Stream概述  Memory Stream记录了进程崩溃时的内存信息 dmp中
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exception) Stream的读取
-Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场的基本信息 崩溃信息包括：  崩溃时的线程id 异常状态码 异常标识 异常的内存地址 寄存器信息 其他信息   以上信息都保存在MDRawExceptionStream中  Exception Stream读取入口  dump的GetException方法，获取dmp文件中的崩溃信息 读取的模块列表信息保存在MinidumpException …</p>
+          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exce</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -373,7 +369,7 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>概述 静态链接库  windows: .lib文件 linux：.a文件  动态链接库  windows：.dll文件 linux：.so文件  </p>
+          <p class = 'pale'>概述 静态链接库 windows: .lib文件 linux：.a文件 动态链接库 windows：.dll文件 linux：.so文件</p>
           <a href='https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -406,8 +402,7 @@ Exception Stream概述  Exception Stream记录了进程崩溃时，崩溃现场�
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、寄存器等上下文信息。这些信息是后面分析调用栈的核心参考。本节主要介绍模块stream信息。
-module stream概述  module信息记录了应用程序（exe）在运行时，加载了哪些dll 每个dll相关的信息，在dmp中称为module dmp中module列表的stream类型为MD_MODULE_LIST_STREAM，枚举值是4 每个module使用MinidumpModule对象表示 每个module在内存中占用一段位置，dmp分析时，根据线程的崩溃地址， …</p>
+          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
@@ -440,9 +435,7 @@ module stream概述  module信息记录了应用程序（exe）在运行时，�
       </div>
       
         <div>
-          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信息、异常信息、模块信息等。
-breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位置：src/google_breakpad/common/minidump_format.h
-1typedef enum { 2 MD_UNUSED_STREAM = 0, 3 MD_RESERVED_STREAM_0 = 1, 4 MD_RESERVED_STREAM_1 = 2, 5 MD_THREAD_LIST_STREAM = 3, /* MDRawThreadList …</p>
+          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信</p>
           <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
