@@ -42,11 +42,11 @@
     
 
     
-    <link rel="preload" href="https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css" integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ==' as="style">
-    <link rel="preload" href="https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js" as="script">
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.bcdb2ea7690006493263863422acbd7158adc713f96f2669f3b92d2679363f31e2267554c8829c87d5e8a2a14d2cbece1094fc965d353d1f3aa7d49950afc2fd.css" integrity = 'sha512-vNsup2kABkkyY4Y0Iqy9cVitxxP5byZp87ktJnk2PzHiJnVUyIKch9XooqFNLL7OEJT8ll01PR86p9SZUK/C/Q==' as="style">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.eee5874ae267c1f514e6e52a5cecc1212612aa3cfa2d37b0412b45a003f382b9f74dd7d89b7e7efb5ce9e7bc78df38ca7dc9585c021ef9d2b839768491e45457.js" as="script">
 
     
-    <link rel = 'stylesheet' href = 'https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css' integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ=='>
+    <link rel = 'stylesheet' href = 'https://kinnylee.github.io/css/styles.bcdb2ea7690006493263863422acbd7158adc713f96f2669f3b92d2679363f31e2267554c8829c87d5e8a2a14d2cbece1094fc965d353d1f3aa7d49950afc2fd.css' integrity = 'sha512-vNsup2kABkkyY4Y0Iqy9cVitxxP5byZp87ktJnk2PzHiJnVUyIKch9XooqFNLL7OEJT8ll01PR86p9SZUK/C/Q=='>
 	  
   </head>
   
@@ -141,7 +141,7 @@
     <main>
   
 <div class = 'grid-inverse wrap content'>
-  <article class='post_content'>
+  <article class='post_content' id= 'post_content'>
     <h1 class='post_title'>这个博客系统如何搭建</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
@@ -151,7 +151,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 99 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 179 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
     <div class='post_share'>
   Share on:
   <a href="https://twitter.com/intent/tweet?text=%e8%bf%99%e4%b8%aa%e5%8d%9a%e5%ae%a2%e7%b3%bb%e7%bb%9f%e5%a6%82%e4%bd%95%e6%90%ad%e5%bb%ba&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fhugo%2f%25E8%25BF%2599%25E4%25B8%25AA%25E5%258D%259A%25E5%25AE%25A2%25E7%25B3%25BB%25E7%25BB%259F%25E5%25A6%2582%25E4%25BD%2595%25E6%2590%25AD%25E5%25BB%25BA%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
@@ -231,6 +231,10 @@ hugo    |</p>
 <span class="ln">2</span><span class="o">&lt;</span><span class="nx">span</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&#34;busuanzi_value_page_pv&#34;</span><span class="o">&gt;&lt;</span><span class="nx">span</span><span class="o">&gt;&lt;</span><span class="nx">span</span><span class="o">&gt;</span>
 <span class="ln">3</span>      <span class="nx">阅读</span> <span class="o">&lt;</span><span class="err">/span&gt;&lt;/span&gt;|&lt;span class=&#34;post-date&#34;&gt; 共 {{ .WordCount }} 字&lt;/span&gt;，阅读约&lt;span class=&#34;more-meta&#34;&gt; {{ .ReadingTime }} 分钟&lt;/span&gt;</span>
 </code></pre></div><h3 id="评论系统">评论系统</h3>
+<ul>
+<li><a href="https://blog.shuiba.co/comment-systems-recommendation">选型对比</a></li>
+<li></li>
+</ul>
 <p>选型对比：</p>
 <p>名称    |     概述   | 优势         | 劣势</p>
 <ul>
@@ -239,17 +243,45 @@ hugo    |</p>
 </code></pre>
 </li>
 </ul>
-<p>Valine  |国内，使用较多，加载快|评论门槛低，可以安装 valine-admin 来过滤垃圾评论和实现邮件提醒|需要将数据保存到他们的服务器
-Disqus  |   |   | 评论门槛高 | 界面比较丑，需要翻墙
-gittalk  |
-gitment  | | 评论数据直接保存仓库
-livere   | 韩国
-畅言      | 国内 |  | 免费版有广告，需要备案</p>
-<ul>
-<li>Valine</li>
-<li>gitment</li>
-</ul>
-<h3 id="搜索系统">搜索系统</h3>
+<p>Valine  |国内，使用较多，加载快|评论门槛低，可以安装 valine-admin 来过滤垃圾评论和实现邮件提醒|需要将数据保存到他们的服务器|注册账号后还要用身份证号码信息认证，认证完后还要用支付宝扫码验证是不是本人的
+Disqus  |   |   | 评论门槛高 | 界面比较丑，需要翻墙。广告多，加载慢
+gittalk  |github issue风格 | |需要登录github账号才能评论，账号写到前端代码中
+gitment  | github issue风格| 评论数据直接保存仓库 | 很久没有人维护了
+livere   | 韩国 | | 加载慢，后台访问不稳定
+畅言      | 国内 |  | 免费版有广告，需要备案
+Utterances | github issue风格</p>
+<h4 id="最终选定utterances">最终选定Utterances</h4>
+<ol>
+<li>登录https://github.com/apps/utterances</li>
+<li>github新建一个仓库</li>
+<li>安装utterances到新建的仓库</li>
+</ol>
+<p>因为我用的主题hugo-clarity没有集成utterances，需要自己将脚本集成进去</p>
+<p>themes/hugo-clarity/assets/js/index.js 最后一个花括号前面加入函数</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="ln"> 1</span><span class="p">...</span>
+<span class="ln"> 2</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 3</span>    <span class="c1">// 匿名函数，防止污染全局变量
+</span><span class="ln"> 4</span><span class="c1"></span>    <span class="kd">var</span> <span class="nx">utterances</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">);</span>
+<span class="ln"> 5</span>    <span class="nx">utterances</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s1">&#39;text/javascript&#39;</span><span class="p">;</span>
+<span class="ln"> 6</span>    <span class="nx">utterances</span><span class="p">.</span><span class="nx">async</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+<span class="ln"> 7</span>    <span class="nx">utterances</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;issue-term&#39;</span><span class="p">,</span><span class="s1">&#39;pathname&#39;</span><span class="p">)</span>
+<span class="ln"> 8</span>    <span class="nx">utterances</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;theme&#39;</span><span class="p">,</span><span class="s1">&#39;github-light&#39;</span><span class="p">)</span>
+<span class="ln"> 9</span>    <span class="nx">utterances</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span><span class="s1">&#39;kinnylee/hugo-blog-comment&#39;</span><span class="p">)</span>
+<span class="ln">10</span>    <span class="nx">utterances</span><span class="p">.</span><span class="nx">crossorigin</span> <span class="o">=</span> <span class="s1">&#39;anonymous&#39;</span><span class="p">;</span>
+<span class="ln">11</span>    <span class="nx">utterances</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="s1">&#39;https://utteranc.es/client.js&#39;</span><span class="p">;</span>
+<span class="ln">12</span>    <span class="c1">// content 是要插入评论的地方
+</span><span class="ln">13</span><span class="c1"></span>    <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="s1">&#39;post_content&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">utterances</span><span class="p">);</span>
+<span class="ln">14</span>  <span class="p">})();</span>
+<span class="ln">15</span>
+<span class="ln">16</span>  <span class="c1">// add new code above this line
+</span><span class="ln">17</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><p>themes/hugo-clarity/layout/_default/single.html中添加一个id为post_content的div，这样前面的脚本都能自动在后面追加了</p>
+<div class="highlight"><pre class="chroma"><code class="language-html" data-lang="html"><span class="ln">1</span><span class="p">&lt;</span><span class="nt">article</span> <span class="na">class</span><span class="o">=</span><span class="s">&#39;post_content&#39;</span> <span class="na">id</span><span class="o">=</span><span class="s">&#34;post_content&#34;</span><span class="p">&gt;</span>
+</code></pre></div><p>调整一下样式，最大宽度太小了（760px）</p>
+<p>theames/hugo-clarity/assets/sass/_custom.sass</p>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln">1</span>.utterances
+<span class="ln">2</span>  max-width: 2000px
+</code></pre></div><h3 id="搜索系统">搜索系统</h3>
 <ul>
 <li>Algolia</li>
 </ul>
@@ -499,6 +531,6 @@ livere   | 韩国
 
   </div>
 </footer>
-    <script src = 'https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js'></script>
+    <script src = 'https://kinnylee.github.io/js/bundle.eee5874ae267c1f514e6e52a5cecc1212612aa3cfa2d37b0412b45a003f382b9f74dd7d89b7e7efb5ce9e7bc78df38ca7dc9585c021ef9d2b839768491e45457.js'></script>
   </body>
 </html>
