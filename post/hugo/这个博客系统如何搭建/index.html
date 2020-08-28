@@ -18,9 +18,7 @@
 <meta name="description" content="如何搭建自己的博客系统  静态网页搭建 集成评论功能  静态网页搭建 选型对比：
 名称 | 优势 | 劣势 | 开发语言
    | - | - | -    hexo | hugo |
-评论系统 选型对比：
-名称 | 概述 | 优势 | 劣势
-   | - | - | -    Valine |国内，使用较多，加载快| …">
+访问数、字数、阅读数集成集成  不蒜子  theme的header中添加js文件  themes/你的主 …">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "这个博客系统如何搭建" />
@@ -29,9 +27,7 @@
 <meta property = "og:description" content = "如何搭建自己的博客系统  静态网页搭建 集成评论功能  静态网页搭建 选型对比：
 名称 | 优势 | 劣势 | 开发语言
    | - | - | -    hexo | hugo |
-评论系统 选型对比：
-名称 | 概述 | 优势 | 劣势
-   | - | - | -    Valine |国内，使用较多，加载快| …" />
+访问数、字数、阅读数集成集成  不蒜子  theme的header中添加js文件  themes/你的主 …" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -154,8 +150,8 @@
     Aug 27, 2020</span>
 </div>
 <br/>
-    <span id="busuanzi_container_page_pv">|<span id="busuanzi_value_page_pv"></span><span>
-      阅读 </span></span>|<span class="post-date"> 共 67 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 99 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
     <div class='post_share'>
   Share on:
   <a href="https://twitter.com/intent/tweet?text=%e8%bf%99%e4%b8%aa%e5%8d%9a%e5%ae%a2%e7%b3%bb%e7%bb%9f%e5%a6%82%e4%bd%95%e6%90%ad%e5%bb%ba&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fhugo%2f%25E8%25BF%2599%25E4%25B8%25AA%25E5%258D%259A%25E5%25AE%25A2%25E7%25B3%25BB%25E7%25BB%259F%25E5%25A6%2582%25E4%25BD%2595%25E6%2590%25AD%25E5%25BB%25BA%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
@@ -194,6 +190,7 @@
     <li><a href="#如何搭建自己的博客系统">如何搭建自己的博客系统</a>
       <ul>
         <li><a href="#静态网页搭建">静态网页搭建</a></li>
+        <li><a href="#访问数字数阅读数集成集成">访问数、字数、阅读数集成集成</a></li>
         <li><a href="#评论系统">评论系统</a></li>
         <li><a href="#搜索系统">搜索系统</a></li>
       </ul>
@@ -216,7 +213,24 @@
 </ul>
 <p>hexo    |
 hugo    |</p>
-<h3 id="评论系统">评论系统</h3>
+<h3 id="访问数字数阅读数集成集成">访问数、字数、阅读数集成集成</h3>
+<ul>
+<li><a href="http://ibruce.info/2015/04/04/busuanzi/">不蒜子</a></li>
+</ul>
+<h4 id="theme的header中添加js文件">theme的header中添加js文件</h4>
+<ul>
+<li>themes/你的主题/layout/partial/footer.html添加上述脚本即可，当然你也可以添加到 header 中</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="ln">1</span><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">async</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&#34;//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js&#34;</span><span class="o">&gt;</span>
+<span class="ln">2</span><span class="o">&lt;</span><span class="err">/script&gt;</span>
+</code></pre></div><h4 id="文章标题后面添加标签">文章标题后面添加标签</h4>
+<ul>
+<li>themes/你的主题/layout/_default/single.html添加上述脚本即可，当然你也可以添加到 header 中</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="ln">1</span><span class="o">&lt;</span><span class="nx">span</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&#34;busuanzi_container_page_pv&#34;</span><span class="o">&gt;|</span>
+<span class="ln">2</span><span class="o">&lt;</span><span class="nx">span</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&#34;busuanzi_value_page_pv&#34;</span><span class="o">&gt;&lt;</span><span class="nx">span</span><span class="o">&gt;&lt;</span><span class="nx">span</span><span class="o">&gt;</span>
+<span class="ln">3</span>      <span class="nx">阅读</span> <span class="o">&lt;</span><span class="err">/span&gt;&lt;/span&gt;|&lt;span class=&#34;post-date&#34;&gt; 共 {{ .WordCount }} 字&lt;/span&gt;，阅读约&lt;span class=&#34;more-meta&#34;&gt; {{ .ReadingTime }} 分钟&lt;/span&gt;</span>
+</code></pre></div><h3 id="评论系统">评论系统</h3>
 <p>选型对比：</p>
 <p>名称    |     概述   | 优势         | 劣势</p>
 <ul>

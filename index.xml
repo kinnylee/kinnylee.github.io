@@ -56,9 +56,7 @@ g0  每个m都有一个g0，因为每个线程都有一个系统堆栈。 和其
       <description>如何搭建自己的博客系统  静态网页搭建 集成评论功能  静态网页搭建 选型对比：
 名称 | 优势 | 劣势 | 开发语言
    | - | - | -    hexo | hugo |
-评论系统 选型对比：
-名称 | 概述 | 优势 | 劣势
-   | - | - | -    Valine |国内，使用较多，加载快|评论门槛低，可以安装 valine-admin 来过滤垃圾评论和实现邮件提醒|需要将数据保存到他们的服务器 Disqus | | | 评论门槛高 | 界面比较丑，需要翻墙 gittalk | gitment | | 评论数据直接保存仓库 livere | 韩国 畅言 | 国内 | | 免费版有广告，需要备案</description>
+访问数、字数、阅读数集成集成  不蒜子  theme的header中添加js文件  themes/你的主题/layout/partial/footer.html添加上述脚本即可，当然你也可以添加到 header 中  1&amp;lt;script async src=&amp;#34;//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js&amp;#34;&amp;gt; 2&amp;lt;/script&amp;gt; 文章标题后面添加标签  themes/你的主题/layout/_default/single.html添加上述脚本即可，当然你也可以添加到 header 中  1&amp;lt;span id=&amp;#34;busuanzi_container_page_pv&amp;#34;&amp;gt;| 2&amp;lt;span id=&amp;#34;busuanzi_value_page_pv&amp;#34;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;span&amp;gt; 3 阅读 &amp;lt;/span&amp;gt;&amp;lt;/span&amp;gt;|&amp;lt;span class=&amp;#34;post-date&amp;#34;&amp;gt; 共 {{ .WordCount }} 字&amp;lt;/span&amp;gt;，阅读约&amp;lt;span class=&amp;#34;more-meta&amp;#34;&amp;gt; {{ .ReadingTime }} 分钟&amp;lt;/span&amp;gt; 评论系统 选型对比：</description>
     </item>
     
     <item>
