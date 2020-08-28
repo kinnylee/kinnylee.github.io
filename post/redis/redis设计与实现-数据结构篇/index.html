@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>K8s基本入门 | kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.74.3" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+  
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="前言  redis性能为什么这么出色？它与其他缓存中间件有什么区别？ redis底层使用了哪些数据结构支撑它如此高效的性能？ 内部丰富的数据类型底层为什么都使用至少两种数据结构实现？分别是什么？ 如果合理的使用redis才能发挥它最大的优势？  学习完《redis设计与实现》前面关于数据结构与对象的章节，以上问题都能得 …">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "K8s基本入门" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/redis/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AF%87/" />
+<meta property = "og:title" content = "K8s基本入门" />
+<meta property = "og:description" content = "前言  redis性能为什么这么出色？它与其他缓存中间件有什么区别？ redis底层使用了哪些数据结构支撑它如此高效的性能？ 内部丰富的数据类型底层为什么都使用至少两种数据结构实现？分别是什么？ 如果合理的使用redis才能发挥它最大的优势？  学习完《redis设计与实现》前面关于数据结构与对象的章节，以上问题都能得 …" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/redis/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AF%87/'>
+
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css" integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ==' as="style">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js" as="script">
+
+    
+    <link rel = 'stylesheet' href = 'https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css' integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ=='>
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <svg class="icon">
+          <use xlink:href="#open-menu"></use>
+        </svg>
+        <svg class="icon">
+          <use xlink:href="#closeme"></use>
+        </svg>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://twitter.com/' class = 'nav_child nav_item'>中间件</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/tags/ansible' class = 'nav_child nav_item'>Ansible</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>K8s基本入门</h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Jun 28, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/redis' class = 'post_tag button button_translucent'>redis
+  </a>
+</div>
+
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=K8s%e5%9f%ba%e6%9c%ac%e5%85%a5%e9%97%a8&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fredis%2fredis%25E8%25AE%25BE%25E8%25AE%25A1%25E4%25B8%258E%25E5%25AE%259E%25E7%258E%25B0-%25E6%2595%25B0%25E6%258D%25AE%25E7%25BB%2593%25E6%259E%2584%25E7%25AF%2587%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
+  </a>
+  
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fredis%2fredis%25E8%25AE%25BE%25E8%25AE%25A1%25E4%25B8%258E%25E5%25AE%259E%25E7%258E%25B0-%25E6%2595%25B0%25E6%258D%25AE%25E7%25BB%2593%25E6%259E%2584%25E7%25AF%2587%2f&t=K8s%e5%9f%ba%e6%9c%ac%e5%85%a5%e9%97%a8" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/redis/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AF%87/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/redis/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%AF%87/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#特点">特点</a></li>
+    <li><a href="#支持的数据类型">支持的数据类型</a></li>
+    <li><a href="#redis为什么这么快">redis为什么这么快</a></li>
+    <li><a href="#redis为什么是单线程的">redis为什么是单线程的</a></li>
+    <li><a href="#redis的回收策略">redis的回收策略</a></li>
+    <li><a href="#使用注意">使用注意</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#redis5版本新增功能">redis5版本新增功能：</a></li>
+    <li><a href="#reids4版本新增功能">reids4版本新增功能：</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#简单动态字符串sds">简单动态字符串SDS</a>
+      <ul>
+        <li><a href="#数据结构-1">数据结构</a></li>
+        <li><a href="#分配和释放策略">分配和释放策略</a></li>
+        <li><a href="#比c字符串的优势">比C字符串的优势</a></li>
+      </ul>
+    </li>
+    <li><a href="#链表">链表</a>
+      <ul>
+        <li><a href="#数据结构-2">数据结构</a></li>
+        <li><a href="#特点-1">特点</a></li>
+      </ul>
+    </li>
+    <li><a href="#字典">字典</a>
+      <ul>
+        <li><a href="#数据结构-3">数据结构</a></li>
+        <li><a href="#哈希算法">哈希算法</a></li>
+        <li><a href="#rehash">rehash</a></li>
+        <li><a href="#渐进式rehash">渐进式rehash</a></li>
+      </ul>
+    </li>
+    <li><a href="#跳跃表">跳跃表</a>
+      <ul>
+        <li><a href="#数据结构-4">数据结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#整数集合">整数集合</a>
+      <ul>
+        <li><a href="#数据结构-5">数据结构</a></li>
+        <li><a href="#升级">升级</a></li>
+        <li><a href="#升级的好处">升级的好处</a></li>
+      </ul>
+    </li>
+    <li><a href="#压缩列表">压缩列表</a>
+      <ul>
+        <li><a href="#压缩列表的构成">压缩列表的构成</a></li>
+        <li><a href="#压缩列表节点的构成">压缩列表节点的构成</a></li>
+        <li><a href="#连锁更新">连锁更新</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#概述-1">概述</a>
+      <ul>
+        <li><a href="#使用对象的好处">使用对象的好处</a></li>
+        <li><a href="#redis中的对象">redis中的对象</a></li>
+        <li><a href="#对象的类型与编码">对象的类型与编码</a></li>
+      </ul>
+    </li>
+    <li><a href="#字符串对象">字符串对象</a>
+      <ul>
+        <li><a href="#编码转换">编码转换</a></li>
+        <li><a href="#字符串命令">字符串命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#列表对象">列表对象</a>
+      <ul>
+        <li><a href="#编码转换-1">编码转换</a></li>
+        <li><a href="#列表命令">列表命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#哈希对象">哈希对象</a>
+      <ul>
+        <li><a href="#编码转换-2">编码转换</a></li>
+        <li><a href="#哈希命令">哈希命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#集合对象">集合对象</a>
+      <ul>
+        <li><a href="#编码转换-3">编码转换</a></li>
+        <li><a href="#集合命令">集合命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#有序结合对象">有序结合对象</a>
+      <ul>
+        <li><a href="#编码转换-4">编码转换</a></li>
+        <li><a href="#有序集合命令">有序集合命令</a></li>
+      </ul>
+    </li>
+    <li><a href="#类型检查和命令多态">类型检查和命令多态</a></li>
+    <li><a href="#内存回收">内存回收</a></li>
+    <li><a href="#对象共享">对象共享</a></li>
+    <li><a href="#对象空转时长">对象空转时长</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#参考文献">参考文献</a></li>
+  </ul>
+</nav>
+    <h1 id="前言">前言</h1>
+<ul>
+<li>redis性能为什么这么出色？它与其他缓存中间件有什么区别？</li>
+<li>redis底层使用了哪些数据结构支撑它如此高效的性能？</li>
+<li>内部丰富的数据类型底层为什么都使用至少两种数据结构实现？分别是什么？</li>
+<li>如果合理的使用redis才能发挥它最大的优势？</li>
+</ul>
+<p>学习完《redis设计与实现》前面关于数据结构与对象的章节，以上问题都能得到解答。你也能了解到redis作者如此的煞费苦心设计了这么多丰富的数据结构，目的就是优化内存。学完这些内容，在使用redis的过程中，也会合理的使用以适应它内部的特点。当然新版本的redis支持了更多更丰富的特性，该书基于redis3版本，还没有涉及到那些内容。</p>
+<p>《redis设计与实现》这本书非常浅显易懂，作者黄建宏老师，90后。另外还是《redis实战》的译者</p>
+<p>另一篇可参考<a href="https://juejin.im/post/6844903741829677063">《redis设计与实现》2-数据库实现篇</a></p>
+<h1 id="概述">概述</h1>
+<h2 id="特点">特点</h2>
+<ol>
+<li>c语言开发，性能出色，纯内存操作，每秒可处理超过10w读写（QPS）</li>
+<li>多种数据结构，单个最大限制可到1GB(memcached只支持字符串，最大1M)</li>
+<li>受物理内存限制，不能作海量数据的读写。适用于较小数据量的高性能操作和运算上</li>
+<li>支持事务，持久化</li>
+<li>单线程模型（memcached是多线程）</li>
+</ol>
+<h2 id="支持的数据类型">支持的数据类型</h2>
+<ol>
+<li>Sring</li>
+<li>List</li>
+<li>Set</li>
+<li>SortedSet</li>
+<li>hash</li>
+<li>Bitmap</li>
+<li>Hyperloglogs</li>
+<li>Geo</li>
+<li>pub/sub</li>
+</ol>
+<h2 id="redis为什么这么快">redis为什么这么快</h2>
+<ol>
+<li>纯内存操作，没有磁盘io</li>
+<li>单线程处理请求，没有线程切换开销和竞争条件，也不存在加锁问题</li>
+<li>多路复用模型epoll，非阻塞io(多路：多个网络连接；复用：复用同一个线程)
+多路复用技术可以让单个线程高效的处理多个连接请求</li>
+<li>数据结构简单，对数据操作也简单。还做了自己的数据结构优化</li>
+</ol>
+<h2 id="redis为什么是单线程的">redis为什么是单线程的</h2>
+<ol>
+<li>单线程已经很快了，减少多线程带来的网络开销，锁操作</li>
+<li>后续的4.0版本在考虑多线程</li>
+<li>单线程是指处理网络请求的时候只有一个线程，并不是redis-server只有一个线程在工作。持久化的时候，就是通过fork一个子线程来执行。</li>
+<li>缺点：耗时的命令会导致并发的下降，比如keys *</li>
+</ol>
+<h2 id="redis的回收策略">redis的回收策略</h2>
+<ol>
+<li>volatile-lru：从过期的数据集 server.db[i].expires中挑选最近最少使用的数据</li>
+<li>volatile-ttl：从过期的数据集 server.db[i].expires中挑选将要过期的数据淘汰</li>
+<li>volatile-random： server.db[i].expires中挑选任意数据淘汰</li>
+<li>allkeys-lru: 从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰</li>
+<li>allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰</li>
+<li>no-enviction（驱逐）：禁止驱逐数据</li>
+</ol>
+<h2 id="使用注意">使用注意</h2>
+<ol>
+<li>redis单线程无法发挥多核cpu性能，可以通过单机开多个redis实例来完善</li>
+<li>redis实现分布式锁：先用setnx（如果不存在才设置）争抢锁，抢到后，expire设置过期时间，防止忘记释放。</li>
+<li>redis实现一对多消息订阅：sub/pub数据结构</li>
+<li>redis实现延时消息队列：zadd时间戳作为score 消费的时候根据时间戳+延时时间做查询操作。</li>
+</ol>
+<h1 id="各大版本介绍">各大版本介绍</h1>
+<h2 id="redis5版本新增功能">redis5版本新增功能：</h2>
+<ul>
+<li>zpopmax zpopmin以及阻塞变种：返回集合中给定分值最大最小的数据数量</li>
+</ul>
+<h2 id="reids4版本新增功能">reids4版本新增功能：</h2>
+<ul>
+<li>模块功能，提供类似于插件的方式，自己开发一个.so模块，并加装
+作者本人提供了一个神经网络的module。
+可到redis-modules-hub上查看更多的module
+模块功能使得用户可以将 Redis 用作基础设施， 并在上面构建更多功能， 这给 Redis 带来了无数新的可能性。</li>
+<li>PSYNC：解决了旧版本的 Redis 在复制时的一些不够优化的地方</li>
+<li>缓存清理策略优化
+新增last frequently used
+对已有策略进行优化</li>
+<li>非阻塞DEL FLUSHDB FLUSHALL
+解决了之前执行这些命令的时候导致阻塞的问题
+Flushdb async, flushall async, unlink(替代del)</li>
+<li>添加了swapdb：交换数据库</li>
+<li>混合RDB-AOF的持久化格式</li>
+<li>添加内存使用情况命令：MEMORY</li>
+</ul>
+<h1 id="数据结构">数据结构</h1>
+<ul>
+<li>redis里面每个键值对都是由对象组成的</li>
+<li>键总是一个字符串对象，</li>
+<li>值则可以是以下对象的一种：
+<ul>
+<li>字符串对象</li>
+<li>列表对象</li>
+<li>哈希对象</li>
+<li>集合对象</li>
+<li>有序结合对象</li>
+</ul>
+</li>
+</ul>
+<h2 id="简单动态字符串sds">简单动态字符串SDS</h2>
+<h3 id="数据结构-1">数据结构</h3>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="ln">1</span><span class="k">struct</span> <span class="n">sdshdr</span> <span class="p">{</span>
+<span class="ln">2</span>    <span class="n">uint8_t</span> <span class="n">len</span><span class="p">;</span> <span class="cm">/* used，使用的字节数 */</span>
+<span class="ln">3</span>    <span class="n">uint8_t</span> <span class="n">alloc</span><span class="p">;</span> <span class="cm">/* excluding the header and null terminator，预分配总字节数，不包括结束符\0的长度 */</span>
+<span class="ln">4</span>    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">flags</span><span class="p">;</span> <span class="cm">/* 3 lsb of type, 5 unused bits */</span>
+<span class="ln">5</span>    <span class="kt">char</span> <span class="n">buf</span><span class="p">[];</span> <span class="cm">/*c风格的字符，包括结束符\0*/</span>
+<span class="ln">6</span><span class="p">};</span>
+</code></pre></div><ul>
+<li>位于sds.h文件</li>
+<li>SDS遵循C字符串以\0结尾的惯例，存储在buf中（不同于nginx的底层实现，nginx实现时不保存最后一个\0）</li>
+<li>但是不计算最后一个字符的长度到len中</li>
+<li>保留c风格buf的好处是可以重用一部分c函数库的函数
+<img src="https://user-gold-cdn.xitu.io/2018/12/14/167abed91fcbe05f?w=528&amp;h=142&amp;f=png&amp;s=20827" alt=""></li>
+</ul>
+<h3 id="分配和释放策略">分配和释放策略</h3>
+<h4 id="空间预分配">空间预分配</h4>
+<ul>
+<li>用于优化SDS字符串增长操作，以减少连续执行增长操作所需的内存重分配次数</li>
+<li>扩展SDS空间时，先检查未使用的空间是否足够，如果足够直接使用，如果不够，不仅分配够用，还预分配一些空间</li>
+<li>预分配策略：
+<ul>
+<li>修改后的SDS长度（len的值）&lt; 1MB，预分配同样len大小的空间</li>
+<li>修改后的SDS长度（len的值）&gt;= 1MB，预分配1MB大小的空间</li>
+</ul>
+</li>
+</ul>
+<h4 id="惰性空间释放">惰性空间释放</h4>
+<ul>
+<li>用于优化SDS字符缩短操作</li>
+<li>缩短SDS空间时，并不立即进行内存重分配释放空间，而是记录free的字节数</li>
+<li>SDS提供相应api，有需要时真正释放空间</li>
+</ul>
+<h3 id="比c字符串的优势">比C字符串的优势</h3>
+<ul>
+<li>获取字符串的长度时间复杂度由O(N)降到O(1)</li>
+<li>避免缓冲区溢出</li>
+<li>减少修改字符串时带来的内存重分配次数。内存分配会涉及复杂算法，且可能需要系统调用，非常耗时。</li>
+<li>二进制安全：c语言的结束符限制了它只能保存文本数据，不能保存图片，音频等二进制数据</li>
+</ul>
+<h2 id="链表">链表</h2>
+<h3 id="数据结构-2">数据结构</h3>
+<p>位于adlist.h文件</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="ln"> 1</span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">listNode</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="k">struct</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">prev</span><span class="p">;</span> <span class="c1">// 前置节点
+</span><span class="ln"> 3</span><span class="c1"></span>    <span class="k">struct</span> <span class="n">listNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span> <span class="c1">// 后置节点
+</span><span class="ln"> 4</span><span class="c1"></span>    <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">;</span><span class="c1">//节点值
+</span><span class="ln"> 5</span><span class="c1"></span><span class="p">}</span> <span class="n">listNode</span><span class="p">;</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">list</span> <span class="p">{</span>
+<span class="ln"> 8</span>    <span class="n">listNode</span> <span class="o">*</span><span class="n">head</span><span class="p">;</span> <span class="c1">// 表头节点
+</span><span class="ln"> 9</span><span class="c1"></span>    <span class="n">listNode</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span> <span class="c1">// 表尾节点
+</span><span class="ln">10</span><span class="c1"></span>    <span class="kt">void</span> <span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">dup</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">);</span> <span class="c1">// 节点值复制函数
+</span><span class="ln">11</span><span class="c1"></span>    <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">free</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">);</span> <span class="c1">// 节点值释放函数
+</span><span class="ln">12</span><span class="c1"></span>    <span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">match</span><span class="p">)(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">key</span><span class="p">);</span> <span class="c1">// 节点值对比函数
+</span><span class="ln">13</span><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">len</span><span class="p">;</span> <span class="c1">// 节点数量
+</span><span class="ln">14</span><span class="c1"></span><span class="p">}</span> <span class="n">list</span><span class="p">;</span>
+</code></pre></div><h3 id="特点-1">特点</h3>
+<ul>
+<li>双端队列，可以获取某个节点前置节点和后置节点,复杂度为O(1)</li>
+<li>无环</li>
+<li>获取表头和表尾复杂度为O(1)</li>
+<li>带长度，获取链表长度复杂度为O(1)</li>
+<li>多态：使用void*保存节点值，可保存不同类型的值
+<img src="https://user-gold-cdn.xitu.io/2018/12/14/167abee9fcb2654c?w=614&amp;h=205&amp;f=png&amp;s=43393" alt=""></li>
+</ul>
+<h2 id="字典">字典</h2>
+<h3 id="数据结构-3">数据结构</h3>
+<p>位于dict.h文件</p>
+<h4 id="哈希表">哈希表</h4>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln">1</span>// 哈希表
+<span class="ln">2</span>typedef struct dictht {
+<span class="ln">3</span>    dictEntry **table; // 一个数组，数组中每个元素都是指向dictEntry结构的指针
+<span class="ln">4</span>    unsigned long size; // table数组的大小
+<span class="ln">5</span>    unsigned long sizemask; // 值总数size-1
+<span class="ln">6</span>    unsigned long used; // 哈希表目前已有节点（键值对）的数量
+<span class="ln">7</span>} dictht;
+</code></pre></div><h4 id="哈希节点">哈希节点</h4>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span>// 每个dictEntry都保存着一个键值对，表示哈希表节点
+<span class="ln"> 2</span>typedef struct dictEntry {
+<span class="ln"> 3</span>    void *key; // 键值对的键
+<span class="ln"> 4</span>    // 键值对的值，可以是指针，整形，浮点型
+<span class="ln"> 5</span>    union { 
+<span class="ln"> 6</span>        void *val;
+<span class="ln"> 7</span>        uint64_t u64;
+<span class="ln"> 8</span>        int64_t s64;
+<span class="ln"> 9</span>        double d;
+<span class="ln">10</span>    } v;
+<span class="ln">11</span>    struct dictEntry *next; // 哈希表节点指针，用于解决键冲突问题
+<span class="ln">12</span>} dictEntry;
+</code></pre></div><p><img src="https://user-gold-cdn.xitu.io/2018/12/14/167abef0d744699f?w=400&amp;h=193&amp;f=png&amp;s=31053" alt=""></p>
+<h4 id="字典类型">字典类型</h4>
+<p>每个字典类型保存一簇用于操作特定类型键值对的函数</p>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span>typedef struct dictType {
+<span class="ln"> 2</span>    // 计算哈希值的函数
+<span class="ln"> 3</span>    uint64_t (*hashFunction)(const void *key);
+<span class="ln"> 4</span>    // 复制键的函数
+<span class="ln"> 5</span>    void *(*keyDup)(void *privdata, const void *key);
+<span class="ln"> 6</span>    // 复制值的函数
+<span class="ln"> 7</span>    void *(*valDup)(void *privdata, const void *obj);
+<span class="ln"> 8</span>    // 对比键的函数
+<span class="ln"> 9</span>    int (*keyCompare)(void *privdata, const void *key1, const void *key2);  
+<span class="ln">10</span>    // 销毁键的函数
+<span class="ln">11</span>    void (*keyDestructor)(void *privdata, void *key);
+<span class="ln">12</span>    // 销毁值的函数
+<span class="ln">13</span>    void (*valDestructor)(void *privdata, void *obj);
+<span class="ln">14</span>} dictType;
+</code></pre></div><h4 id="字典-1">字典</h4>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln">1</span>// 字典
+<span class="ln">2</span>typedef struct dict {
+<span class="ln">3</span>    dictType *type; // 不同键值对类型对应的操作函数
+<span class="ln">4</span>    void *privdata; // 需要传递给对应函数的参数
+<span class="ln">5</span>    dictht ht[2]; // ht[0]用于存放数据，ht[1]在进行rehash时使用
+<span class="ln">6</span>    long rehashidx; /* rehashing not in progress if rehashidx == -1，目前rehash的进度*/
+<span class="ln">7</span>    unsigned long iterators; /* number of iterators currently running */
+<span class="ln">8</span>} dict;
+</code></pre></div><p><img src="https://user-gold-cdn.xitu.io/2018/12/14/167ac471ba2b2b76?w=756&amp;h=399&amp;f=png&amp;s=80250" alt=""></p>
+<h3 id="哈希算法">哈希算法</h3>
+<ul>
+<li>redis使用MurmurHash2算法计算键的hash值</li>
+<li>哈希值与sizemask取或，得到哈希索引</li>
+<li>哈希冲突（两个或以上数量键被分配到哈希表数组同一个索引上）：链地址法解决冲突</li>
+</ul>
+<h3 id="rehash">rehash</h3>
+<ul>
+<li>对哈希表进行扩展或收缩，以使哈希表的负载因子维持在一个合理范围之内</li>
+<li>负载因子 = 保存的节点数（used）/ 哈希表大小（size）</li>
+</ul>
+<h4 id="rehash步骤包括">rehash步骤包括</h4>
+<ul>
+<li>为字典的ht[1]哈希表分配空间，大小取决于要执行的操作以及ht[0]当前包含的键值对数量
+<ul>
+<li>扩展操作：ht[1]大小为第一个大于等于ht[0].used乘以2的2的n次幂</li>
+<li>收缩操作：ht[1]大小为第一个大于等于ht[0].used的2的n次幂</li>
+</ul>
+</li>
+<li>将保存在ht[0]的所有键值对rehash到ht[1]上面：重新计算键的哈希值和索引值</li>
+<li>当所有ht[0]的键值对都迁移到ht[1]之后，释放ht[0]，将ht[1]置为ht[0],并新建一个恐怖hash作为ht[1]</li>
+</ul>
+<h4 id="自动扩展的条件">自动扩展的条件</h4>
+<ul>
+<li>服务器没有执行BGSave命令或GBRewriteAOF命令，并且哈希表的负载因子 &gt;= 1</li>
+<li>服务器正在执行BGSave命令或GBRewriteAOF命令，并且哈希表的负载因子 &gt;= 5</li>
+<li>BGSave命令或GBRewriteAOF命令时，服务器需要创建当前服务器进程的子进程，会耗费内存，提高负载因子避免写入，节约内存</li>
+</ul>
+<h4 id="自动收缩的条件">自动收缩的条件</h4>
+<ul>
+<li>哈希表负载因子小于0.1时，自动收缩</li>
+</ul>
+<h3 id="渐进式rehash">渐进式rehash</h3>
+<ul>
+<li>ht[0]数据重新索引到ht[1]不是一次性集中完成的，而是多次渐进式完成（避免hash表过大时导致性能问题）</li>
+</ul>
+<h4 id="渐进式rehash详细步骤">渐进式rehash详细步骤</h4>
+<ul>
+<li>为ht[1]分配空间，让自动同时持有两个哈希表</li>
+<li>字典中rehashidx置为0，表示开始执行rehash（默认值为-1）</li>
+<li>rehash期间，每次对字典执行操作时，顺带将ht[0]哈希表在rehashidx索引上的所有键值对rehash到ht[1]</li>
+<li>全部rehash完毕时，rehashidx设为-1</li>
+</ul>
+<h4 id="注意点">注意点</h4>
+<ul>
+<li>rehash的所有操作会在两个哈希表进行</li>
+<li>新增加的值一律放入ht[1]，保证数据只会减少不会增加</li>
+</ul>
+<h2 id="跳跃表">跳跃表</h2>
+<ul>
+<li>跳跃表是一种有序数据结构，通过在每个节点维持多个指向其他节点的指针，达到快速访问节点的目的</li>
+<li>时间复杂度：最坏O(N)，平均O(logN)</li>
+<li>大部分情况下，效率可与平衡树媲美，不过比平衡树实现简单</li>
+<li>有序集合的底层实现之一</li>
+</ul>
+<h3 id="数据结构-4">数据结构</h3>
+<p>位于server.h文件中</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="ln"> 1</span><span class="c1">// 跳跃表节点
+</span><span class="ln"> 2</span><span class="c1"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="p">{</span>
+<span class="ln"> 3</span>    <span class="n">sds</span> <span class="n">ele</span><span class="p">;</span> <span class="c1">// 成员对象
+</span><span class="ln"> 4</span><span class="c1"></span>    <span class="kt">double</span> <span class="n">score</span><span class="p">;</span> <span class="c1">// 分值，从小到大排序
+</span><span class="ln"> 5</span><span class="c1"></span>    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">backward</span><span class="p">;</span> <span class="c1">// 后退指针，从表尾向表头遍历时使用
+</span><span class="ln"> 6</span><span class="c1"></span>    <span class="k">struct</span> <span class="n">zskiplistLevel</span> <span class="p">{</span>
+<span class="ln"> 7</span>        <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">forward</span><span class="p">;</span> <span class="c1">// 前进指针
+</span><span class="ln"> 8</span><span class="c1"></span>        <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">span</span><span class="p">;</span> <span class="c1">// 跨度，记录两个节点之间的距离
+</span><span class="ln"> 9</span><span class="c1"></span>    <span class="p">}</span> <span class="n">level</span><span class="p">[];</span> <span class="c1">// 层，是一个数组
+</span><span class="ln">10</span><span class="c1"></span><span class="p">}</span> <span class="n">zskiplistNode</span><span class="p">;</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="c1">// 跳跃表相关信息
+</span><span class="ln">13</span><span class="c1"></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">zskiplist</span> <span class="p">{</span>
+<span class="ln">14</span>    <span class="k">struct</span> <span class="n">zskiplistNode</span> <span class="o">*</span><span class="n">header</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span> <span class="c1">// 表头和表尾
+</span><span class="ln">15</span><span class="c1"></span>    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">length</span><span class="p">;</span> <span class="c1">// 跳跃表长度（包含节点的数量）
+</span><span class="ln">16</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">level</span><span class="p">;</span> <span class="c1">// 跳跃表内层数最大那个节点的层数（不包括表头节点层数）
+</span><span class="ln">17</span><span class="c1"></span><span class="p">}</span> <span class="n">zskiplist</span><span class="p">;</span>
+</code></pre></div><p><img src="https://user-gold-cdn.xitu.io/2018/12/14/167ac8dd5c6d78ac?w=760&amp;h=276&amp;f=png&amp;s=82350" alt=""></p>
+<ul>
+<li>level数组的大小在每次新建跳跃表的时候，随机生成，大小介于1-32直接</li>
+<li>遍历操作只使用前进指针，跨度用来计算排位（rank），沿途访问的所有层跨度加起来就是节点的排位</li>
+<li>多个节点可以包含相同的分支，但每个节点成员对象是唯一的</li>
+</ul>
+<h2 id="整数集合">整数集合</h2>
+<ul>
+<li>intset是集合键的底层实现之一</li>
+<li>当一个集合只包含整数值原素，且数量不多时，会使用整数集合作为底层实现</li>
+</ul>
+<h3 id="数据结构-5">数据结构</h3>
+<p>位于intset.h文件</p>
+<div class="highlight"><pre class="chroma"><code class="language-C" data-lang="C"><span class="ln">1</span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">intset</span> <span class="p">{</span>
+<span class="ln">2</span>    <span class="n">uint32_t</span> <span class="n">encoding</span><span class="p">;</span> <span class="c1">// 编码方式
+</span><span class="ln">3</span><span class="c1"></span>    <span class="n">uint32_t</span> <span class="n">length</span><span class="p">;</span> <span class="c1">// 长度
+</span><span class="ln">4</span><span class="c1"></span>    <span class="n">int8_t</span> <span class="n">contents</span><span class="p">[];</span> <span class="c1">// 内容,数组内容类型取决于encoding属性，并不是int8_t。按照大小排序，没有重复
+</span><span class="ln">5</span><span class="c1"></span><span class="p">}</span> <span class="n">intset</span><span class="p">;</span>
+</code></pre></div><h3 id="升级">升级</h3>
+<ul>
+<li>当我们要将一个新元素添加到整数集合里，并且新元素的类型比整数集合现有所有的元素类型都要长时，集合要先进行升级才能添加新数据</li>
+<li>升级步骤包括三步：
+<ul>
+<li>根据类型，扩展大小，分配空间</li>
+<li>将底层数组数据都转换成新的类型，并反倒正确位置</li>
+<li>新元素添加到底层数组里面</li>
+</ul>
+</li>
+<li>添加元素可能导致升级，所以添加新元素的世界复杂度为O(N)</li>
+<li>不支持降级，升级后将一直保持新的数据类型</li>
+</ul>
+<h3 id="升级的好处">升级的好处</h3>
+<ul>
+<li>提高灵活性</li>
+<li>节约内存</li>
+</ul>
+<h2 id="压缩列表">压缩列表</h2>
+<ul>
+<li>ziplist是列表键和哈希键的底层实现之一</li>
+<li>redis为了节约内存而开发的顺序型数据结构</li>
+<li>当列表键只包含少量列表项，且每个列表项要么是小整数，要么是短字符串，就使用ziplist作为列表键底层实现</li>
+<li>压缩列表遍历时，从表位向表头回溯遍历</li>
+<li>ziplist没有专门的struct来表示</li>
+</ul>
+<h3 id="压缩列表的构成">压缩列表的构成</h3>
+<p><img src="https://user-gold-cdn.xitu.io/2018/12/14/167acb15d0535cca?w=797&amp;h=49&amp;f=png&amp;s=18502" alt="">
+属性|类型|长度|用途
+-|-|-|-
+zlbytes|uint32_t|4字节|整个压缩列表占用的内存字节数
+zltail|uint32_t|4字节|表尾节点距离压缩列表起始地址有多少字节，无需遍历就可得到表尾节点
+zllen|uint16_t|2字节|节点数量，小于65535时是实际值，超过时需要遍历才能算出
+entryN|列表节点|不定|包含的各个节点
+zlend|uint8_t|1字节|特殊值0xFF,末端标记</p>
+<h3 id="压缩列表节点的构成">压缩列表节点的构成</h3>
+<p><img src="https://user-gold-cdn.xitu.io/2018/12/14/167acb9bf2ab4cae?w=464&amp;h=57&amp;f=png&amp;s=11559" alt=""></p>
+<ul>
+<li>previos_entry_length：前一个节点的长度，用于从表尾向表头回溯用
+<ul>
+<li>如果前面节点长度小于254字节，preivos_entry_length用1字节表示</li>
+<li>如果前面节点长度小于254字节，preivos_entry_length用5字节表示，第1个字节为0xFE（254），后面四个字节表示实际长度</li>
+</ul>
+</li>
+<li>encoding：记录content的类型以及长度，encoding分为两部分，高两位和余下的位数，最高两位的取值有以下情况：
+最高两位取值|表示是数据类型|encoding字节数|余下的bit数|最大范围
+-|-|-|-|-|-
+00|字符数组|一个字节|6bit|63位
+01|字符数组|两个字节|14bit|2^14-1
+10|字符数组|五个字节|4*8，第一个字节余下的6bit留空|2^32-1位
+11|整数|1个字节|000000|int16_t类型整数
+11|整数|1个字节|010000|int32_t类型整数
+11|整数|1个字节|100000|int64_t类型整数
+11|整数|1个字节|110000|24位有符号整数
+11|整数|1个字节|111110|8位有符号整数
+11|整数|1个字节|xxxxxx|没有content，xxxx本身就表示了0-12的整数</li>
+<li>content：保存节点的值</li>
+</ul>
+<h3 id="连锁更新">连锁更新</h3>
+<ul>
+<li>连续多个节点大小介于254左右的节点，因扩展导致连续内存分配的情况。不过在时间情况下，这种情况比较少。</li>
+</ul>
+<h1 id="对象">对象</h1>
+<h2 id="概述-1">概述</h2>
+<ul>
+<li>redis并没有直接使用前面的数据结构来实现键值对的数据库，而是基于数据结构创建了一个对象系统，每种对象都用到前面至少一种数据结构</li>
+<li>每个对象都由一个redisObject结构来表示</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span>//server.h
+<span class="ln"> 2</span>typedef struct redisObject {
+<span class="ln"> 3</span>   unsigned type:4; //类型
+<span class="ln"> 4</span>   unsigned encoding:4; // 编码
+<span class="ln"> 5</span>   // 对象最后一个被命令程序访问的时间
+<span class="ln"> 6</span>   unsigned lru:LRU_BITS; /* LRU time (relative to global lru_clock) or
+<span class="ln"> 7</span>                           * LFU data (least significant 8 bits frequency
+<span class="ln"> 8</span>                           * and most significant 16 bits access time). */
+<span class="ln"> 9</span>   int refcount; // 引用计数
+<span class="ln">10</span>   void *ptr; // 指向底层的数据结构指针
+<span class="ln">11</span>} robj;
+</code></pre></div><h3 id="使用对象的好处">使用对象的好处</h3>
+<ul>
+<li>在执行命令之前，根据对象类型判断一个对象是否可以执行给定的命令</li>
+<li>针对不同厂家，Wie对象设置多种不同的数据结构实现，从而优化效率</li>
+<li>实现了基于引用计数的内存回收机制，不再使用的对象，内存会自动释放</li>
+<li>引用计数实现对象共享机制，多个数据库共享同一个对象以节约内存</li>
+<li>对象带有时间时间积累信息，用于计算空转时间</li>
+</ul>
+<h3 id="redis中的对象">redis中的对象</h3>
+<ul>
+<li>字符串对象</li>
+<li>列表对象</li>
+<li>哈希对象</li>
+<li>集合对象</li>
+<li>有序结合对象</li>
+</ul>
+<h3 id="对象的类型与编码">对象的类型与编码</h3>
+<h4 id="对象的类型">对象的类型</h4>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>对象type属性</th>
+<th>type命令的输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字符串对象</td>
+<td>REDIS_STRING</td>
+<td>string</td>
+</tr>
+<tr>
+<td>列表对象</td>
+<td>REDIS_LIST</td>
+<td>list</td>
+</tr>
+<tr>
+<td>哈希对象</td>
+<td>REDIS_HASH</td>
+<td>hash</td>
+</tr>
+<tr>
+<td>集合对象</td>
+<td>REDIS_SET</td>
+<td>set</td>
+</tr>
+<tr>
+<td>有序集合对象</td>
+<td>REDIS_ZSET</td>
+<td>zset</td>
+</tr>
+</tbody>
+</table>
+<h4 id="对象的编码">对象的编码</h4>
+<ul>
+<li>编码决定了ptr指向的数据类型，表明使用什么数据类型作为底层实现</li>
+<li>每种类型对象至少使用两种不同的编码</li>
+<li>通过编码，redis可以根据不同场景设定不同编码，极大提高灵活性和效率</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>编码常量</th>
+<th>对应的数据结构</th>
+<th>OBJECT ENCODING命令输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>REDIS_ENCODING_INT</td>
+<td>long类型的整数</td>
+<td>“int”</td>
+</tr>
+<tr>
+<td>REDIS_ENCODING_EMBSTR</td>
+<td>embstr编码的简单动态字符串</td>
+<td>“embstr”</td>
+</tr>
+<tr>
+<td>REDIS_ENCODING_RAW</td>
+<td>简单动态字符串</td>
+<td>“raw”</td>
+</tr>
+<tr>
+<td>REDIS_ENCODING_HT</td>
+<td>字典</td>
+<td>“hashtable”</td>
+</tr>
+<tr>
+<td>REDIS_ENCODING_LINKEDLIST</td>
+<td>双端链表</td>
+<td>“linkedlist”</td>
+</tr>
+<tr>
+<td>REDIS_ENCODING_ZIPLIST</td>
+<td>压缩列表</td>
+<td>“ziplist”</td>
+</tr>
+<tr>
+<td>REDIS_ENCODING_INTSET</td>
+<td>整数集合</td>
+<td>“intset”</td>
+</tr>
+<tr>
+<td>REDIS_ENCODING_SKIPLIST</td>
+<td>跳跃表和字典</td>
+<td>“skiplist”</td>
+</tr>
+</tbody>
+</table>
+<h2 id="字符串对象">字符串对象</h2>
+<ul>
+<li>字符串对象的编码可以是
+<ul>
+<li>int
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b15616ddb9ce3?w=516&amp;h=316&amp;f=png&amp;s=54905" alt=""></li>
+<li>raw
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b156e779c0e4a?w=1523&amp;h=325&amp;f=png&amp;s=114597" alt=""></li>
+<li>embstr
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1579b6f8ddcb?w=1486&amp;h=168&amp;f=png&amp;s=88118" alt=""></li>
+</ul>
+</li>
+<li>浮点数在redis中也是作为字符串对象保存，涉及计算时，先转回浮点数。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字符串对象内容</th>
+<th>长度</th>
+<th>编码类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>整数值</td>
+<td>-</td>
+<td>int</td>
+</tr>
+<tr>
+<td>字符串值</td>
+<td>小于32字节</td>
+<td>embstr</td>
+</tr>
+<tr>
+<td>字符串值</td>
+<td>大于32字节</td>
+<td>raw</td>
+</tr>
+</tbody>
+</table>
+<p>embstr编码是专门用于保存短字符串的一种优化编码方式。这种编码和raw编码一样，都使用redisObject结构和sdshdr结构来表示对象。区别在于：</p>
+<ul>
+<li>raw编码调用两次内存分配函数来分别创建redisObject和sdrhdr结构</li>
+<li>embstr则调用一次内存分配函数来创建一块连续空间，里面包括redisObject和sdrhdr</li>
+</ul>
+<h3 id="编码转换">编码转换</h3>
+<p>int编码和embstr编码的对象满足条件时会自动转换为raw编码的字符串对象</p>
+<ul>
+<li>int编码对象，执行命令导致对象不再是整数时，会转换为raw对象</li>
+<li>embstr编码没有相应执行函数，是只读编码。涉及修改时，会转换为raw对象</li>
+</ul>
+<h3 id="字符串命令">字符串命令</h3>
+<p>redis中所有键都是字符串对象，所以所有对于键的命令都是针对字符串键来构建的</p>
+<ul>
+<li>set</li>
+<li>get</li>
+<li>append</li>
+<li>incrbyfloat</li>
+<li>incrby</li>
+<li>decrby</li>
+<li>strlen</li>
+<li>strrange</li>
+<li>getrange</li>
+</ul>
+<h2 id="列表对象">列表对象</h2>
+<ul>
+<li>列表对象的编码可以是
+<ul>
+<li>ziplist
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1586d405e8c1?w=1351&amp;h=326&amp;f=png&amp;s=92729" alt=""></li>
+<li>linkedlist
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b15907ad10305?w=1464&amp;h=311&amp;f=png&amp;s=136686" alt=""></li>
+</ul>
+</li>
+</ul>
+<h3 id="编码转换-1">编码转换</h3>
+<p>使用ziplist编码的两个条件如下，不满足的都用linkedlist编码（这两个条件可以在配置文件中修改）:</p>
+<ul>
+<li>保存的所有字符串元素的长度都小于64字节</li>
+<li>列表的元素数量小于512个</li>
+</ul>
+<h3 id="列表命令">列表命令</h3>
+<ul>
+<li>lpush</li>
+<li>rpush</li>
+<li>lpop</li>
+<li>rpop</li>
+<li>lindex</li>
+<li>llen</li>
+<li>linsert</li>
+<li>lrem</li>
+<li>ltrim</li>
+<li>lset</li>
+</ul>
+<h2 id="哈希对象">哈希对象</h2>
+<p>哈希对象的编码可以是</p>
+<ul>
+<li>ziplist
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1bf5d2e45469?w=1461&amp;h=203&amp;f=png&amp;s=97671" alt=""></li>
+<li>hashtable
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1c05675034a3?w=933&amp;h=572&amp;f=png&amp;s=141286" alt=""></li>
+</ul>
+<h3 id="编码转换-2">编码转换</h3>
+<ul>
+<li>使用ziplist需要满足两个条件，不满足则都使用hashtable（这两个条件可以在配置文件中修改）
+<ul>
+<li>所有键值对的键和值的字符串长度都小于64字节</li>
+<li>键值对数量小于512个</li>
+</ul>
+</li>
+</ul>
+<h3 id="哈希命令">哈希命令</h3>
+<ul>
+<li>hset</li>
+<li>hget</li>
+<li>hexists</li>
+<li>hdel</li>
+<li>hlen</li>
+<li>hgetall</li>
+</ul>
+<h2 id="集合对象">集合对象</h2>
+<p>集合对象的编码可以是：</p>
+<ul>
+<li>intset：所有元素保存在整数集合里
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1c7c861215e8?w=1111&amp;h=334&amp;f=png&amp;s=106767" alt=""></li>
+<li>hashtale：字典的值为null
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1c81ff7bbdaf?w=838&amp;h=355&amp;f=png&amp;s=108143" alt=""></li>
+</ul>
+<h3 id="编码转换-3">编码转换</h3>
+<p>集合使用intset需要满足两个条件，不满足时使用hashtable（参数可通过配置文件修改）</p>
+<ul>
+<li>保存的所有元素都是整数值</li>
+<li>元素数量不超过512个</li>
+</ul>
+<h3 id="集合命令">集合命令</h3>
+<ul>
+<li>sadd</li>
+<li>scard</li>
+<li>sismember</li>
+<li>smembers</li>
+<li>srandmember</li>
+<li>spop</li>
+<li>srem</li>
+</ul>
+<h2 id="有序结合对象">有序结合对象</h2>
+<p>有序集合的编码可以是</p>
+<ul>
+<li>ziplist：每个元素使用两个紧挨在一起的节点表示，第一个表示成员，第二个表示分值。分值小的靠近表头，分值大的靠近表尾
+<img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1d0b6c46fa95?w=1322&amp;h=180&amp;f=png&amp;s=83093" alt=""></li>
+<li>skiplist：使用zset作为底层实现，zset结构同时包含了字典和跳跃表，分别用于根据key查找score和分值排序或范围查询</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln">1</span>// 两种数据结构通过指针共享元素成员和分值，不会浪费内存
+<span class="ln">2</span>typedef struct zset {
+<span class="ln">3</span>    zskplist *zsl; //跳跃表，方便zrank，zrange
+<span class="ln">4</span>    dict *dict; //字典，方便zscore
+<span class="ln">5</span>}zset;
+</code></pre></div><p><img src="https://user-gold-cdn.xitu.io/2018/12/15/167b1db35769bf51?w=1566&amp;h=813&amp;f=png&amp;s=330533" alt=""></p>
+<h3 id="编码转换-4">编码转换</h3>
+<p>当满足以下两个条件时，使用ziplist编码，否则使用skiplist（可通过配置文件修改）</p>
+<ul>
+<li>保存的元素数量少于128个</li>
+<li>成员长度小于64字节</li>
+</ul>
+<h3 id="有序集合命令">有序集合命令</h3>
+<ul>
+<li>zadd</li>
+<li>zcard</li>
+<li>zcount</li>
+<li>zrange</li>
+<li>zrevrange</li>
+<li>zrem</li>
+<li>zscore</li>
+</ul>
+<h2 id="类型检查和命令多态">类型检查和命令多态</h2>
+<p>redis的命令可以分为两大类：</p>
+<ul>
+<li>可以对任意类型的键执行，如
+<ul>
+<li>del</li>
+<li>expire</li>
+<li>rename</li>
+<li>type</li>
+<li>object</li>
+</ul>
+</li>
+<li>只能对特定类型的键执行，比如前面各种对象的命令。是通过redisObject的type属性实现的</li>
+</ul>
+<h2 id="内存回收">内存回收</h2>
+<p>redis通过对象的refcount属性记录对象引用计数信息，适当的时候自动释放对象进行内存回收</p>
+<h2 id="对象共享">对象共享</h2>
+<ul>
+<li>包含同样数值的对象，键的值指向同一个对象，以节约内存。</li>
+<li>redis在初始化时，创建一万个字符串对象，包含从0-9999的所有整数值，当需要用到这些值时，服务器会共享这些对象，而不是新建对象</li>
+<li>数量可通过配置文件修改</li>
+<li>目前不包含字符串的对象共享，因为要比对字符串是否相同本身就会造成性能问题</li>
+</ul>
+<h2 id="对象空转时长">对象空转时长</h2>
+<ul>
+<li>空转时长=现在时间-redisObject.lru，lru记录对象最后一次被访问的时间</li>
+<li>当redis配置了最大内存（maxmemory）时，回收算法判断内存超过该值时，空转时长高的会优先被释放以回收内存</li>
+</ul>
+<h1 id="参考命令">参考命令</h1>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span># 设置字符串
+<span class="ln"> 2</span>set msg &#34;hello world&#34;
+<span class="ln"> 3</span>rpush numbers 1 2 3 4 5
+<span class="ln"> 4</span>llen numbers
+<span class="ln"> 5</span>lrange numbers 0 5
+<span class="ln"> 6</span># 获取键值使用的底层数据结构
+<span class="ln"> 7</span>object encoding numbers
+<span class="ln"> 8</span># 查看对象的引用计数值
+<span class="ln"> 9</span>object refcount numbers
+<span class="ln">10</span># 对象空转时长: value=now-object.lru
+<span class="ln">11</span>object idletime numbers
+</code></pre></div><h2 id="参考文献">参考文献</h2>
+<ul>
+<li>《redis设计与实现》</li>
+</ul>
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">Read More</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go调度机制</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-select源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/" class="nav-link">dmp文件分析（四）- 调用栈分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>17</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>7</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script src = 'https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js'></script>
+  </body>
+</html>
