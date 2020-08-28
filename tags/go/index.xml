@@ -6,10 +6,32 @@
     <description>Recent content in go on kinnylee</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Thu, 27 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>go调度机制</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</link>
+      <pubDate>Fri, 28 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</guid>
+      <description>go调度机制 gopark 和上面的 goready 对应，互为逆操作。gopark 和 goready 在 runtime 的源码中会经常遇到，涉及了 goroutine 的调度过程，</description>
+    </item>
+    
+    <item>
+      <title>go进程启动分析</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/</link>
+      <pubDate>Fri, 28 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/</guid>
+      <description>Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是由runtime.main函数启动的 go进程启动后，会调用runtime·rt0_go来执行程序的初始化和启动系统调度  go进程启动的四大步骤
+ runtime.osinit：获取系统cpu个数 runtime.schedinit：初始化调度系统，p初始化，m0和某个绑定 runtime.newproc：新建groutine，执行runtime.main，建好后插入p的本地队列 runtime.mstart：启动m，进入启动调度系统  概念介绍 m0 表示进程启动的第一个线程，也叫主线程。它是进程启动通过汇编复制的，是个全局变量
+g0  每个m都有一个g0，因为每个线程都有一个系统堆栈。 和其他g的区别是栈的区别。 g0上的栈是系统分配的，在linux上默认大小为8M，不能扩展也不能缩小。而普通g默认2k，可扩展 g0上没有任何任务函数，也没有任何状态，它不能被调度程序抢占。 调度是在g0上跑的  源码位置：src/runtime/proc.go
+1// 全局变量，赋值是汇编实现的 2var ( 3 // 主线程 4 m0 m 5 // 和m0绑定的g0，也可以理解成m0的堆栈 6 g0 g 7 raceprocctx0 uintptr 8) 汇编入口 源码位置：src/runtime/asm_arm64.s
+1TEXT runtime·rt0_go(SB),NOSPLIT,$0 2 3 // 进程启动时的主线程 4 // 当前栈和资源保存在全局变量runtime.g0中 5 MOVD	$runtime·g0(SB), g 6 7 // 当前线程保存在m0 8 MOVD	$runtime·m0(SB), R0 9 10 // g0绑定到m0 11 MOVD	g, m_g0(R0) 12 13 // m0绑定到g0 14 MOVD	R0, g_m(g) 15 16 // os初始化，获取cpu数量 17 BL	runtime·osinit(SB) 18 19 // 调度器初始化 20 BL	runtime·schedinit(SB) 21 22 // 这里进入runtime.</description>
+    </item>
     
     <item>
       <title>go-select源码分析</title>

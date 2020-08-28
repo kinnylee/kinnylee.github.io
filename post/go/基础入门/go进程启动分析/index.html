@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>go进程启动分析 | kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.74.3" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+  
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是 …">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "go进程启动分析" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" />
+<meta property = "og:title" content = "go进程启动分析" />
+<meta property = "og:description" content = "Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是 …" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/'>
+
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css" integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ==' as="style">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js" as="script">
+
+    
+    <link rel = 'stylesheet' href = 'https://kinnylee.github.io/css/styles.911db35c8e306d717b4098e7a4f14096bbc15388e4c04e8b7e7809a9d1dd2820d178edba6928d1cbfa82083bd2263626853f300038e96a7dc6284ace1dfdcdc9.css' integrity = 'sha512-kR2zXI4wbXF7QJjnpPFAlrvBU4jkwE6LfngJqdHdKCDReO26aSjRy/qCCDvSJjYmhT8wADjpan3GKErOHf3NyQ=='>
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <svg class="icon">
+          <use xlink:href="#open-menu"></use>
+        </svg>
+        <svg class="icon">
+          <use xlink:href="#closeme"></use>
+        </svg>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://twitter.com/' class = 'nav_child nav_item'>中间件</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/tags/ansible' class = 'nav_child nav_item'>Ansible</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>go进程启动分析</h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 28, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=go%e8%bf%9b%e7%a8%8b%e5%90%af%e5%8a%a8%e5%88%86%e6%9e%90&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E8%25BF%259B%25E7%25A8%258B%25E5%2590%25AF%25E5%258A%25A8%25E5%2588%2586%25E6%259E%2590%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
+  </a>
+  
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E8%25BF%259B%25E7%25A8%258B%25E5%2590%25AF%25E5%258A%25A8%25E5%2588%2586%25E6%259E%2590%2f&t=go%e8%bf%9b%e7%a8%8b%e5%90%af%e5%8a%a8%e5%88%86%e6%9e%90" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#go进程启动概述">Go进程启动概述</a></li>
+    <li><a href="#概念介绍">概念介绍</a>
+      <ul>
+        <li><a href="#m0">m0</a></li>
+        <li><a href="#g0">g0</a></li>
+        <li><a href="#汇编入口">汇编入口</a></li>
+      </ul>
+    </li>
+    <li><a href="#go进程启动源码解析">Go进程启动源码解析</a>
+      <ul>
+        <li><a href="#osinit">osinit</a></li>
+        <li><a href="#scheint">scheint</a></li>
+        <li><a href="#mstart">mstart</a></li>
+        <li><a href="#schedule">schedule</a></li>
+        <li><a href="#main函数">main函数</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+    <h1 id="go进程启动分析">Go进程启动分析</h1>
+<ul>
+<li>我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？</li>
+<li>这一篇内容用到上一篇《go协程原理》的GMP模型</li>
+</ul>
+<h2 id="go进程启动概述">Go进程启动概述</h2>
+<ul>
+<li>main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的</li>
+<li>main包的main函数是由runtime.main函数启动的</li>
+<li>go进程启动后，会调用runtime·rt0_go来执行程序的初始化和启动系统调度</li>
+</ul>
+<p>go进程启动的四大步骤</p>
+<ul>
+<li>runtime.osinit：获取系统cpu个数</li>
+<li>runtime.schedinit：初始化调度系统，p初始化，m0和某个绑定</li>
+<li>runtime.newproc：新建groutine，执行runtime.main，建好后插入p的本地队列</li>
+<li>runtime.mstart：启动m，进入启动调度系统</li>
+</ul>
+<h2 id="概念介绍">概念介绍</h2>
+<h3 id="m0">m0</h3>
+<p>表示进程启动的第一个线程，也叫主线程。它是进程启动通过汇编复制的，是个全局变量</p>
+<h3 id="g0">g0</h3>
+<ul>
+<li>每个m都有一个g0，因为每个线程都有一个系统堆栈。</li>
+<li>和其他g的区别是栈的区别。</li>
+<li>g0上的栈是系统分配的，在linux上默认大小为8M，不能扩展也不能缩小。而普通g默认2k，可扩展</li>
+<li>g0上没有任何任务函数，也没有任何状态，它不能被调度程序抢占。</li>
+<li>调度是在g0上跑的</li>
+</ul>
+<p>源码位置：src/runtime/proc.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="c1">// 全局变量，赋值是汇编实现的
+</span><span class="ln">2</span><span class="c1"></span><span class="kd">var</span> <span class="p">(</span>
+<span class="ln">3</span>  <span class="c1">// 主线程
+</span><span class="ln">4</span><span class="c1"></span>  <span class="nx">m0</span>           <span class="nx">m</span>
+<span class="ln">5</span>  <span class="c1">// 和m0绑定的g0，也可以理解成m0的堆栈
+</span><span class="ln">6</span><span class="c1"></span>  <span class="nx">g0</span>           <span class="nx">g</span>
+<span class="ln">7</span>  <span class="nx">raceprocctx0</span> <span class="kt">uintptr</span>
+<span class="ln">8</span><span class="p">)</span>
+</code></pre></div><h3 id="汇编入口">汇编入口</h3>
+<p>源码位置：src/runtime/asm_arm64.s</p>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span>TEXT runtime·rt0_go(SB),NOSPLIT,$0
+<span class="ln"> 2</span>
+<span class="ln"> 3</span>  // 进程启动时的主线程
+<span class="ln"> 4</span>  // 当前栈和资源保存在全局变量runtime.g0中
+<span class="ln"> 5</span>  MOVD	$runtime·g0(SB), g
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  // 当前线程保存在m0
+<span class="ln"> 8</span>  MOVD	$runtime·m0(SB), R0
+<span class="ln"> 9</span>
+<span class="ln">10</span>  // g0绑定到m0
+<span class="ln">11</span>  MOVD	g, m_g0(R0)
+<span class="ln">12</span>
+<span class="ln">13</span>  // m0绑定到g0
+<span class="ln">14</span>  MOVD	R0, g_m(g)
+<span class="ln">15</span>
+<span class="ln">16</span>  // os初始化，获取cpu数量
+<span class="ln">17</span>  BL	runtime·osinit(SB)
+<span class="ln">18</span>
+<span class="ln">19</span>  // 调度器初始化
+<span class="ln">20</span>  BL	runtime·schedinit(SB)
+<span class="ln">21</span>
+<span class="ln">22</span>  // 这里进入runtime.main，开始执行用户程序
+<span class="ln">23</span>  MOVD	$runtime·mainPC(SB), R0		// entry
+<span class="ln">24</span>
+<span class="ln">25</span>  // runtime.newproc启动一个groutine
+<span class="ln">26</span>  BL	runtime·newproc(SB)
+<span class="ln">27</span>  // 启动线程，启动调度系统
+<span class="ln">28</span>  BL  runtime·mstart(SB)
+</code></pre></div><h2 id="go进程启动源码解析">Go进程启动源码解析</h2>
+<h3 id="osinit">osinit</h3>
+<ul>
+<li>源码位置：src/runtime/os_linux.go</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">func</span> <span class="nf">osinit</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="c1">// 获取cpu数量
+</span><span class="ln">3</span><span class="c1"></span>  <span class="nx">ncpu</span> <span class="p">=</span> <span class="nf">getproccount</span><span class="p">()</span>
+<span class="ln">4</span>  <span class="nx">physHugePageSize</span> <span class="p">=</span> <span class="nf">getHugePageSize</span><span class="p">()</span>
+<span class="ln">5</span>  <span class="nf">osArchInit</span><span class="p">()</span>
+<span class="ln">6</span><span class="p">}</span>
+</code></pre></div><h3 id="scheint">scheint</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 调度系统的初始化
+</span><span class="ln"> 2</span><span class="c1">// 进行P的初始化
+</span><span class="ln"> 3</span><span class="c1">// 也会把M0和某个P绑定
+</span><span class="ln"> 4</span><span class="c1"></span><span class="kd">func</span> <span class="nf">schedinit</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 5</span>  <span class="c1">// raceinit must be the first call to race detector.
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="c1">// In particular, it must be done before mallocinit below calls racemapshadow.
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln"> 8</span>  <span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+<span class="ln"> 9</span>    <span class="nx">_g_</span><span class="p">.</span><span class="nx">racectx</span><span class="p">,</span> <span class="nx">raceprocctx0</span> <span class="p">=</span> <span class="nf">raceinit</span><span class="p">()</span>
+<span class="ln">10</span>  <span class="p">}</span>
+<span class="ln">11</span>
+<span class="ln">12</span>  <span class="nx">sched</span><span class="p">.</span><span class="nx">maxmcount</span> <span class="p">=</span> <span class="mi">10000</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="nf">tracebackinit</span><span class="p">()</span>
+<span class="ln">15</span>  <span class="nf">moduledataverify</span><span class="p">()</span>
+<span class="ln">16</span>  <span class="nf">stackinit</span><span class="p">()</span>
+<span class="ln">17</span>  <span class="nf">mallocinit</span><span class="p">()</span>
+<span class="ln">18</span>  <span class="nf">fastrandinit</span><span class="p">()</span> <span class="c1">// must run before mcommoninit
+</span><span class="ln">19</span><span class="c1"></span>  <span class="nf">mcommoninit</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">)</span>
+<span class="ln">20</span>  <span class="nf">cpuinit</span><span class="p">()</span>       <span class="c1">// must run before alginit
+</span><span class="ln">21</span><span class="c1"></span>  <span class="nf">alginit</span><span class="p">()</span>       <span class="c1">// maps must not be used before this call
+</span><span class="ln">22</span><span class="c1"></span>  <span class="nf">modulesinit</span><span class="p">()</span>   <span class="c1">// provides activeModules
+</span><span class="ln">23</span><span class="c1"></span>  <span class="nf">typelinksinit</span><span class="p">()</span> <span class="c1">// uses maps, activeModules
+</span><span class="ln">24</span><span class="c1"></span>  <span class="nf">itabsinit</span><span class="p">()</span>     <span class="c1">// uses activeModules
+</span><span class="ln">25</span><span class="c1"></span>
+<span class="ln">26</span>  <span class="nf">msigsave</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">)</span>
+<span class="ln">27</span>  <span class="nx">initSigmask</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">sigmask</span>
+<span class="ln">28</span>
+<span class="ln">29</span>  <span class="nf">goargs</span><span class="p">()</span>
+<span class="ln">30</span>  <span class="nf">goenvs</span><span class="p">()</span>
+<span class="ln">31</span>  <span class="nf">parsedebugvars</span><span class="p">()</span>
+<span class="ln">32</span>  <span class="nf">gcinit</span><span class="p">()</span>
+<span class="ln">33</span>
+<span class="ln">34</span>  <span class="nx">sched</span><span class="p">.</span><span class="nx">lastpoll</span> <span class="p">=</span> <span class="nb">uint64</span><span class="p">(</span><span class="nf">nanotime</span><span class="p">())</span>
+<span class="ln">35</span>
+<span class="ln">36</span>  <span class="c1">// 确认P的个数，默认为CPU个数，可以通过 GOMAXPROCS 环境变量更改
+</span><span class="ln">37</span><span class="c1"></span>  <span class="nx">procs</span> <span class="o">:=</span> <span class="nx">ncpu</span>
+<span class="ln">38</span>  <span class="k">if</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nf">atoi32</span><span class="p">(</span><span class="nf">gogetenv</span><span class="p">(</span><span class="s">&#34;GOMAXPROCS&#34;</span><span class="p">));</span> <span class="nx">ok</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">39</span>    <span class="nx">procs</span> <span class="p">=</span> <span class="nx">n</span>
+<span class="ln">40</span>  <span class="p">}</span>
+<span class="ln">41</span>
+<span class="ln">42</span>  <span class="c1">// 一次性分配procs个P
+</span><span class="ln">43</span><span class="c1"></span>  <span class="k">if</span> <span class="nf">procresize</span><span class="p">(</span><span class="nx">procs</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">44</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;unknown runnable goroutine during bootstrap&#34;</span><span class="p">)</span>
+<span class="ln">45</span>  <span class="p">}</span>
+<span class="ln">46</span>
+<span class="ln">47</span>  <span class="c1">// For cgocheck &gt; 1, we turn on the write barrier at all times
+</span><span class="ln">48</span><span class="c1"></span>  <span class="c1">// and check all pointer writes. We can&#39;t do this until after
+</span><span class="ln">49</span><span class="c1"></span>  <span class="c1">// procresize because the write barrier needs a P.
+</span><span class="ln">50</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">debug</span><span class="p">.</span><span class="nx">cgocheck</span> <span class="p">&gt;</span> <span class="mi">1</span> <span class="p">{</span>
+<span class="ln">51</span>    <span class="nx">writeBarrier</span><span class="p">.</span><span class="nx">cgo</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln">52</span>    <span class="nx">writeBarrier</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln">53</span>    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">p</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">allp</span> <span class="p">{</span>
+<span class="ln">54</span>      <span class="nx">p</span><span class="p">.</span><span class="nx">wbBuf</span><span class="p">.</span><span class="nf">reset</span><span class="p">()</span>
+<span class="ln">55</span>    <span class="p">}</span>
+<span class="ln">56</span>  <span class="p">}</span>
+<span class="ln">57</span>
+<span class="ln">58</span>  <span class="k">if</span> <span class="nx">buildVersion</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+<span class="ln">59</span>    <span class="c1">// Condition should never trigger. This code just serves
+</span><span class="ln">60</span><span class="c1"></span>    <span class="c1">// to ensure runtime·buildVersion is kept in the resulting binary.
+</span><span class="ln">61</span><span class="c1"></span>    <span class="nx">buildVersion</span> <span class="p">=</span> <span class="s">&#34;unknown&#34;</span>
+<span class="ln">62</span>  <span class="p">}</span>
+<span class="ln">63</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">modinfo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+<span class="ln">64</span>    <span class="c1">// Condition should never trigger. This code just serves
+</span><span class="ln">65</span><span class="c1"></span>    <span class="c1">// to ensure runtime·modinfo is kept in the resulting binary.
+</span><span class="ln">66</span><span class="c1"></span>    <span class="nx">modinfo</span> <span class="p">=</span> <span class="s">&#34;&#34;</span>
+<span class="ln">67</span>  <span class="p">}</span>
+<span class="ln">68</span><span class="p">}</span>
+</code></pre></div><h3 id="mstart">mstart</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 启动线程，并且启动调度系统
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">func</span> <span class="nf">mstart</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="c1">// 这里获取的是g0，在系统堆栈
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span>  <span class="nx">osStack</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="ln"> 7</span>  <span class="k">if</span> <span class="nx">osStack</span> <span class="p">{</span>
+<span class="ln"> 8</span>    <span class="c1">// Initialize stack bounds from system stack.
+</span><span class="ln"> 9</span><span class="c1"></span>    <span class="c1">// Cgo may have left stack size in stack.hi.
+</span><span class="ln">10</span><span class="c1"></span>    <span class="c1">// minit may update the stack bounds.
+</span><span class="ln">11</span><span class="c1"></span>    <span class="nx">size</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span>
+<span class="ln">12</span>    <span class="k">if</span> <span class="nx">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">13</span>      <span class="nx">size</span> <span class="p">=</span> <span class="mi">8192</span> <span class="o">*</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">StackGuardMultiplier</span>
+<span class="ln">14</span>    <span class="p">}</span>
+<span class="ln">15</span>    <span class="nx">_g_</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span> <span class="p">=</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nf">noescape</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">size</span><span class="p">)))</span>
+<span class="ln">16</span>    <span class="nx">_g_</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">hi</span> <span class="o">-</span> <span class="nx">size</span> <span class="o">+</span> <span class="mi">1024</span>
+<span class="ln">17</span>  <span class="p">}</span>
+<span class="ln">18</span>  <span class="c1">// Initialize stack guard so that we can start calling regular
+</span><span class="ln">19</span><span class="c1"></span>  <span class="c1">// Go code.
+</span><span class="ln">20</span><span class="c1"></span>  <span class="nx">_g_</span><span class="p">.</span><span class="nx">stackguard0</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">+</span> <span class="nx">_StackGuard</span>
+<span class="ln">21</span>  <span class="c1">// This is the g0, so we can also call go:systemstack
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">// functions, which check stackguard1.
+</span><span class="ln">23</span><span class="c1"></span>  <span class="nx">_g_</span><span class="p">.</span><span class="nx">stackguard1</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">stackguard0</span>
+<span class="ln">24</span>  <span class="nf">mstart1</span><span class="p">()</span>
+<span class="ln">25</span>
+<span class="ln">26</span>  <span class="c1">// Exit this thread.
+</span><span class="ln">27</span><span class="c1"></span>  <span class="k">switch</span> <span class="nx">GOOS</span> <span class="p">{</span>
+<span class="ln">28</span>  <span class="k">case</span> <span class="s">&#34;windows&#34;</span><span class="p">,</span> <span class="s">&#34;solaris&#34;</span><span class="p">,</span> <span class="s">&#34;illumos&#34;</span><span class="p">,</span> <span class="s">&#34;plan9&#34;</span><span class="p">,</span> <span class="s">&#34;darwin&#34;</span><span class="p">,</span> <span class="s">&#34;aix&#34;</span><span class="p">:</span>
+<span class="ln">29</span>    <span class="c1">// Windows, Solaris, illumos, Darwin, AIX and Plan 9 always system-allocate
+</span><span class="ln">30</span><span class="c1"></span>    <span class="c1">// the stack, but put it in _g_.stack before mstart,
+</span><span class="ln">31</span><span class="c1"></span>    <span class="c1">// so the logic above hasn&#39;t set osStack yet.
+</span><span class="ln">32</span><span class="c1"></span>    <span class="nx">osStack</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln">33</span>  <span class="p">}</span>
+<span class="ln">34</span>  <span class="nf">mexit</span><span class="p">(</span><span class="nx">osStack</span><span class="p">)</span>
+<span class="ln">35</span><span class="p">}</span>
+<span class="ln">36</span>
+<span class="ln">37</span><span class="kd">func</span> <span class="nf">mstart1</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">38</span>  <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln">39</span>
+<span class="ln">40</span>  <span class="c1">// 确保g是系统栈上的g0，调度器只在g0上执行
+</span><span class="ln">41</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">_g_</span> <span class="o">!=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">g0</span> <span class="p">{</span>
+<span class="ln">42</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;bad runtime·mstart&#34;</span><span class="p">)</span>
+<span class="ln">43</span>  <span class="p">}</span>
+<span class="ln">44</span>
+<span class="ln">45</span>  <span class="c1">// Record the caller for use as the top of stack in mcall and
+</span><span class="ln">46</span><span class="c1"></span>  <span class="c1">// for terminating the thread.
+</span><span class="ln">47</span><span class="c1"></span>  <span class="c1">// We&#39;re never coming back to mstart1 after we call schedule,
+</span><span class="ln">48</span><span class="c1"></span>  <span class="c1">// so other calls can reuse the current frame.
+</span><span class="ln">49</span><span class="c1"></span>  <span class="nf">save</span><span class="p">(</span><span class="nf">getcallerpc</span><span class="p">(),</span> <span class="nf">getcallersp</span><span class="p">())</span>
+<span class="ln">50</span>  <span class="nf">asminit</span><span class="p">()</span>
+<span class="ln">51</span>
+<span class="ln">52</span>  <span class="c1">// 初始m
+</span><span class="ln">53</span><span class="c1"></span>  <span class="nf">minit</span><span class="p">()</span>
+<span class="ln">54</span>
+<span class="ln">55</span>  <span class="c1">// Install signal handlers; after minit so that minit can
+</span><span class="ln">56</span><span class="c1"></span>  <span class="c1">// prepare the thread to be able to handle the signals.
+</span><span class="ln">57</span><span class="c1"></span>  <span class="c1">// 如果当前g的m是m0，执行mstartm0
+</span><span class="ln">58</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span> <span class="o">==</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
+<span class="ln">59</span>    <span class="c1">// 对于初始m，需要一些特殊处理
+</span><span class="ln">60</span><span class="c1"></span>    <span class="nf">mstartm0</span><span class="p">()</span>
+<span class="ln">61</span>  <span class="p">}</span>
+<span class="ln">62</span>
+<span class="ln">63</span>  <span class="c1">// 如果有m的起始函数执行，先执行它
+</span><span class="ln">64</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">fn</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">mstartfn</span><span class="p">;</span> <span class="nx">fn</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">65</span>    <span class="nf">fn</span><span class="p">()</span>
+<span class="ln">66</span>  <span class="p">}</span>
+<span class="ln">67</span>
+<span class="ln">68</span>  <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
+<span class="ln">69</span>    <span class="c1">// 如果不是m0，需要绑定p
+</span><span class="ln">70</span><span class="c1"></span>    <span class="nf">acquirep</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">nextp</span><span class="p">.</span><span class="nf">ptr</span><span class="p">())</span>
+<span class="ln">71</span>    <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">nextp</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln">72</span>  <span class="p">}</span>
+<span class="ln">73</span>
+<span class="ln">74</span>  <span class="c1">// 开始进入调度
+</span><span class="ln">75</span><span class="c1"></span>  <span class="nf">schedule</span><span class="p">()</span>
+<span class="ln">76</span><span class="p">}</span>
+</code></pre></div><h3 id="schedule">schedule</h3>
+<p>调度的本质是：尽力找可以运行的G，然后运行G上的任务函数</p>
+<p>具体流程包括：</p>
+<ul>
+<li>如果GC需要STW，就休眠M</li>
+<li>每隔61次从全局队列获取G，避免全局队列的g被饿死</li>
+<li>从p的本地队列获取G</li>
+<li>调用findrunnable 找G，找不到的话就将M休眠，等待唤醒</li>
+<li>找到G后，调用execute去执行G</li>
+</ul>
+<blockquote>
+<p>main函数也是放入到G中的</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">  1</span><span class="kd">func</span> <span class="nf">schedule</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">  2</span>  <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln">  3</span>
+<span class="ln">  4</span><span class="nx">top</span><span class="p">:</span>
+<span class="ln">  5</span>  <span class="nx">pp</span> <span class="o">:=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">()</span>
+<span class="ln">  6</span>  <span class="nx">pp</span><span class="p">.</span><span class="nx">preempt</span> <span class="p">=</span> <span class="kc">false</span>
+<span class="ln">  7</span>
+<span class="ln">  8</span>  <span class="c1">// GC(垃圾回收)需要STW（stop the world)，休眠当前m
+</span><span class="ln">  9</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">gcwaiting</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 10</span>    <span class="nf">gcstopm</span><span class="p">()</span>
+<span class="ln"> 11</span>    <span class="k">goto</span> <span class="nx">top</span>
+<span class="ln"> 12</span>  <span class="p">}</span>
+<span class="ln"> 13</span>  <span class="k">if</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">runSafePointFn</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 14</span>    <span class="nf">runSafePointFn</span><span class="p">()</span>
+<span class="ln"> 15</span>  <span class="p">}</span>
+<span class="ln"> 16</span>
+<span class="ln"> 17</span>  <span class="c1">// Sanity check: if we are spinning, the run queue should be empty.
+</span><span class="ln"> 18</span><span class="c1"></span>  <span class="c1">// Check this before calling checkTimers, as that might call
+</span><span class="ln"> 19</span><span class="c1"></span>  <span class="c1">// goready to put a ready goroutine on the local run queue.
+</span><span class="ln"> 20</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">spinning</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">pp</span><span class="p">.</span><span class="nx">runnext</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">runqhead</span> <span class="o">!=</span> <span class="nx">pp</span><span class="p">.</span><span class="nx">runqtail</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 21</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;schedule: spinning with local work&#34;</span><span class="p">)</span>
+<span class="ln"> 22</span>  <span class="p">}</span>
+<span class="ln"> 23</span>
+<span class="ln"> 24</span>  <span class="nf">checkTimers</span><span class="p">(</span><span class="nx">pp</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="ln"> 25</span>
+<span class="ln"> 26</span>  <span class="kd">var</span> <span class="nx">gp</span> <span class="o">*</span><span class="nx">g</span>
+<span class="ln"> 27</span>  <span class="kd">var</span> <span class="nx">inheritTime</span> <span class="kt">bool</span>
+<span class="ln"> 28</span>
+<span class="ln"> 29</span>  <span class="c1">// Normal goroutines will check for need to wakeP in ready,
+</span><span class="ln"> 30</span><span class="c1"></span>  <span class="c1">// but GCworkers and tracereaders will not, so the check must
+</span><span class="ln"> 31</span><span class="c1"></span>  <span class="c1">// be done here instead.
+</span><span class="ln"> 32</span><span class="c1"></span>  <span class="nx">tryWakeP</span> <span class="o">:=</span> <span class="kc">false</span>
+<span class="ln"> 33</span>  <span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="o">||</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">shutdown</span> <span class="p">{</span>
+<span class="ln"> 34</span>    <span class="nx">gp</span> <span class="p">=</span> <span class="nf">traceReader</span><span class="p">()</span>
+<span class="ln"> 35</span>    <span class="k">if</span> <span class="nx">gp</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 36</span>      <span class="nf">casgstatus</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">_Gwaiting</span><span class="p">,</span> <span class="nx">_Grunnable</span><span class="p">)</span>
+<span class="ln"> 37</span>      <span class="nf">traceGoUnpark</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="ln"> 38</span>      <span class="nx">tryWakeP</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln"> 39</span>    <span class="p">}</span>
+<span class="ln"> 40</span>  <span class="p">}</span>
+<span class="ln"> 41</span>  <span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">gcBlackenEnabled</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 42</span>    <span class="nx">gp</span> <span class="p">=</span> <span class="nx">gcController</span><span class="p">.</span><span class="nf">findRunnableGCWorker</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">())</span>
+<span class="ln"> 43</span>    <span class="nx">tryWakeP</span> <span class="p">=</span> <span class="nx">tryWakeP</span> <span class="o">||</span> <span class="nx">gp</span> <span class="o">!=</span> <span class="kc">nil</span>
+<span class="ln"> 44</span>  <span class="p">}</span>
+<span class="ln"> 45</span>  <span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 46</span>    <span class="c1">// Check the global runnable queue once in a while to ensure fairness.
+</span><span class="ln"> 47</span><span class="c1"></span>    <span class="c1">// Otherwise two goroutines can completely occupy the local runqueue
+</span><span class="ln"> 48</span><span class="c1"></span>    <span class="c1">// by constantly respawning each other.
+</span><span class="ln"> 49</span><span class="c1"></span>    <span class="c1">// 每隔61次调度，从全局队列获取G
+</span><span class="ln"> 50</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">schedtick</span><span class="o">%</span><span class="mi">61</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">runqsize</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 51</span>      <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+<span class="ln"> 52</span>      <span class="nx">gp</span> <span class="p">=</span> <span class="nf">globrunqget</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="ln"> 53</span>      <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+<span class="ln"> 54</span>    <span class="p">}</span>
+<span class="ln"> 55</span>  <span class="p">}</span>
+<span class="ln"> 56</span>  <span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 57</span>    <span class="c1">// 从P的本地队列获取G
+</span><span class="ln"> 58</span><span class="c1"></span>    <span class="nx">gp</span><span class="p">,</span> <span class="nx">inheritTime</span> <span class="p">=</span> <span class="nf">runqget</span><span class="p">(</span><span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">())</span>
+<span class="ln"> 59</span>    <span class="c1">// We can see gp != nil here even if the M is spinning,
+</span><span class="ln"> 60</span><span class="c1"></span>    <span class="c1">// if checkTimers added a local goroutine via goready.
+</span><span class="ln"> 61</span><span class="c1"></span>  <span class="p">}</span>
+<span class="ln"> 62</span>  <span class="k">if</span> <span class="nx">gp</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 63</span>    <span class="c1">// 阻塞住，直到找到G
+</span><span class="ln"> 64</span><span class="c1"></span>    <span class="nx">gp</span><span class="p">,</span> <span class="nx">inheritTime</span> <span class="p">=</span> <span class="nf">findrunnable</span><span class="p">()</span> <span class="c1">// blocks until work is available
+</span><span class="ln"> 65</span><span class="c1"></span>  <span class="p">}</span>
+<span class="ln"> 66</span>
+<span class="ln"> 67</span>  <span class="c1">// This thread is going to run a goroutine and is not spinning anymore,
+</span><span class="ln"> 68</span><span class="c1"></span>  <span class="c1">// so if it was marked as spinning we need to reset it now and potentially
+</span><span class="ln"> 69</span><span class="c1"></span>  <span class="c1">// start a new spinning M.
+</span><span class="ln"> 70</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">spinning</span> <span class="p">{</span>
+<span class="ln"> 71</span>    <span class="nf">resetspinning</span><span class="p">()</span>
+<span class="ln"> 72</span>  <span class="p">}</span>
+<span class="ln"> 73</span>
+<span class="ln"> 74</span>  <span class="k">if</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">disable</span><span class="p">.</span><span class="nx">user</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nf">schedEnabled</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 75</span>    <span class="c1">// Scheduling of this goroutine is disabled. Put it on
+</span><span class="ln"> 76</span><span class="c1"></span>    <span class="c1">// the list of pending runnable goroutines for when we
+</span><span class="ln"> 77</span><span class="c1"></span>    <span class="c1">// re-enable user scheduling and look again.
+</span><span class="ln"> 78</span><span class="c1"></span>    <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+<span class="ln"> 79</span>    <span class="k">if</span> <span class="nf">schedEnabled</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 80</span>      <span class="c1">// Something re-enabled scheduling while we
+</span><span class="ln"> 81</span><span class="c1"></span>      <span class="c1">// were acquiring the lock.
+</span><span class="ln"> 82</span><span class="c1"></span>      <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+<span class="ln"> 83</span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 84</span>      <span class="nx">sched</span><span class="p">.</span><span class="nx">disable</span><span class="p">.</span><span class="nx">runnable</span><span class="p">.</span><span class="nf">pushBack</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span>
+<span class="ln"> 85</span>      <span class="nx">sched</span><span class="p">.</span><span class="nx">disable</span><span class="p">.</span><span class="nx">n</span><span class="o">++</span>
+<span class="ln"> 86</span>      <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
+<span class="ln"> 87</span>      <span class="k">goto</span> <span class="nx">top</span>
+<span class="ln"> 88</span>    <span class="p">}</span>
+<span class="ln"> 89</span>  <span class="p">}</span>
+<span class="ln"> 90</span>
+<span class="ln"> 91</span>  <span class="c1">// If about to schedule a not-normal goroutine (a GCworker or tracereader),
+</span><span class="ln"> 92</span><span class="c1"></span>  <span class="c1">// wake a P if there is one.
+</span><span class="ln"> 93</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">tryWakeP</span> <span class="p">{</span>
+<span class="ln"> 94</span>    <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">npidle</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sched</span><span class="p">.</span><span class="nx">nmspinning</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 95</span>      <span class="nf">wakep</span><span class="p">()</span>
+<span class="ln"> 96</span>    <span class="p">}</span>
+<span class="ln"> 97</span>  <span class="p">}</span>
+<span class="ln"> 98</span>  <span class="k">if</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">lockedm</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 99</span>    <span class="c1">// Hands off own p to the locked m,
+</span><span class="ln">100</span><span class="c1"></span>    <span class="c1">// then blocks waiting for a new p.
+</span><span class="ln">101</span><span class="c1"></span>    <span class="nf">startlockedm</span><span class="p">(</span><span class="nx">gp</span><span class="p">)</span>
+<span class="ln">102</span>    <span class="k">goto</span> <span class="nx">top</span>
+<span class="ln">103</span>  <span class="p">}</span>
+<span class="ln">104</span>  <span class="c1">// 执行G上的任务
+</span><span class="ln">105</span><span class="c1"></span>  <span class="nf">execute</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">inheritTime</span><span class="p">)</span>
+<span class="ln">106</span><span class="p">}</span>
+</code></pre></div><h3 id="main函数">main函数</h3>
+<p>前面介绍过，main函数在和m绑定的P队列中。因此在调度时，先将main从本地队列取出来，然后传给execute，就可以执行main groutine的任务了。main groutine的任务函数为runtime.main()</p>
+<p>主要流程包括：</p>
+<ul>
+<li>新建线程执行sysmon，用于系统后台监控（定期GC和调度抢占）</li>
+<li>确保在主线程上执行</li>
+<li>执行runtime包下所有的init函数</li>
+<li>启动执行GC的协程</li>
+<li>执行用户定义的所有的init函数</li>
+<li>然后在真正执行用户编写的main函数</li>
+<li>最后exit(0)系统退出</li>
+<li>如果没有退出，for循环一直访问非法地址，让操作系统杀死进程</li>
+</ul>
+<p>源码位置：src/runtime/proc.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-GO" data-lang="GO"><span class="ln">  1</span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">  2</span>  <span class="nx">g</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln">  3</span>
+<span class="ln">  4</span>  <span class="c1">// Racectx of m0-&gt;g0 is used only as the parent of the main goroutine.
+</span><span class="ln">  5</span><span class="c1"></span>  <span class="c1">// It must not be used for anything else.
+</span><span class="ln">  6</span><span class="c1"></span>  <span class="nx">g</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">g0</span><span class="p">.</span><span class="nx">racectx</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln">  7</span>
+<span class="ln">  8</span>  <span class="c1">// Max stack size is 1 GB on 64-bit, 250 MB on 32-bit.
+</span><span class="ln">  9</span><span class="c1"></span>  <span class="c1">// Using decimal instead of binary GB and MB because
+</span><span class="ln"> 10</span><span class="c1"></span>  <span class="c1">// they look nicer in the stack overflow failure message.
+</span><span class="ln"> 11</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">PtrSize</span> <span class="o">==</span> <span class="mi">8</span> <span class="p">{</span>
+<span class="ln"> 12</span>    <span class="nx">maxstacksize</span> <span class="p">=</span> <span class="mi">1000000000</span>
+<span class="ln"> 13</span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 14</span>    <span class="nx">maxstacksize</span> <span class="p">=</span> <span class="mi">250000000</span>
+<span class="ln"> 15</span>  <span class="p">}</span>
+<span class="ln"> 16</span>
+<span class="ln"> 17</span>  <span class="c1">// Allow newproc to start new Ms.
+</span><span class="ln"> 18</span><span class="c1"></span>  <span class="nx">mainStarted</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln"> 19</span>
+<span class="ln"> 20</span>  <span class="k">if</span> <span class="nx">GOARCH</span> <span class="o">!=</span> <span class="s">&#34;wasm&#34;</span> <span class="p">{</span> <span class="c1">// no threads on wasm yet, so no sysmon
+</span><span class="ln"> 21</span><span class="c1"></span>    <span class="c1">// 系统栈上分配一个新的m，运行sysmon(系统后台监控，定期垃圾回收和系统抢占）
+</span><span class="ln"> 22</span><span class="c1"></span>    <span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 23</span>      <span class="nf">newm</span><span class="p">(</span><span class="nx">sysmon</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln"> 24</span>    <span class="p">})</span>
+<span class="ln"> 25</span>  <span class="p">}</span>
+<span class="ln"> 26</span>
+<span class="ln"> 27</span>  <span class="c1">// Lock the main goroutine onto this, the main OS thread,
+</span><span class="ln"> 28</span><span class="c1"></span>  <span class="c1">// during initialization. Most programs won&#39;t care, but a few
+</span><span class="ln"> 29</span><span class="c1"></span>  <span class="c1">// do require certain calls to be made by the main thread.
+</span><span class="ln"> 30</span><span class="c1"></span>  <span class="c1">// Those can arrange for main.main to run in the main thread
+</span><span class="ln"> 31</span><span class="c1"></span>  <span class="c1">// by calling runtime.LockOSThread during initialization
+</span><span class="ln"> 32</span><span class="c1"></span>  <span class="c1">// to preserve the lock.
+</span><span class="ln"> 33</span><span class="c1"></span>  <span class="nf">lockOSThread</span><span class="p">()</span>
+<span class="ln"> 34</span>
+<span class="ln"> 35</span>  <span class="c1">// 确保在主线程上执行
+</span><span class="ln"> 36</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">g</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
+<span class="ln"> 37</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;runtime.main not on m0&#34;</span><span class="p">)</span>
+<span class="ln"> 38</span>  <span class="p">}</span>
+<span class="ln"> 39</span>
+<span class="ln"> 40</span>  <span class="c1">// 执行runtime包下所有的init
+</span><span class="ln"> 41</span><span class="c1"></span>  <span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runtime_inittask</span><span class="p">)</span> <span class="c1">// must be before defer
+</span><span class="ln"> 42</span><span class="c1"></span>  <span class="k">if</span> <span class="nf">nanotime</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 43</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;nanotime returning zero&#34;</span><span class="p">)</span>
+<span class="ln"> 44</span>  <span class="p">}</span>
+<span class="ln"> 45</span>
+<span class="ln"> 46</span>  <span class="c1">// Defer unlock so that runtime.Goexit during init does the unlock too.
+</span><span class="ln"> 47</span><span class="c1"></span>  <span class="nx">needUnlock</span> <span class="o">:=</span> <span class="kc">true</span>
+<span class="ln"> 48</span>  <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 49</span>    <span class="k">if</span> <span class="nx">needUnlock</span> <span class="p">{</span>
+<span class="ln"> 50</span>      <span class="nf">unlockOSThread</span><span class="p">()</span>
+<span class="ln"> 51</span>    <span class="p">}</span>
+<span class="ln"> 52</span>  <span class="p">}()</span>
+<span class="ln"> 53</span>
+<span class="ln"> 54</span>  <span class="c1">// Record when the world started.
+</span><span class="ln"> 55</span><span class="c1"></span>  <span class="nx">runtimeInitTime</span> <span class="p">=</span> <span class="nf">nanotime</span><span class="p">()</span>
+<span class="ln"> 56</span>
+<span class="ln"> 57</span>  <span class="c1">// 启动一个groutine进行GC
+</span><span class="ln"> 58</span><span class="c1"></span>  <span class="nf">gcenable</span><span class="p">()</span>
+<span class="ln"> 59</span>
+<span class="ln"> 60</span>  <span class="nx">main_init_done</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+<span class="ln"> 61</span>  <span class="k">if</span> <span class="nx">iscgo</span> <span class="p">{</span>
+<span class="ln"> 62</span>    <span class="k">if</span> <span class="nx">_cgo_thread_start</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 63</span>      <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_thread_start missing&#34;</span><span class="p">)</span>
+<span class="ln"> 64</span>    <span class="p">}</span>
+<span class="ln"> 65</span>    <span class="k">if</span> <span class="nx">GOOS</span> <span class="o">!=</span> <span class="s">&#34;windows&#34;</span> <span class="p">{</span>
+<span class="ln"> 66</span>      <span class="k">if</span> <span class="nx">_cgo_setenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 67</span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_setenv missing&#34;</span><span class="p">)</span>
+<span class="ln"> 68</span>      <span class="p">}</span>
+<span class="ln"> 69</span>      <span class="k">if</span> <span class="nx">_cgo_unsetenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 70</span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_unsetenv missing&#34;</span><span class="p">)</span>
+<span class="ln"> 71</span>      <span class="p">}</span>
+<span class="ln"> 72</span>    <span class="p">}</span>
+<span class="ln"> 73</span>    <span class="k">if</span> <span class="nx">_cgo_notify_runtime_init_done</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 74</span>      <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_notify_runtime_init_done missing&#34;</span><span class="p">)</span>
+<span class="ln"> 75</span>    <span class="p">}</span>
+<span class="ln"> 76</span>    <span class="c1">// Start the template thread in case we enter Go from
+</span><span class="ln"> 77</span><span class="c1"></span>    <span class="c1">// a C-created thread and need to create a new thread.
+</span><span class="ln"> 78</span><span class="c1"></span>    <span class="nf">startTemplateThread</span><span class="p">()</span>
+<span class="ln"> 79</span>    <span class="nf">cgocall</span><span class="p">(</span><span class="nx">_cgo_notify_runtime_init_done</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln"> 80</span>  <span class="p">}</span>
+<span class="ln"> 81</span>
+<span class="ln"> 82</span>  <span class="c1">// 执行用户定义的所有init函数
+</span><span class="ln"> 83</span><span class="c1"></span>  <span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">main_inittask</span><span class="p">)</span>
+<span class="ln"> 84</span>
+<span class="ln"> 85</span>  <span class="nb">close</span><span class="p">(</span><span class="nx">main_init_done</span><span class="p">)</span>
+<span class="ln"> 86</span>
+<span class="ln"> 87</span>  <span class="nx">needUnlock</span> <span class="p">=</span> <span class="kc">false</span>
+<span class="ln"> 88</span>  <span class="nf">unlockOSThread</span><span class="p">()</span>
+<span class="ln"> 89</span>
+<span class="ln"> 90</span>  <span class="k">if</span> <span class="nx">isarchive</span> <span class="o">||</span> <span class="nx">islibrary</span> <span class="p">{</span>
+<span class="ln"> 91</span>    <span class="c1">// A program compiled with -buildmode=c-archive or c-shared
+</span><span class="ln"> 92</span><span class="c1"></span>    <span class="c1">// has a main, but it is not executed.
+</span><span class="ln"> 93</span><span class="c1"></span>    <span class="k">return</span>
+<span class="ln"> 94</span>  <span class="p">}</span>
+<span class="ln"> 95</span>
+<span class="ln"> 96</span>  <span class="c1">// 真正执行main包下的main函数
+</span><span class="ln"> 97</span><span class="c1"></span>  <span class="nx">fn</span> <span class="o">:=</span> <span class="nx">main_main</span> <span class="c1">// make an indirect call, as the linker doesn&#39;t know the address of the main package when laying down the runtime
+</span><span class="ln"> 98</span><span class="c1"></span>  <span class="nf">fn</span><span class="p">()</span>
+<span class="ln"> 99</span>  <span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+<span class="ln">100</span>    <span class="nf">racefini</span><span class="p">()</span>
+<span class="ln">101</span>  <span class="p">}</span>
+<span class="ln">102</span>
+<span class="ln">103</span>  <span class="c1">// Make racy client program work: if panicking on
+</span><span class="ln">104</span><span class="c1"></span>  <span class="c1">// another goroutine at the same time as main returns,
+</span><span class="ln">105</span><span class="c1"></span>  <span class="c1">// let the other goroutine finish printing the panic trace.
+</span><span class="ln">106</span><span class="c1"></span>  <span class="c1">// Once it does, it will exit. See issues 3934 and 20018.
+</span><span class="ln">107</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">108</span>    <span class="c1">// Running deferred functions should not take long.
+</span><span class="ln">109</span><span class="c1"></span>    <span class="k">for</span> <span class="nx">c</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">c</span> <span class="p">&lt;</span> <span class="mi">1000</span><span class="p">;</span> <span class="nx">c</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">110</span>      <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">111</span>        <span class="k">break</span>
+<span class="ln">112</span>      <span class="p">}</span>
+<span class="ln">113</span>      <span class="nf">Gosched</span><span class="p">()</span>
+<span class="ln">114</span>    <span class="p">}</span>
+<span class="ln">115</span>  <span class="p">}</span>
+<span class="ln">116</span>  <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">panicking</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">117</span>    <span class="nf">gopark</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">waitReasonPanicWait</span><span class="p">,</span> <span class="nx">traceEvGoStop</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="ln">118</span>  <span class="p">}</span>
+<span class="ln">119</span>
+<span class="ln">120</span>  <span class="c1">// 退出程序
+</span><span class="ln">121</span><span class="c1"></span>  <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="ln">122</span>
+<span class="ln">123</span>  <span class="c1">// 确保程序崩溃，程序就一定会退出
+</span><span class="ln">124</span><span class="c1"></span>  <span class="c1">// or循环一直访问非法地址，让操作系统杀死进程
+</span><span class="ln">125</span><span class="c1"></span>  <span class="k">for</span> <span class="p">{</span>
+<span class="ln">126</span>    <span class="kd">var</span> <span class="nx">x</span> <span class="o">*</span><span class="kt">int32</span>
+<span class="ln">127</span>    <span class="o">*</span><span class="nx">x</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln">128</span>  <span class="p">}</span>
+<span class="ln">129</span><span class="p">}</span>
+</code></pre></div><h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://zboya.github.io/post/go_scheduler/">https://zboya.github.io/post/go_scheduler/</a></li>
+</ul>
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">Read More</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go调度机制</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-select源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/" class="nav-link">dmp文件分析（四）- 调用栈分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>16</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>7</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script src = 'https://kinnylee.github.io/js/bundle.9b227854346833b3e8ddaf35d67dba908f1d31d44872d312e541368bb03c0133d1f3dda83ca3129ca876dd1ecbb6f73d089e10697c6324e95ab1767533c2f891.js'></script>
+  </body>
+</html>
