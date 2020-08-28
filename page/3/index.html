@@ -199,6 +199,35 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/'>Ansible部署核心代码解析</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Jun 28, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/ansible' class = 'post_tag button button_translucent'>ansible
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+      <div class = 'excerpt_footer'>
+        <div>
+          <p class = 'pale'>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&#39;v2_playbook_on_start&#39;, pb) 8 # 遍历单个 playbook 下所有的 play(entries对象) 9 plays = pb.get_plays() 10 for …</p>
+          <a href='https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
         <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'></a>
       </h3>
       <div class = 'post_meta'>
@@ -350,6 +379,11 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
           <span class='button_tally'>2</span>
         </a>
         
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
           JAVA
           <span class='button_tally'>1</span>
@@ -374,7 +408,7 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>16</span>
+          <span class='button_tally'>17</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
@@ -395,6 +429,11 @@ go语言的诞生  google的三位大咖与2007年开始发明设计，称为21�
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
           C&#43;&#43;
           <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">

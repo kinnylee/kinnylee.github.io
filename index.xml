@@ -259,6 +259,15 @@ go语言覆盖范围  容器：docker 容器编排：k8s 监控：prometheus 数
     </item>
     
     <item>
+      <title>Ansible部署核心代码解析</title>
+      <link>https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/</guid>
+      <description>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&amp;#39;v2_playbook_on_start&amp;#39;, pb) 8 # 遍历单个 playbook 下所有的 play(entries对象) 9 plays = pb.get_plays() 10 for play in plays: 11 # 获取主机列表 12 batches = self._get_serialized_batches(play) 13 for batch in batches: 14 # 执行单个 play 逻辑, 调用 task_queue_manager.run() 15 result = self._tqm.run(play=play) 16 # 触发 统计 的回调函数 17 self.</description>
+    </item>
+    
+    <item>
       <title></title>
       <link>https://kinnylee.github.io/archives/</link>
       <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
@@ -273,7 +282,7 @@ go语言覆盖范围  容器：docker 容器编排：k8s 监控：prometheus 数
       <pubDate>Thu, 28 Feb 2019 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/about/</guid>
-      <description> 2014年毕业于中国地质大学（武汉），计算机科学与技术专业 目前就职于国内某软件公司，坐标北京 写过C++、Java、Python、Go 喜欢研究源码 篮球爱好者 喜欢研究新技术，包括  机器学习 k8s go 云原生    </description>
+      <description> 2014年毕业于中国地质大学（武汉），计算机科学与技术专业 目前就职于国内某软件公司，坐标北京 写过C++、Java、Python、Go 喜欢研究源码 篮球爱好者 喜欢研究新技术，包括  机器学习 k8s go 云原生   其他博客  掘金    </description>
     </item>
     
     <item>

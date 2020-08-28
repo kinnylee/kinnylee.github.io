@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="">
-  <head>  <title>Go第三方库 | kinnylee</title>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>Ansible部署核心代码解析 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,15 +12,16 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
+  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="">
+<meta name="description" content="Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 …">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "Go第三方库" />
-<meta property = "og:url" content = "https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/" />
-<meta property = "og:title" content = "Go第三方库" />
-<meta property = "og:description" content = "" />
+<meta name = "twitter:title" content = "Ansible部署核心代码解析" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/" />
+<meta property = "og:title" content = "Ansible部署核心代码解析" />
+<meta property = "og:description" content = "Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 …" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -30,7 +31,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/'>
 
     
 
@@ -132,42 +133,159 @@
 </header>
 
     <main>
-
-<div class='grid-inverse wrap content'>
-  <ul class='posts' id = 'posts'>
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/'>Go第三库之命令行框架：go-cli</a>
-      </h3>
-      <div class = 'post_meta'>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content'>
+    <h1 class='post_title'>Ansible部署核心代码解析</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Aug 17, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93' class = 'post_tag button button_translucent'>Go第三方库
+    Jun 28, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/ansible' class = 'post_tag button button_translucent'>ansible
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
   </a>
 </div>
 
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>Go-cli 简介  A simple, fast, and fun package for building command line apps in Go 一个简单的、快速的、并且有趣的用于构建go应用程序的包 github地址 目标是帮助开发人员快速构建易于表达的命令行程序 目前存在两个版本v1、v2（新版本）  快速上手 v2官方使用说明
-   添加模块依赖    1GO111MODULE=on go get github.com/urfave/cli/v2   使用    1package main 2 3import ( 4 &#34;os&#34; 5 …</p>
-          <a href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go-cli/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=Ansible%e9%83%a8%e7%bd%b2%e6%a0%b8%e5%bf%83%e4%bb%a3%e7%a0%81%e8%a7%a3%e6%9e%90&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fansible%2fansible-%25E9%2583%25A8%25E7%25BD%25B2%25E6%25A0%25B8%25E5%25BF%2583%25E4%25BB%25A3%25E7%25A0%2581%25E8%25A7%25A3%25E6%259E%2590%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
+  </a>
   
-    <li>
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fansible%2fansible-%25E9%2583%25A8%25E7%25BD%25B2%25E6%25A0%25B8%25E5%25BF%2583%25E4%25BB%25A3%25E7%25A0%2581%25E8%25A7%25A3%25E6%259E%2590%2f&t=Ansible%e9%83%a8%e7%bd%b2%e6%a0%b8%e5%bf%83%e4%bb%a3%e7%a0%81%e8%a7%a3%e6%9e%90" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
 
-
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#ansible部署核心代码解析">Ansible部署核心代码解析</a>
+      <ul>
+        <li><a href="#playbook_executorpy">playbook_executor.py</a></li>
+        <li><a href="#task_queue_managerpy">task_queue_manager.py</a></li>
+        <li><a href="#linearpy">linear.py</a></li>
+        <li><a href="#strategy__init__py">strategy/<strong>init</strong>.py</a></li>
+      </ul>
     </li>
   </ul>
+</nav>
+    <h2 id="ansible部署核心代码解析">Ansible部署核心代码解析</h2>
+<h3 id="playbook_executorpy">playbook_executor.py</h3>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="ln"> 1</span><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="ln"> 2</span>    <span class="c1"># 遍历所有的 playbook</span>
+<span class="ln"> 3</span>    <span class="k">for</span> <span class="n">playbook_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_playbooks</span><span class="p">:</span>
+<span class="ln"> 4</span>        <span class="c1"># 执行单个 playbook 逻辑</span>
+<span class="ln"> 5</span>        <span class="n">pb</span> <span class="o">=</span> <span class="n">Playbook</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="ln"> 6</span>        <span class="c1"># 触发 playbook start 的回调函数</span>
+<span class="ln"> 7</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_tmq</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_playbook_on_start&#39;</span><span class="p">,</span> <span class="n">pb</span><span class="p">)</span>
+<span class="ln"> 8</span>        <span class="c1"># 遍历单个 playbook 下所有的 play(entries对象)</span>
+<span class="ln"> 9</span>        <span class="n">plays</span> <span class="o">=</span> <span class="n">pb</span><span class="o">.</span><span class="n">get_plays</span><span class="p">()</span>
+<span class="ln">10</span>        <span class="k">for</span> <span class="n">play</span> <span class="ow">in</span> <span class="n">plays</span><span class="p">:</span>
+<span class="ln">11</span>            <span class="c1"># 获取主机列表</span>
+<span class="ln">12</span>            <span class="n">batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_serialized_batches</span><span class="p">(</span><span class="n">play</span><span class="p">)</span>
+<span class="ln">13</span>            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+<span class="ln">14</span>                <span class="c1"># 执行单个 play 逻辑, 调用 task_queue_manager.run()</span>
+<span class="ln">15</span>                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">play</span><span class="o">=</span><span class="n">play</span><span class="p">)</span>
+<span class="ln">16</span>        <span class="c1"># 触发 统计 的回调函数</span>
+<span class="ln">17</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_playbook_on_stats&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">_stats</span><span class="p">)</span>
+</code></pre></div><h3 id="task_queue_managerpy">task_queue_manager.py</h3>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="ln"> 1</span>
+<span class="ln"> 2</span><span class="c1"># 执行 play 的核心方法</span>
+<span class="ln"> 3</span><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">play</span><span class="p">):</span>
+<span class="ln"> 4</span>    <span class="c1"># 加载插件</span>
+<span class="ln"> 5</span>    <span class="bp">self</span><span class="o">.</span><span class="n">load_callbacks</span><span class="p">()</span>
+<span class="ln"> 6</span>    <span class="c1"># 触发 play 开始执行的回调函数</span>
+<span class="ln"> 7</span>    <span class="bp">self</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_playbook_on_play_start&#39;</span><span class="p">,</span> <span class="n">new_play</span><span class="p">)</span>
+<span class="ln"> 8</span>    <span class="n">iterator</span> <span class="o">=</span> <span class="n">PlayIterator</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="ln"> 9</span>    <span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy_loader</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">10</span>    <span class="c1"># 调用 linear.py 的 run 方法</span>
+<span class="ln">11</span>    <span class="n">play_return</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">iterator</span><span class="p">,</span> <span class="n">play_context</span><span class="p">)</span>
+<span class="ln">12</span>    <span class="k">return</span> <span class="n">play_return</span>
+<span class="ln">13</span><span class="c1"># 调用回调函数的方法</span>
+<span class="ln">14</span><span class="k">def</span> <span class="nf">send_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="ln">15</span>    <span class="c1"># 遍历所有注册的回调函数</span>
+<span class="ln">16</span>    <span class="k">for</span> <span class="n">callback_plugin</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_stdout_callback</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callback_plugins</span><span class="p">:</span>
+<span class="ln">17</span>        <span class="c1"># 遍历所有的方法名</span>
+<span class="ln">18</span>        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+<span class="ln">19</span>            <span class="c1"># 调用回调函数</span>
+<span class="ln">20</span>            <span class="n">method</span><span class="p">(</span><span class="o">*</span><span class="n">new_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div><h3 id="linearpy">linear.py</h3>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="ln"> 1</span><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterator</span><span class="p">,</span> <span class="n">play_context</span><span class="p">):</span>
+<span class="ln"> 2</span>    <span class="c1"># 循环执行部署</span>
+<span class="ln"> 3</span>    <span class="k">while</span> <span class="n">work_to_do</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">_terminated</span><span class="p">:</span>
+<span class="ln"> 4</span>        <span class="c1"># 获取主机信息</span>
+<span class="ln"> 5</span>        <span class="n">hosts_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hosts_left</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="ln"> 6</span>        <span class="c1"># 获取任务信息</span>
+<span class="ln"> 7</span>        <span class="n">host_tasks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_next_task_lockstep</span><span class="p">(</span><span class="n">hosts_left</span><span class="p">,</span> <span class="n">iterator</span><span class="p">)</span>
+<span class="ln"> 8</span>        <span class="k">for</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span> <span class="ow">in</span> <span class="n">host_tasks</span><span class="p">:</span>
+<span class="ln"> 9</span>            <span class="c1"># 触发 task 开始执行的回调函数</span>
+<span class="ln">10</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_playbook_on_task_start&#39;</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">is_conditional</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="ln">11</span>            <span class="c1"># 将要执行的任务加入队列中排队</span>
+<span class="ln">12</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_queue_task</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">task_vars</span><span class="p">,</span> <span class="n">play_context</span><span class="p">)</span>
+<span class="ln">13</span>        <span class="c1"># 等待收取执行结果</span>
+<span class="ln">14</span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_results</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+<span class="ln">15</span>            <span class="n">results</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait_on_pending_results</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+</code></pre></div><h3 id="strategy__init__py">strategy/<strong>init</strong>.py</h3>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="ln"> 1</span><span class="k">def</span> <span class="nf">_wait_on_pending_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterator</span><span class="p">):</span>
+<span class="ln"> 2</span>    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_results</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">_terminated</span><span class="p">:</span>
+<span class="ln"> 3</span>        <span class="c1"># 等待处理结果</span>
+<span class="ln"> 4</span>        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_pending_results</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="ln"> 5</span>        <span class="k">return</span> <span class="n">ret_results</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="k">def</span> <span class="nf">_process_pending_results</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="ln">10</span>        <span class="c1"># 获取部署结果， _results是一个deque对象</span>
+<span class="ln">11</span>        <span class="n">task_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+<span class="ln">12</span>        <span class="c1"># 触发执行结果的回调函数</span>
+<span class="ln">13</span>        <span class="k">if</span> <span class="s1">&#39;_ansible_retry&#39;</span> <span class="ow">in</span> <span class="n">task_result</span><span class="o">.</span><span class="n">_result</span><span class="p">:</span>
+<span class="ln">14</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_retry&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">)</span>
+<span class="ln">15</span>        <span class="k">elif</span> <span class="s1">&#39;_ansible_item_result&#39;</span> <span class="ow">in</span> <span class="n">task_result</span><span class="o">.</span><span class="n">_result</span><span class="p">:</span>
+<span class="ln">16</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_item_on_failed&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">)</span>
+<span class="ln">17</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_item_on_skipped&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">)</span>
+<span class="ln">18</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_item_on_ok&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">)</span>
+<span class="ln">19</span>
+<span class="ln">20</span>        <span class="c1"># 部署出错</span>
+<span class="ln">21</span>        <span class="k">if</span> <span class="n">task_result</span><span class="o">.</span><span class="n">is_failed</span><span class="p">():</span>
+<span class="ln">22</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_on_failed&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="n">ignore_errors</span><span class="p">)</span>
+<span class="ln">23</span>
+<span class="ln">24</span>        <span class="c1"># 主机不可达</span>
+<span class="ln">25</span>        <span class="k">elif</span> <span class="n">task_result</span><span class="o">.</span><span class="n">is_unreachable</span><span class="p">():</span>
+<span class="ln">26</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_on_unreachable&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">)</span>
+<span class="ln">27</span>        <span class="c1"># 跳过</span>
+<span class="ln">28</span>        <span class="k">elif</span> <span class="n">task_result</span><span class="o">.</span><span class="n">is_skipped</span><span class="p">():</span>
+<span class="ln">29</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_on_skipped&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">)</span>
+<span class="ln">30</span>
+<span class="ln">31</span>        <span class="c1"># 执行成功</span>
+<span class="ln">32</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_tqm</span><span class="o">.</span><span class="n">send_callback</span><span class="p">(</span><span class="s1">&#39;v2_runner_on_ok&#39;</span><span class="p">,</span> <span class="n">task_result</span><span class="p">)</span>
+<span class="ln">33</span>
+<span class="ln">34</span>    <span class="k">return</span> <span class="n">ret_results</span>
+</code></pre></div>
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -306,8 +424,6 @@
 </aside>
 
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
