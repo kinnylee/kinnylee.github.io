@@ -143,6 +143,40 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/'>dmp文件读取（六）- Others</a>
+      </h3>
+      <div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Aug 18, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+</div>
+
+    </div>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/google.jpg'>
+      </div>
+      
+        <div>
+          <p class = 'pale'>dmp文件读取（六） dmp文件中包含各种stream，前面已经介绍完线程、模块、异常、内存这四种stream的读取，至此，核心的stream读取已经介绍完，本章介绍其他的stream读取，这些stream不是不重要，而是代码比较简单，这些stream包括：
+ MD_SYSTEM_INFO_STREAM MD_MISC_INFO_STREAM MD_BREAKPAD_INFO_STREAM MD_ASSERTION_INFO_STREAM  MD_SYSTEM_INFO_STREAM  包含cpu架构 包含操作系统信息 MDRawSystemInfo  system stream 读取入口 1ProcessResult …</p>
+          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%85%AD-others/' class='excerpt_more button'>Read More</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
         <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/'>go协程入门</a>
       </h3>
       <div class = 'post_meta'>
@@ -417,41 +451,6 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
     </div>
   </li>
   
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/'>dmp文件读取（一）- 概述</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 10, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件解析 dmp读取源码分析（一） 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数
-1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体流程： Minidump对象用于保存dmp文件流内容，核心代码
-1PrintMinidumpProcess(...) { 2 ... 3 // 第一步：读取dmp文件内容 4 Minidump dump(minidump_file); 5 if …</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
     <li>
 <ul class="pagination">
   <li class="page-item">
@@ -504,6 +503,9 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-select源码分析</a>
       </li>
       <li>
+        <a href="https://kinnylee.github.io/post/hugo/%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA/" class="nav-link">这个博客系统如何搭建</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
       </li>
       <li>
@@ -514,9 +516,6 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
       </li>
     </ul> 
     
@@ -555,6 +554,11 @@ breakpad中的流的表示 枚举类 MDStreamType 表示所有的流，源码位
         
         <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
           REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent">
+          博客搭建
           <span class='button_tally'>1</span>
         </a>
         

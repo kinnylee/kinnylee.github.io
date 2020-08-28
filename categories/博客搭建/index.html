@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="">
-  <head>  <title>go基础入门 | kinnylee</title>
+  <head>  <title>博客搭建 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -17,9 +17,9 @@
 <meta name="description" content="">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go基础入门" />
-<meta property = "og:url" content = "https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" />
-<meta property = "og:title" content = "go基础入门" />
+<meta name = "twitter:title" content = "博客搭建" />
+<meta property = "og:url" content = "https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" />
+<meta property = "og:title" content = "博客搭建" />
 <meta property = "og:description" content = "" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
@@ -30,7 +30,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/'>
+  <link rel='canonical' href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/'>
 
     
 
@@ -140,70 +140,7 @@
   <div class = 'excerpt'>
     <div class = 'excerpt_header'>
       <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/'>go调度机制</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 28, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>go调度机制 gopark 和上面的 goready 对应，互为逆操作。gopark 和 goready 在 runtime 的源码中会经常遇到，涉及了 goroutine 的调度过程，</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/'>go进程启动分析</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 28, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>Go进程启动分析  我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇《go协程原理》的GMP模型  Go进程启动概述  main包的main函数并不是go语言的入口函数，入口函数是在asm_amd64.s中定义的 main包的main函数是由runtime.main函数启动的 go进程启动后，会调用runtime·rt0_go来执行程序的初始化和启动系统调度  go进程启动的四大步骤
- runtime.osinit：获取系统cpu个数 runtime.schedinit：初始化调度系统，p初始化，m0和某个绑定 runtime.newproc：新 …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>go-select源码分析</a>
+        <a href='https://kinnylee.github.io/post/hugo/%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA/'>这个博客系统如何搭建</a>
       </h3>
       <div class = 'post_meta'>
   <svg class="icon">
@@ -211,116 +148,18 @@
   </svg>
   <span class="post_date">
     Aug 27, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
 </div>
 
     </div>
       <div class = 'excerpt_footer'>
         <div>
-          <p class = 'pale'>select简介 select使用 下面是select的最简单的用法：
-1 select源码入口 select在源码中也没有对应的实现，而是通过编译器将相关符号翻译为底层实现。 使用以下命令将go源码翻译为汇编
-1go tool compile -N -l -S main.go&gt;hello.s 查看部分带有CALL指令的核心内容如下：
-10x0102 00258 (main.go:64) CALL runtime.selectgo(SB) 可以猜测对应关系：
- select语句对应：runtime.selectgo函数  相关源码只需要到runtime包下，全局搜索就可以找到在文件runtime/chan.go下
-1func …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>go-channel源码分析</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 26, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>go-channel源码分析 channel简介  channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的groutine之间的通讯方式  channel使用 下面是channel的最简单的用法：
-1package main 2import &#34;fmt&#34; 3 4func main() { 5 c := make(chan int) 6 go func() { 7 // 发送数据到channel 8 c &lt;- 1 9 }() 10 // 从channel取出数据 11 x := &lt;- c 12 close(c) 13 fmt.Println(x) 14} …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/'>go协程原理</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 25, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>协程原理 并发编程模型  从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性  CSP模型  go语言的并发特性是由1978年发布的CSP理论演化而来，另外一个知名的CSP实现语言是Eralng，大名鼎鼎的Rabbitmq就是用erlang实现的。 CSP是Communicating Sequential Processes(顺序通信进程)的缩写 CSP模型用于描述两个独立的并发实体通过共享的通讯 channel(管道)进行通信的并发模型。  go对CSP模型的实现  go底层使用goroutine做为并发实体，goroutine非常轻量级可以创建几十万个实体。 实体间通过 channel 继续匿名 …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/'>go协程入门</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 17, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>协程在手，说Go就Go 协程概述  协程：轻量级、用户级线程。 协程的调度：  由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度   协程的优势：  占用空间少(只需2k，系统线程为2M) 线程上下文切换成本少   go：语言层面提出了Groutine的概念，支持协程  简单入门  go语言中通过go关键字来调用  1package main 2 3import ( 4 &#34;fmt&#34; 5 &#34;time&#34; 6) 7 8func One(){ 9 fmt.Println(&#34;1&#34;) 10} 11 12func Two(){ 13 fmt.Println(&#34;2&#34;) …</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/' class='excerpt_more button'>Read More</a>
+          <p class = 'pale'>如何搭建自己的博客系统  静态网页搭建 集成评论功能  静态网页搭建 选型对比：
+名称 | 优势 | 劣势 | 开发语言
+   | - | - | -    hexo | hugo |
+评论系统 选型对比：
+名称 | 概述 | 优势 | 劣势
+   | - | - | -    Valine |国内，使用较多，加载快|评论门槛低，可以安装 valine-admin 来过滤垃圾评论和实现邮件提醒|需要将数据保存到他们的服务器 Disqus | | | 评论门槛高 | 界面比较丑，需要翻墙 gittalk | gitment | | 评论数据直接保存仓库 livere | 韩国 畅言 | 国内 | | 免费版有广告，需要备案</p>
+          <a href='https://kinnylee.github.io/post/hugo/%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA/' class='excerpt_more button'>Read More</a>
         </div>
       </div>
     </div>

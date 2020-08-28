@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>博客搭建 on kinnylee</title>
+    <link>https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</link>
+    <description>Recent content in 博客搭建 on kinnylee</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
+    <lastBuildDate>Thu, 27 Aug 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>这个博客系统如何搭建</title>
+      <link>https://kinnylee.github.io/post/hugo/%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA/</link>
+      <pubDate>Thu, 27 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/hugo/%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA/</guid>
+      <description>如何搭建自己的博客系统  静态网页搭建 集成评论功能  静态网页搭建 选型对比：
+名称 | 优势 | 劣势 | 开发语言
+   | - | - | -    hexo | hugo |
+评论系统 选型对比：
+名称 | 概述 | 优势 | 劣势
+   | - | - | -    Valine |国内，使用较多，加载快|评论门槛低，可以安装 valine-admin 来过滤垃圾评论和实现邮件提醒|需要将数据保存到他们的服务器 Disqus | | | 评论门槛高 | 界面比较丑，需要翻墙 gittalk | gitment | | 评论数据直接保存仓库 livere | 韩国 畅言 | 国内 | | 免费版有广告，需要备案</description>
+    </item>
+    
+  </channel>
+</rss>
