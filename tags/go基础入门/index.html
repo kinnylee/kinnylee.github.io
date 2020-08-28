@@ -35,11 +35,12 @@
     
 
     
-    <link rel="preload" href="https://kinnylee.github.io/css/styles.bcdb2ea7690006493263863422acbd7158adc713f96f2669f3b92d2679363f31e2267554c8829c87d5e8a2a14d2cbece1094fc965d353d1f3aa7d49950afc2fd.css" integrity = 'sha512-vNsup2kABkkyY4Y0Iqy9cVitxxP5byZp87ktJnk2PzHiJnVUyIKch9XooqFNLL7OEJT8ll01PR86p9SZUK/C/Q==' as="style">
-    <link rel="preload" href="https://kinnylee.github.io/js/bundle.eee5874ae267c1f514e6e52a5cecc1212612aa3cfa2d37b0412b45a003f382b9f74dd7d89b7e7efb5ce9e7bc78df38ca7dc9585c021ef9d2b839768491e45457.js" as="script">
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity = "sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" as="script" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous">
 
     
-    <link rel = 'stylesheet' href = 'https://kinnylee.github.io/css/styles.bcdb2ea7690006493263863422acbd7158adc713f96f2669f3b92d2679363f31e2267554c8829c87d5e8a2a14d2cbece1094fc965d353d1f3aa7d49950afc2fd.css' integrity = 'sha512-vNsup2kABkkyY4Y0Iqy9cVitxxP5byZp87ktJnk2PzHiJnVUyIKch9XooqFNLL7OEJT8ll01PR86p9SZUK/C/Q=='>
+    <link rel="stylesheet" type="text/css" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity="sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" crossorigin="anonymous">
 	  
   </head>
   
@@ -54,12 +55,14 @@
     <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
       <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
       <div class = 'nav_close'>
-        <svg class="icon">
-          <use xlink:href="#open-menu"></use>
-        </svg>
-        <svg class="icon">
-          <use xlink:href="#closeme"></use>
-        </svg>
+        <div>
+          <svg class="icon">
+            <use xlink:href="#open-menu"></use>
+          </svg>
+          <svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg>
+        </div>
       </div>
     </a>
     <div class = 'nav_body nav_body_left'>
@@ -157,7 +160,11 @@
 </div>
 
     </div>
-      <div class = 'excerpt_footer'>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/go.png'>
+      </div>
+      
         <div>
           <p class = 'pale'>go调度机制 gopark 和上面的 goready 对应，互为逆操作。gopark 和 goready 在 runtime 的源码中会经常遇到，涉及了 goroutine 的调度过程，</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/' class='excerpt_more button'>Read More</a>
@@ -188,7 +195,11 @@
 </div>
 
     </div>
-      <div class = 'excerpt_footer'>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/go.png'>
+      </div>
+      
         <div>
           <p class = 'pale'>Go进程启动分析 我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
@@ -219,7 +230,11 @@
 </div>
 
     </div>
-      <div class = 'excerpt_footer'>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/go.png'>
+      </div>
+      
         <div>
           <p class = 'pale'>select简介 select使用 下面是select的最简单的用法： 1 select源码入口 select在源码中也没有对应的实现，而是通过编译器</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
@@ -250,7 +265,11 @@
 </div>
 
     </div>
-      <div class = 'excerpt_footer'>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/go.png'>
+      </div>
+      
         <div>
           <p class = 'pale'>go-channel源码分析 channel简介 channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>Read More</a>
@@ -281,7 +300,11 @@
 </div>
 
     </div>
-      <div class = 'excerpt_footer'>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/go.png'>
+      </div>
+      
         <div>
           <p class = 'pale'>协程原理 并发编程模型 从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性 CSP模型 go语言的并发特性是由197</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/' class='excerpt_more button'>Read More</a>
@@ -310,7 +333,11 @@
 </div>
 
     </div>
-      <div class = 'excerpt_footer'>
+    <div class = 'excerpt_footer partition'>
+      <div class = 'excerpt_thumbnail'>
+      <img src = 'https://kinnylee.github.io/images/go.png'>
+      </div>
+      
         <div>
           <p class = 'pale'>协程在手，说Go就Go 协程概述 协程：轻量级、用户级线程。 协程的调度： 由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度 协程的优势：</p>
           <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/' class='excerpt_more button'>Read More</a>
@@ -333,6 +360,34 @@
     <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">Read More</a>
     <h2 class="mt-4">Featured Posts</h2>
     <ul>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go调度机制</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+      </li>
     
     </ul>
     <h2 class="mt-4">Recent Posts</h2>
@@ -573,6 +628,7 @@
 
   </div>
 </footer>
-    <script src = 'https://kinnylee.github.io/js/bundle.eee5874ae267c1f514e6e52a5cecc1212612aa3cfa2d37b0412b45a003f382b9f74dd7d89b7e7efb5ce9e7bc78df38ca7dc9585c021ef9d2b839768491e45457.js'></script>
+    <script type="text/javascript" src = "https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous"></script>
   </body>
 </html>
