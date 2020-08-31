@@ -89,9 +89,9 @@
       <div class = 'nav_parent'>
         <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
         <div class = 'nav_sub'>
-          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>mysql</a>
-          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>redis</a>
-          <a href = 'https://twitter.com/' class = 'nav_child nav_item'>中间件</a>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>Mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>Redis</a>
+          <a href = 'https://kinnylee.github.io/categories/rocketmq' class = 'nav_child nav_item'>RocketMQ</a>
         </div>
       </div>
       <div class = 'nav_parent'>
@@ -108,7 +108,10 @@
         <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
         <div class = 'nav_sub'>
           <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
-          <a href = 'https://kinnylee.github.io/tags/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/docker' class = 'nav_child nav_item'>Docker</a>
+          <a href = 'https://kinnylee.github.io/categories/linux' class = 'nav_child nav_item'>Linux内核</a>
+          <a href = 'https://kinnylee.github.io/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0' class = 'nav_child nav_item'>机器学习</a>
         </div>
       </div>
       <div class = 'nav_parent'>
@@ -154,7 +157,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 3732 字</span>，阅读约<span class="more-meta"> 8 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 4075 字</span>，阅读约<span class="more-meta"> 9 分钟</span>
     <div class='post_share'>
   Share on:
   <a href="https://twitter.com/intent/tweet?text=go%e8%bf%9b%e7%a8%8b%e5%90%af%e5%8a%a8%e5%88%86%e6%9e%90&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fgo%2f%25E5%259F%25BA%25E7%25A1%2580%25E5%2585%25A5%25E9%2597%25A8%2fgo%25E8%25BF%259B%25E7%25A8%258B%25E5%2590%25AF%25E5%258A%25A8%25E5%2588%2586%25E6%259E%2590%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
@@ -204,6 +207,7 @@
         <li><a href="#scheint">scheint</a></li>
         <li><a href="#mstart">mstart</a></li>
         <li><a href="#schedule">schedule</a></li>
+        <li><a href="#execute">execute</a></li>
         <li><a href="#main函数">main函数</a></li>
       </ul>
     </li>
@@ -554,6 +558,49 @@
 <span class="ln">104</span>  <span class="c1">// 执行G上的任务
 </span><span class="ln">105</span><span class="c1"></span>  <span class="nf">execute</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">inheritTime</span><span class="p">)</span>
 <span class="ln">106</span><span class="p">}</span>
+</code></pre></div><h4 id="findrunnable">findrunnable</h4>
+<p>函数的实现非常复杂，这个 300 多行的函数通过以下的过程。获取可运行的 Goroutine，获取不到就阻塞住</p>
+<ul>
+<li>从本地运行队列、全局运行队列查找</li>
+<li>从网络轮询器中查找是否有等待的groutine</li>
+<li>通过 runtime.runqsteal 函数尝试从其他随机的处理器中窃取待运行的 Goroutine，在该过程中还可能窃取处理器中的计时器；</li>
+</ul>
+<h3 id="execute">execute</h3>
+<ul>
+<li>execute中调用gogo函数将groutine调度到当前线程上</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">execute</span><span class="p">(</span><span class="nx">gp</span> <span class="o">*</span><span class="nx">g</span><span class="p">,</span> <span class="nx">inheritTime</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">_g_</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span>  <span class="c1">// Assign gp.m before entering _Grunning so running Gs have an
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="c1">// M.
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">curg</span> <span class="p">=</span> <span class="nx">gp</span>
+<span class="ln"> 7</span>  <span class="nx">gp</span><span class="p">.</span><span class="nx">m</span> <span class="p">=</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span>
+<span class="ln"> 8</span>  <span class="nf">casgstatus</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">_Grunnable</span><span class="p">,</span> <span class="nx">_Grunning</span><span class="p">)</span>
+<span class="ln"> 9</span>  <span class="nx">gp</span><span class="p">.</span><span class="nx">waitsince</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln">10</span>  <span class="nx">gp</span><span class="p">.</span><span class="nx">preempt</span> <span class="p">=</span> <span class="kc">false</span>
+<span class="ln">11</span>  <span class="nx">gp</span><span class="p">.</span><span class="nx">stackguard0</span> <span class="p">=</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">stack</span><span class="p">.</span><span class="nx">lo</span> <span class="o">+</span> <span class="nx">_StackGuard</span>
+<span class="ln">12</span>  <span class="k">if</span> <span class="p">!</span><span class="nx">inheritTime</span> <span class="p">{</span>
+<span class="ln">13</span>    <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">p</span><span class="p">.</span><span class="nf">ptr</span><span class="p">().</span><span class="nx">schedtick</span><span class="o">++</span>
+<span class="ln">14</span>  <span class="p">}</span>
+<span class="ln">15</span>
+<span class="ln">16</span>  <span class="c1">// Check whether the profiler needs to be turned on or off.
+</span><span class="ln">17</span><span class="c1"></span>  <span class="nx">hz</span> <span class="o">:=</span> <span class="nx">sched</span><span class="p">.</span><span class="nx">profilehz</span>
+<span class="ln">18</span>  <span class="k">if</span> <span class="nx">_g_</span><span class="p">.</span><span class="nx">m</span><span class="p">.</span><span class="nx">profilehz</span> <span class="o">!=</span> <span class="nx">hz</span> <span class="p">{</span>
+<span class="ln">19</span>    <span class="nf">setThreadCPUProfiler</span><span class="p">(</span><span class="nx">hz</span><span class="p">)</span>
+<span class="ln">20</span>  <span class="p">}</span>
+<span class="ln">21</span>
+<span class="ln">22</span>  <span class="k">if</span> <span class="nx">trace</span><span class="p">.</span><span class="nx">enabled</span> <span class="p">{</span>
+<span class="ln">23</span>    <span class="c1">// GoSysExit has to happen when we have a P, but before GoStart.
+</span><span class="ln">24</span><span class="c1"></span>    <span class="c1">// So we emit it here.
+</span><span class="ln">25</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">syscallsp</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">gp</span><span class="p">.</span><span class="nx">sysblocktraced</span> <span class="p">{</span>
+<span class="ln">26</span>      <span class="nf">traceGoSysExit</span><span class="p">(</span><span class="nx">gp</span><span class="p">.</span><span class="nx">sysexitticks</span><span class="p">)</span>
+<span class="ln">27</span>    <span class="p">}</span>
+<span class="ln">28</span>    <span class="nf">traceGoStart</span><span class="p">()</span>
+<span class="ln">29</span>  <span class="p">}</span>
+<span class="ln">30</span>
+<span class="ln">31</span>  <span class="nf">gogo</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">gp</span><span class="p">.</span><span class="nx">sched</span><span class="p">)</span>
+<span class="ln">32</span><span class="p">}</span>
 </code></pre></div><h3 id="main函数">main函数</h3>
 <p>前面介绍过，main函数在和m绑定的P队列中。因此在调度时，先将main从本地队列取出来，然后传给execute，就可以执行main groutine的任务了。main groutine的任务函数为runtime.main()</p>
 <p>主要流程包括：</p>
@@ -589,114 +636,115 @@
 <span class="ln"> 19</span>
 <span class="ln"> 20</span>  <span class="k">if</span> <span class="nx">GOARCH</span> <span class="o">!=</span> <span class="s">&#34;wasm&#34;</span> <span class="p">{</span> <span class="c1">// no threads on wasm yet, so no sysmon
 </span><span class="ln"> 21</span><span class="c1"></span>    <span class="c1">// 系统栈上分配一个新的m，运行sysmon(系统后台监控，定期垃圾回收和系统抢占）
-</span><span class="ln"> 22</span><span class="c1"></span>    <span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln"> 23</span>      <span class="nf">newm</span><span class="p">(</span><span class="nx">sysmon</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
-<span class="ln"> 24</span>    <span class="p">})</span>
-<span class="ln"> 25</span>  <span class="p">}</span>
-<span class="ln"> 26</span>
-<span class="ln"> 27</span>  <span class="c1">// Lock the main goroutine onto this, the main OS thread,
-</span><span class="ln"> 28</span><span class="c1"></span>  <span class="c1">// during initialization. Most programs won&#39;t care, but a few
-</span><span class="ln"> 29</span><span class="c1"></span>  <span class="c1">// do require certain calls to be made by the main thread.
-</span><span class="ln"> 30</span><span class="c1"></span>  <span class="c1">// Those can arrange for main.main to run in the main thread
-</span><span class="ln"> 31</span><span class="c1"></span>  <span class="c1">// by calling runtime.LockOSThread during initialization
-</span><span class="ln"> 32</span><span class="c1"></span>  <span class="c1">// to preserve the lock.
-</span><span class="ln"> 33</span><span class="c1"></span>  <span class="nf">lockOSThread</span><span class="p">()</span>
-<span class="ln"> 34</span>
-<span class="ln"> 35</span>  <span class="c1">// 确保在主线程上执行
-</span><span class="ln"> 36</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">g</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
-<span class="ln"> 37</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;runtime.main not on m0&#34;</span><span class="p">)</span>
-<span class="ln"> 38</span>  <span class="p">}</span>
-<span class="ln"> 39</span>
-<span class="ln"> 40</span>  <span class="c1">// 执行runtime包下所有的init
-</span><span class="ln"> 41</span><span class="c1"></span>  <span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runtime_inittask</span><span class="p">)</span> <span class="c1">// must be before defer
-</span><span class="ln"> 42</span><span class="c1"></span>  <span class="k">if</span> <span class="nf">nanotime</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-<span class="ln"> 43</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;nanotime returning zero&#34;</span><span class="p">)</span>
-<span class="ln"> 44</span>  <span class="p">}</span>
-<span class="ln"> 45</span>
-<span class="ln"> 46</span>  <span class="c1">// Defer unlock so that runtime.Goexit during init does the unlock too.
-</span><span class="ln"> 47</span><span class="c1"></span>  <span class="nx">needUnlock</span> <span class="o">:=</span> <span class="kc">true</span>
-<span class="ln"> 48</span>  <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln"> 49</span>    <span class="k">if</span> <span class="nx">needUnlock</span> <span class="p">{</span>
-<span class="ln"> 50</span>      <span class="nf">unlockOSThread</span><span class="p">()</span>
-<span class="ln"> 51</span>    <span class="p">}</span>
-<span class="ln"> 52</span>  <span class="p">}()</span>
-<span class="ln"> 53</span>
-<span class="ln"> 54</span>  <span class="c1">// Record when the world started.
-</span><span class="ln"> 55</span><span class="c1"></span>  <span class="nx">runtimeInitTime</span> <span class="p">=</span> <span class="nf">nanotime</span><span class="p">()</span>
-<span class="ln"> 56</span>
-<span class="ln"> 57</span>  <span class="c1">// 启动一个groutine进行GC
-</span><span class="ln"> 58</span><span class="c1"></span>  <span class="nf">gcenable</span><span class="p">()</span>
-<span class="ln"> 59</span>
-<span class="ln"> 60</span>  <span class="nx">main_init_done</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
-<span class="ln"> 61</span>  <span class="k">if</span> <span class="nx">iscgo</span> <span class="p">{</span>
-<span class="ln"> 62</span>    <span class="k">if</span> <span class="nx">_cgo_thread_start</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln"> 63</span>      <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_thread_start missing&#34;</span><span class="p">)</span>
-<span class="ln"> 64</span>    <span class="p">}</span>
-<span class="ln"> 65</span>    <span class="k">if</span> <span class="nx">GOOS</span> <span class="o">!=</span> <span class="s">&#34;windows&#34;</span> <span class="p">{</span>
-<span class="ln"> 66</span>      <span class="k">if</span> <span class="nx">_cgo_setenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln"> 67</span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_setenv missing&#34;</span><span class="p">)</span>
-<span class="ln"> 68</span>      <span class="p">}</span>
-<span class="ln"> 69</span>      <span class="k">if</span> <span class="nx">_cgo_unsetenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln"> 70</span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_unsetenv missing&#34;</span><span class="p">)</span>
-<span class="ln"> 71</span>      <span class="p">}</span>
-<span class="ln"> 72</span>    <span class="p">}</span>
-<span class="ln"> 73</span>    <span class="k">if</span> <span class="nx">_cgo_notify_runtime_init_done</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln"> 74</span>      <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_notify_runtime_init_done missing&#34;</span><span class="p">)</span>
-<span class="ln"> 75</span>    <span class="p">}</span>
-<span class="ln"> 76</span>    <span class="c1">// Start the template thread in case we enter Go from
-</span><span class="ln"> 77</span><span class="c1"></span>    <span class="c1">// a C-created thread and need to create a new thread.
-</span><span class="ln"> 78</span><span class="c1"></span>    <span class="nf">startTemplateThread</span><span class="p">()</span>
-<span class="ln"> 79</span>    <span class="nf">cgocall</span><span class="p">(</span><span class="nx">_cgo_notify_runtime_init_done</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
-<span class="ln"> 80</span>  <span class="p">}</span>
-<span class="ln"> 81</span>
-<span class="ln"> 82</span>  <span class="c1">// 执行用户定义的所有init函数
-</span><span class="ln"> 83</span><span class="c1"></span>  <span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">main_inittask</span><span class="p">)</span>
-<span class="ln"> 84</span>
-<span class="ln"> 85</span>  <span class="nb">close</span><span class="p">(</span><span class="nx">main_init_done</span><span class="p">)</span>
-<span class="ln"> 86</span>
-<span class="ln"> 87</span>  <span class="nx">needUnlock</span> <span class="p">=</span> <span class="kc">false</span>
-<span class="ln"> 88</span>  <span class="nf">unlockOSThread</span><span class="p">()</span>
-<span class="ln"> 89</span>
-<span class="ln"> 90</span>  <span class="k">if</span> <span class="nx">isarchive</span> <span class="o">||</span> <span class="nx">islibrary</span> <span class="p">{</span>
-<span class="ln"> 91</span>    <span class="c1">// A program compiled with -buildmode=c-archive or c-shared
-</span><span class="ln"> 92</span><span class="c1"></span>    <span class="c1">// has a main, but it is not executed.
-</span><span class="ln"> 93</span><span class="c1"></span>    <span class="k">return</span>
-<span class="ln"> 94</span>  <span class="p">}</span>
-<span class="ln"> 95</span>
-<span class="ln"> 96</span>  <span class="c1">// 真正执行main包下的main函数
-</span><span class="ln"> 97</span><span class="c1"></span>  <span class="nx">fn</span> <span class="o">:=</span> <span class="nx">main_main</span> <span class="c1">// make an indirect call, as the linker doesn&#39;t know the address of the main package when laying down the runtime
-</span><span class="ln"> 98</span><span class="c1"></span>  <span class="nf">fn</span><span class="p">()</span>
-<span class="ln"> 99</span>  <span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
-<span class="ln">100</span>    <span class="nf">racefini</span><span class="p">()</span>
-<span class="ln">101</span>  <span class="p">}</span>
-<span class="ln">102</span>
-<span class="ln">103</span>  <span class="c1">// Make racy client program work: if panicking on
-</span><span class="ln">104</span><span class="c1"></span>  <span class="c1">// another goroutine at the same time as main returns,
-</span><span class="ln">105</span><span class="c1"></span>  <span class="c1">// let the other goroutine finish printing the panic trace.
-</span><span class="ln">106</span><span class="c1"></span>  <span class="c1">// Once it does, it will exit. See issues 3934 and 20018.
-</span><span class="ln">107</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-<span class="ln">108</span>    <span class="c1">// Running deferred functions should not take long.
-</span><span class="ln">109</span><span class="c1"></span>    <span class="k">for</span> <span class="nx">c</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">c</span> <span class="p">&lt;</span> <span class="mi">1000</span><span class="p">;</span> <span class="nx">c</span><span class="o">++</span> <span class="p">{</span>
-<span class="ln">110</span>      <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-<span class="ln">111</span>        <span class="k">break</span>
-<span class="ln">112</span>      <span class="p">}</span>
-<span class="ln">113</span>      <span class="nf">Gosched</span><span class="p">()</span>
-<span class="ln">114</span>    <span class="p">}</span>
-<span class="ln">115</span>  <span class="p">}</span>
-<span class="ln">116</span>  <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">panicking</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-<span class="ln">117</span>    <span class="nf">gopark</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">waitReasonPanicWait</span><span class="p">,</span> <span class="nx">traceEvGoStop</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="ln">118</span>  <span class="p">}</span>
-<span class="ln">119</span>
-<span class="ln">120</span>  <span class="c1">// 退出程序
-</span><span class="ln">121</span><span class="c1"></span>  <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="ln">122</span>
-<span class="ln">123</span>  <span class="c1">// 确保程序崩溃，程序就一定会退出
-</span><span class="ln">124</span><span class="c1"></span>  <span class="c1">// or循环一直访问非法地址，让操作系统杀死进程
-</span><span class="ln">125</span><span class="c1"></span>  <span class="k">for</span> <span class="p">{</span>
-<span class="ln">126</span>    <span class="kd">var</span> <span class="nx">x</span> <span class="o">*</span><span class="kt">int32</span>
-<span class="ln">127</span>    <span class="o">*</span><span class="nx">x</span> <span class="p">=</span> <span class="mi">0</span>
-<span class="ln">128</span>  <span class="p">}</span>
-<span class="ln">129</span><span class="p">}</span>
+</span><span class="ln"> 22</span><span class="c1"></span>    <span class="c1">// p里的G是按照顺序执行的，放在某个G执行时间过长，阻塞其他的G
+</span><span class="ln"> 23</span><span class="c1"></span>    <span class="nf">systemstack</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 24</span>      <span class="nf">newm</span><span class="p">(</span><span class="nx">sysmon</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln"> 25</span>    <span class="p">})</span>
+<span class="ln"> 26</span>  <span class="p">}</span>
+<span class="ln"> 27</span>
+<span class="ln"> 28</span>  <span class="c1">// Lock the main goroutine onto this, the main OS thread,
+</span><span class="ln"> 29</span><span class="c1"></span>  <span class="c1">// during initialization. Most programs won&#39;t care, but a few
+</span><span class="ln"> 30</span><span class="c1"></span>  <span class="c1">// do require certain calls to be made by the main thread.
+</span><span class="ln"> 31</span><span class="c1"></span>  <span class="c1">// Those can arrange for main.main to run in the main thread
+</span><span class="ln"> 32</span><span class="c1"></span>  <span class="c1">// by calling runtime.LockOSThread during initialization
+</span><span class="ln"> 33</span><span class="c1"></span>  <span class="c1">// to preserve the lock.
+</span><span class="ln"> 34</span><span class="c1"></span>  <span class="nf">lockOSThread</span><span class="p">()</span>
+<span class="ln"> 35</span>
+<span class="ln"> 36</span>  <span class="c1">// 确保在主线程上执行
+</span><span class="ln"> 37</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">g</span><span class="p">.</span><span class="nx">m</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="nx">m0</span> <span class="p">{</span>
+<span class="ln"> 38</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;runtime.main not on m0&#34;</span><span class="p">)</span>
+<span class="ln"> 39</span>  <span class="p">}</span>
+<span class="ln"> 40</span>
+<span class="ln"> 41</span>  <span class="c1">// 执行runtime包下所有的init
+</span><span class="ln"> 42</span><span class="c1"></span>  <span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runtime_inittask</span><span class="p">)</span> <span class="c1">// must be before defer
+</span><span class="ln"> 43</span><span class="c1"></span>  <span class="k">if</span> <span class="nf">nanotime</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 44</span>    <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;nanotime returning zero&#34;</span><span class="p">)</span>
+<span class="ln"> 45</span>  <span class="p">}</span>
+<span class="ln"> 46</span>
+<span class="ln"> 47</span>  <span class="c1">// Defer unlock so that runtime.Goexit during init does the unlock too.
+</span><span class="ln"> 48</span><span class="c1"></span>  <span class="nx">needUnlock</span> <span class="o">:=</span> <span class="kc">true</span>
+<span class="ln"> 49</span>  <span class="k">defer</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 50</span>    <span class="k">if</span> <span class="nx">needUnlock</span> <span class="p">{</span>
+<span class="ln"> 51</span>      <span class="nf">unlockOSThread</span><span class="p">()</span>
+<span class="ln"> 52</span>    <span class="p">}</span>
+<span class="ln"> 53</span>  <span class="p">}()</span>
+<span class="ln"> 54</span>
+<span class="ln"> 55</span>  <span class="c1">// Record when the world started.
+</span><span class="ln"> 56</span><span class="c1"></span>  <span class="nx">runtimeInitTime</span> <span class="p">=</span> <span class="nf">nanotime</span><span class="p">()</span>
+<span class="ln"> 57</span>
+<span class="ln"> 58</span>  <span class="c1">// 启动一个groutine进行GC
+</span><span class="ln"> 59</span><span class="c1"></span>  <span class="nf">gcenable</span><span class="p">()</span>
+<span class="ln"> 60</span>
+<span class="ln"> 61</span>  <span class="nx">main_init_done</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+<span class="ln"> 62</span>  <span class="k">if</span> <span class="nx">iscgo</span> <span class="p">{</span>
+<span class="ln"> 63</span>    <span class="k">if</span> <span class="nx">_cgo_thread_start</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 64</span>      <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_thread_start missing&#34;</span><span class="p">)</span>
+<span class="ln"> 65</span>    <span class="p">}</span>
+<span class="ln"> 66</span>    <span class="k">if</span> <span class="nx">GOOS</span> <span class="o">!=</span> <span class="s">&#34;windows&#34;</span> <span class="p">{</span>
+<span class="ln"> 67</span>      <span class="k">if</span> <span class="nx">_cgo_setenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 68</span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_setenv missing&#34;</span><span class="p">)</span>
+<span class="ln"> 69</span>      <span class="p">}</span>
+<span class="ln"> 70</span>      <span class="k">if</span> <span class="nx">_cgo_unsetenv</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 71</span>        <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_unsetenv missing&#34;</span><span class="p">)</span>
+<span class="ln"> 72</span>      <span class="p">}</span>
+<span class="ln"> 73</span>    <span class="p">}</span>
+<span class="ln"> 74</span>    <span class="k">if</span> <span class="nx">_cgo_notify_runtime_init_done</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 75</span>      <span class="nf">throw</span><span class="p">(</span><span class="s">&#34;_cgo_notify_runtime_init_done missing&#34;</span><span class="p">)</span>
+<span class="ln"> 76</span>    <span class="p">}</span>
+<span class="ln"> 77</span>    <span class="c1">// Start the template thread in case we enter Go from
+</span><span class="ln"> 78</span><span class="c1"></span>    <span class="c1">// a C-created thread and need to create a new thread.
+</span><span class="ln"> 79</span><span class="c1"></span>    <span class="nf">startTemplateThread</span><span class="p">()</span>
+<span class="ln"> 80</span>    <span class="nf">cgocall</span><span class="p">(</span><span class="nx">_cgo_notify_runtime_init_done</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln"> 81</span>  <span class="p">}</span>
+<span class="ln"> 82</span>
+<span class="ln"> 83</span>  <span class="c1">// 执行用户定义的所有init函数
+</span><span class="ln"> 84</span><span class="c1"></span>  <span class="nf">doInit</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">main_inittask</span><span class="p">)</span>
+<span class="ln"> 85</span>
+<span class="ln"> 86</span>  <span class="nb">close</span><span class="p">(</span><span class="nx">main_init_done</span><span class="p">)</span>
+<span class="ln"> 87</span>
+<span class="ln"> 88</span>  <span class="nx">needUnlock</span> <span class="p">=</span> <span class="kc">false</span>
+<span class="ln"> 89</span>  <span class="nf">unlockOSThread</span><span class="p">()</span>
+<span class="ln"> 90</span>
+<span class="ln"> 91</span>  <span class="k">if</span> <span class="nx">isarchive</span> <span class="o">||</span> <span class="nx">islibrary</span> <span class="p">{</span>
+<span class="ln"> 92</span>    <span class="c1">// A program compiled with -buildmode=c-archive or c-shared
+</span><span class="ln"> 93</span><span class="c1"></span>    <span class="c1">// has a main, but it is not executed.
+</span><span class="ln"> 94</span><span class="c1"></span>    <span class="k">return</span>
+<span class="ln"> 95</span>  <span class="p">}</span>
+<span class="ln"> 96</span>
+<span class="ln"> 97</span>  <span class="c1">// 真正执行main包下的main函数
+</span><span class="ln"> 98</span><span class="c1"></span>  <span class="nx">fn</span> <span class="o">:=</span> <span class="nx">main_main</span> <span class="c1">// make an indirect call, as the linker doesn&#39;t know the address of the main package when laying down the runtime
+</span><span class="ln"> 99</span><span class="c1"></span>  <span class="nf">fn</span><span class="p">()</span>
+<span class="ln">100</span>  <span class="k">if</span> <span class="nx">raceenabled</span> <span class="p">{</span>
+<span class="ln">101</span>    <span class="nf">racefini</span><span class="p">()</span>
+<span class="ln">102</span>  <span class="p">}</span>
+<span class="ln">103</span>
+<span class="ln">104</span>  <span class="c1">// Make racy client program work: if panicking on
+</span><span class="ln">105</span><span class="c1"></span>  <span class="c1">// another goroutine at the same time as main returns,
+</span><span class="ln">106</span><span class="c1"></span>  <span class="c1">// let the other goroutine finish printing the panic trace.
+</span><span class="ln">107</span><span class="c1"></span>  <span class="c1">// Once it does, it will exit. See issues 3934 and 20018.
+</span><span class="ln">108</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">109</span>    <span class="c1">// Running deferred functions should not take long.
+</span><span class="ln">110</span><span class="c1"></span>    <span class="k">for</span> <span class="nx">c</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">c</span> <span class="p">&lt;</span> <span class="mi">1000</span><span class="p">;</span> <span class="nx">c</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">111</span>      <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">runningPanicDefers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">112</span>        <span class="k">break</span>
+<span class="ln">113</span>      <span class="p">}</span>
+<span class="ln">114</span>      <span class="nf">Gosched</span><span class="p">()</span>
+<span class="ln">115</span>    <span class="p">}</span>
+<span class="ln">116</span>  <span class="p">}</span>
+<span class="ln">117</span>  <span class="k">if</span> <span class="nx">atomic</span><span class="p">.</span><span class="nf">Load</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">panicking</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">118</span>    <span class="nf">gopark</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">waitReasonPanicWait</span><span class="p">,</span> <span class="nx">traceEvGoStop</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="ln">119</span>  <span class="p">}</span>
+<span class="ln">120</span>
+<span class="ln">121</span>  <span class="c1">// 退出程序
+</span><span class="ln">122</span><span class="c1"></span>  <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="ln">123</span>
+<span class="ln">124</span>  <span class="c1">// 确保程序崩溃，程序就一定会退出
+</span><span class="ln">125</span><span class="c1"></span>  <span class="c1">// or循环一直访问非法地址，让操作系统杀死进程
+</span><span class="ln">126</span><span class="c1"></span>  <span class="k">for</span> <span class="p">{</span>
+<span class="ln">127</span>    <span class="kd">var</span> <span class="nx">x</span> <span class="o">*</span><span class="kt">int32</span>
+<span class="ln">128</span>    <span class="o">*</span><span class="nx">x</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln">129</span>  <span class="p">}</span>
+<span class="ln">130</span><span class="p">}</span>
 </code></pre></div><h2 id="参考">参考</h2>
 <ul>
 <li><a href="https://zboya.github.io/post/go_scheduler/">https://zboya.github.io/post/go_scheduler/</a></li>
@@ -714,7 +762,7 @@
     <ul>
     
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go调度机制</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
       </li>
     
     
@@ -743,10 +791,16 @@
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go调度机制</a>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="nav-link">《kubernetes源码剖析》- k8s核心数据结构</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-select源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/mysql/%E4%B8%BA%E4%BB%80%E4%B9%88mysql%E4%BD%BF%E7%94%A8b&#43;%E6%A0%91%E8%80%8Cmongo%E4%BD%BF%E7%94%A8b%E6%A0%91/" class="nav-link">为什么mysql使用B&#43;树，而mongo使用B树</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/hugo/%E8%BF%99%E4%B8%AA%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E6%90%AD%E5%BB%BA/" class="nav-link">这个博客系统如何搭建</a>
@@ -756,12 +810,6 @@
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E5%9B%9B-%E8%B0%83%E7%94%A8%E6%A0%88/" class="nav-link">dmp文件分析（四）- 调用栈分析</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
       </li>
     </ul> 
     
@@ -773,8 +821,18 @@
           <span class='button_tally'>8</span>
         </a>
         
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>4</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
           C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
           <span class='button_tally'>2</span>
         </a>
         
@@ -788,8 +846,13 @@
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
-          K8S
+        <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent">
+          MYSQL
           <span class='button_tally'>1</span>
         </a>
         
@@ -808,11 +871,6 @@
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
-          源码分析
-          <span class='button_tally'>1</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
           计算机原理
           <span class='button_tally'>1</span>
@@ -827,7 +885,7 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>17</span>
+          <span class='button_tally'>19</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
@@ -847,6 +905,16 @@
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
           C&#43;&#43;
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
+          CLIENT-GO
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
           <span class='button_tally'>2</span>
         </a>
         
@@ -870,8 +938,13 @@
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
-          K8S
+        <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
+          MYSQL
           <span class='button_tally'>1</span>
         </a>
         
@@ -880,16 +953,82 @@
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent">
-          REDIS
-          <span class='button_tally'>1</span>
-        </a>
         
-        <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
-          计算机原理
-          <span class='button_tally'>1</span>
-        </a>
-        
+        <br>
+        <div class="post_tags_toggle button">All tags</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent" data-position=11>BREAKPAD<span class='button_tally'>11</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=2>C&#43;&#43;<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=2>CLIENT-GO<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent" data-position=7>GO<span class='button_tally'>7</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent" data-position=6>GO基础入门<span class='button_tally'>6</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=1>GO第三方库<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent" data-position=1>INDEX<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=2>K8S<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=1>MYSQL<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=19>源码分析<span class='button_tally'>19</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
         
       </nav>
     </div>

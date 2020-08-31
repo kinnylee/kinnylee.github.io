@@ -13,11 +13,11 @@
     
     
     <item>
-      <title>go调度机制</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</link>
+      <title>go触发调度机制</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</link>
       <pubDate>Fri, 28 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</guid>
       <description>go调度机制 gopark 和上面的 goready 对应，互为逆操作。gopark 和 goready 在 runtime 的源码中会经常遇到，涉及了 goroutine 的调度过程，</description>
     </item>
     

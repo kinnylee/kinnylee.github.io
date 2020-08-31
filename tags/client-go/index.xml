@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>client-go on kinnylee</title>
+    <link>https://kinnylee.github.io/tags/client-go/</link>
+    <description>Recent content in client-go on kinnylee</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
+    <lastBuildDate>Thu, 30 Aug 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://kinnylee.github.io/tags/client-go/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>client-go源码分析(一) - Client客户端对象</title>
+      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-client%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</link>
+      <pubDate>Thu, 30 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-client%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</guid>
+      <description>client-go源码分析(一) - Client客户端对象 概述 client-go支持4种客户端对象与api-server的交互，都可以通过ku</description>
+    </item>
+    
+    <item>
+      <title>client-go源码分析(二) - Informer机制</title>
+      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</link>
+      <pubDate>Thu, 30 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</guid>
+      <description>client-go源码分析(二) - Informer机制 概述 k8s中，组件之间通过http通讯，在不依赖任何中间件的情况下，需要保证消息的可靠</description>
+    </item>
+    
+  </channel>
+</rss>

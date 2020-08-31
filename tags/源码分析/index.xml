@@ -13,11 +13,11 @@
     
     
     <item>
-      <title>go调度机制</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</link>
+      <title>go触发调度机制</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</link>
       <pubDate>Fri, 28 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/</guid>
       <description>go调度机制 gopark 和上面的 goready 对应，互为逆操作。gopark 和 goready 在 runtime 的源码中会经常遇到，涉及了 goroutine 的调度过程，</description>
     </item>
     
@@ -163,6 +163,24 @@
       
       <guid>https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/</guid>
       <description>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&amp;#39;v2_playbook_on_start&amp;#39;, pb) 8 # 遍历单个 playbook 下所有的 p</description>
+    </item>
+    
+    <item>
+      <title>client-go源码分析(一) - Client客户端对象</title>
+      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-client%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</link>
+      <pubDate>Thu, 30 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-client%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</guid>
+      <description>client-go源码分析(一) - Client客户端对象 概述 client-go支持4种客户端对象与api-server的交互，都可以通过ku</description>
+    </item>
+    
+    <item>
+      <title>client-go源码分析(二) - Informer机制</title>
+      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</link>
+      <pubDate>Thu, 30 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</guid>
+      <description>client-go源码分析(二) - Informer机制 概述 k8s中，组件之间通过http通讯，在不依赖任何中间件的情况下，需要保证消息的可靠</description>
     </item>
     
   </channel>
