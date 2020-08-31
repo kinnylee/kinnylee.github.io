@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>client-go源码分析(一) - Client客户端对象 | kinnylee</title>
+  <head>  <title>client-go源码分析(一) - Client-go客户端对象 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -18,9 +18,9 @@
 <meta name="description" content="client-go源码分析(一) - Client客户端对象 概述 client-go支持4种客户端对象与api-server的交互，都可以通过ku">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "client-go源码分析(一) - Client客户端对象" />
+<meta name = "twitter:title" content = "client-go源码分析(一) - Client-go客户端对象" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-client%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/" />
-<meta property = "og:title" content = "client-go源码分析(一) - Client客户端对象" />
+<meta property = "og:title" content = "client-go源码分析(一) - Client-go客户端对象" />
 <meta property = "og:description" content = "client-go源码分析(一) - Client客户端对象 概述 client-go支持4种客户端对象与api-server的交互，都可以通过ku" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
@@ -142,7 +142,7 @@
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content' id= 'post_content'>
-    <h1 class='post_title'>client-go源码分析(一) - Client客户端对象</h1><div class = 'post_meta'>
+    <h1 class='post_title'>client-go源码分析(一) - Client-go客户端对象</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
@@ -158,13 +158,13 @@
        阅读 </span></span>|<span class="post-date"> 共 1818 字</span>，阅读约<span class="more-meta"> 4 分钟</span>
     <div class='post_share'>
   Share on:
-  <a href="https://twitter.com/intent/tweet?text=client-go%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%28%e4%b8%80%29%20-%20Client%e5%ae%a2%e6%88%b7%e7%ab%af%e5%af%b9%e8%b1%a1&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fk8s%2f%25E5%259F%25BA%25E6%259C%25AC%25E5%258E%259F%25E7%2590%2586%2f%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2fclient-go%2fclient-go%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2580-client%25E5%25AE%25A2%25E6%2588%25B7%25E7%25AB%25AF%25E5%25AF%25B9%25E8%25B1%25A1%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+  <a href="https://twitter.com/intent/tweet?text=client-go%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%28%e4%b8%80%29%20-%20Client-go%e5%ae%a2%e6%88%b7%e7%ab%af%e5%af%b9%e8%b1%a1&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fk8s%2f%25E5%259F%25BA%25E6%259C%25AC%25E5%258E%259F%25E7%2590%2586%2f%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2fclient-go%2fclient-go%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2580-client%25E5%25AE%25A2%25E6%2588%25B7%25E7%25AB%25AF%25E5%25AF%25B9%25E8%25B1%25A1%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
     <svg class="icon">
       <use xlink:href="#twitter"></use>
     </svg>
   </a>
   
-  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fk8s%2f%25E5%259F%25BA%25E6%259C%25AC%25E5%258E%259F%25E7%2590%2586%2f%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2fclient-go%2fclient-go%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2580-client%25E5%25AE%25A2%25E6%2588%25B7%25E7%25AB%25AF%25E5%25AF%25B9%25E8%25B1%25A1%2f&t=client-go%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%28%e4%b8%80%29%20-%20Client%e5%ae%a2%e6%88%b7%e7%ab%af%e5%af%b9%e8%b1%a1" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fk8s%2f%25E5%259F%25BA%25E6%259C%25AC%25E5%258E%259F%25E7%2590%2586%2f%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2fclient-go%2fclient-go%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%25E4%25B8%2580-client%25E5%25AE%25A2%25E6%2588%25B7%25E7%25AB%25AF%25E5%25AF%25B9%25E8%25B1%25A1%2f&t=client-go%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%28%e4%b8%80%29%20-%20Client-go%e5%ae%a2%e6%88%b7%e7%ab%af%e5%af%b9%e8%b1%a1" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
     <svg class="icon">
       <use xlink:href="#facebook"></use>
     </svg>
@@ -358,6 +358,9 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="nav-link">vscode远程调试C&#43;&#43;环境搭建</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="nav-link">《kubernetes源码剖析》- k8s核心数据结构</a>
       </li>
       <li>
@@ -378,9 +381,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
-      </li>
     </ul> 
     
     <div>
@@ -398,7 +398,7 @@
         
         <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
           C&#43;&#43;
-          <span class='button_tally'>2</span>
+          <span class='button_tally'>3</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
@@ -582,6 +582,10 @@
             
             
             <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
             </a>
             
             

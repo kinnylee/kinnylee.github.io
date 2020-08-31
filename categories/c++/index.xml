@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Sat, 15 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 31 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/categories/c++/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>vscode远程调试C&#43;&#43;环境搭建</title>
+      <link>https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link>
+      <pubDate>Mon, 31 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid>
+      <description>环境准备 配置远程主机 安装 Remote Development vscode插件 ssh-copy-id，将远程机器添加到免密登录列表中 远程连接到该机器 选择远程主机的代码路径（会</description>
+    </item>
     
     <item>
       <title>breakpad概述</title>

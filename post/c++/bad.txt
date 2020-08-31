@@ -1,0 +1,279 @@
+
+2020-08-31 17:47:58: libcurl_download.cc:103: ERROR: Minidump libcurl download failed time out, curl code: 28, retry time:3
+2020-08-31 17:48:18: libcurl_download.cc:112: ERROR: Minidump libcurl download failed time out, curl code: 28retry count:2
+2020-08-31 17:48:24: minidump.cc:4795: INFO: Minidump reopening minidump 
+2020-08-31 17:48:24: minidump.cc:4931: INFO: Minidump not byte-swapping minidump
+2020-08-31 17:48:24: minidump.cc:4281: INFO: MinidumpBreakpadInfo has no dump thread
+2020-08-31 17:48:24: minidump.cc:4304: INFO: MinidumpBreakpadInfo has no requesting thread
+2020-08-31 17:48:24: minidump_processor.cc:1212: INFO: Unknown exception reason 0xc000000d / 0x00000000
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\ZPert.exe
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\ZPert.exe
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\windows\System32\umpdc.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\ss_user_login.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\ss_user_login.dll
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\Program Files (x86)\ZebraTech\ZPert\ss_user_login.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\libxl.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\libxl.dll
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\Program Files (x86)\ZebraTech\ZPert\skshaper.dll
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\Program Files (x86)\ZebraTech\ZPert\skia.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\GSCAccountCore.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\GSCAccountCore.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\Common Files\Grandsoft Shared\GrandDog\3.8.596.4620\GSCCore.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\Common Files\Grandsoft Shared\GrandDog\3.8.596.4620\GSCCore.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\ZPert.exe
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\ZPert.exe
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\windows\System32\umpdc.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\ss_user_login.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\ss_user_login.dll
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\Program Files (x86)\ZebraTech\ZPert\ss_user_login.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\libxl.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\libxl.dll
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\Program Files (x86)\ZebraTech\ZPert\skshaper.dll
+2020-08-31 17:48:24: minidump.cc:2182: INFO: MinidumpModule could not determine version for C:\Program Files (x86)\ZebraTech\ZPert\skia.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\ZebraTech\ZPert\GSCAccountCore.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\ZebraTech\ZPert\GSCAccountCore.dll
+2020-08-31 17:48:24: minidump.cc:2060: INFO: MinidumpModule could not determine debug_file for C:\Program Files (x86)\Common Files\Grandsoft Shared\GrandDog\3.8.596.4620\GSCCore.dll
+2020-08-31 17:48:24: minidump.cc:2150: INFO: MinidumpModule could not determine debug_identifier for C:\Program Files (x86)\Common Files\Grandsoft Shared\GrandDog\3.8.596.4620\GSCCore.dll
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module 7z.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module 7z.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module 7z.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module 7z.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module 7z.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module AdSyncNamespace.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module MSVCP140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module VCRUNTIME140.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module xmllite.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module wpdshext.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module audiodev.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module WMVCore.DLL could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module WMASF.DLL could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module mfperfhelper.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module 7z.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module PortableDeviceApi.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module SETUPAPI.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module twinapi.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module Windows.Storage.Search.dll could not be stored
+2020-08-31 17:48:24: basic_code_modules.cc:72: ERROR: Module tiptsf.dll could not be stored
+2020-08-31 17:48:24: minidump_processor.cc:152: INFO: Found 359 memory regions.
+2020-08-31 17:48:24: minidump.cc:1485: ERROR: MinidumpThread has a memory region problem, 0x1b0aed50+0x12b0, RVA 0x0x0
+2020-08-31 17:48:24: minidump_processor.cc:162: INFO: Minidump  has CPU info, OS info, Breakpad info, exception, module list, thread list, no dump thread, requesting thread, and process create time
+2020-08-31 17:48:24: minidump_processor.cc:201: INFO: Looking at thread :0/1 id 0x3bf8
+2020-08-31 17:48:58: simple_symbol_supplier.cc:287: INFO: No symbol file at http://192.168.162.89:50070/webhdfs/v1/gcr/symbols/wntdll.pdb/3D038F31BBBF51C701937460DBAB1F531/wntdll.sym?op=open, http_status_code 404
+2020-08-31 17:48:58: simple_symbol_supplier.cc:287: INFO: No symbol file at http://192.168.162.89:50070/webhdfs/v1/gcr/system_symbols/wntdll.pdb/3D038F31BBBF51C701937460DBAB1F531/wntdll.sym?op=open, http_status_code 404
+2020-08-31 17:48:58: simple_symbol_supplier.cc:287: INFO: No symbol file at http://192.168.162.89:50070/webhdfs/v1/gcr/zpert/4.0.0.44/symbols/wntdll.pdb/3D038F31BBBF51C701937460DBAB1F531/wntdll.sym?op=open, http_status_code 404
+2020-08-31 17:48:58: simple_symbol_supplier.cc:287: INFO: No symbol file at http://192.168.162.89:50070/webhdfs/v1/gcr/default_symbols/qt/x86/wntdll.pdb/3D038F31BBBF51C701937460DBAB1F531/wntdll.sym?op=open, http_status_code 404
+2020-08-31 17:48:58: simple_symbol_supplier.cc:287: INFO: No symbol file at http://gdl.glodon.com/download/symbols/wntdll.pdb/3D038F31BBBF51C701937460DBAB1F531/wntdll.sym?op=open, http_status_code 404
+2020-08-31 17:48:58: libcurl_download.cc:124: ERROR: Minidump libcurl download failed, http_status_code: 404
+2020-08-31 17:49:07: stackwalker.cc:103: INFO: Couldn't load symbols for: wntdll.pdb|3D038F31BBBF51C701937460DBAB1F531
+2020-08-31 17:49:07: minidump.cc:5284: ERROR: SeekSet: error 115: Operation now in progress
+2020-08-31 17:49:07: minidump.cc:1237: ERROR: MinidumpMemoryRegion could not seek to memory region
+2020-08-31 17:49:07: minidump.cc:5284: ERROR: SeekSet: error 115: Operation now in progress
+2020-08-31 17:49:07: minidump.cc:1237: ERROR: MinidumpMemoryRegion could not seek to memory region
+2020-08-31 17:49:21: minidump_processor.cc:326: INFO: Processed 
+2020-08-31 17:49:21: minidump.cc:4783: INFO: Minidump closing minidump
+OS|Windows NT|10.0.18362 
+CPU|x86|GenuineIntel family 6 model 142 stepping 10|8
+GPU|||
+Crash|0xc000000d / 0x00000000|0x77beec75|0
+Ptime|13882
+Module|GSCAccountCore.dll|1.0.5.0|||0x00400000|0x00b8ffff|0
+Module|ZPert.exe|4.0.0.44|||0x00fa0000|0x04303fff|1
+Module|libcef.dll|3.3626.1888.0|libcef.dll.pdb|3039F2D8961140964C4C44205044422E1|0x04bd0000|0x0a58afff|0
+Module|SogouPY.ime|9.6.0.3612|SogouPy.pdb|DE118492F7B84DB6B092C09D9D25D5C0d|0x0db80000|0x0e19ffff|0
+Module|Resource.dll|9.6.0.3612|Resource.pdb|21C731E037CA447BBC13C19951953641d|0x0f180000|0x0f29cfff|0
+Module|libxl.dll|3.8.2.0|||0x10000000|0x10679fff|0
+Module|GSCCore.dll|3.8.596.4620|||0x145e0000|0x14be6fff|0
+Module|dlnashext.dll|6.2.18362.1|dlnashext.pdb|D0AA194BE734C3334178FC0836701F2D1|0x23e70000|0x23eb2fff|0
+Module|360EnterpriseShellExt.dll|1.0.0.1007|360EnterpriseShellExt.pdb|E0C9EEB2D8E1494E8B4D82EE2576D95A1|0x24240000|0x24260fff|0
+Module|TextInputFramework.dll|6.2.18362.207|TextInputFramework.pdb|968C62B78DF77259AF169C8A453B7F561|0x503a0000|0x50423fff|0
+Module|wlanapi.dll|6.2.18362.239|wlanapi.pdb|4F8DB48F8F65D9E19E5E99AD2E5A05111|0x509e0000|0x50a32fff|0
+Module|chrome_elf.dll|72.0.3626.96|chrome_elf.dll.pdb|8A2E7163EA114DD74C4C44205044422E1|0x50c20000|0x50cd5fff|0
+Module|cryptui.dll|6.2.18362.476|cryptui.pdb|BAAAB4B72D40FB0C3F3605B4A96CF4E31|0x50ce0000|0x50d1efff|0
+Module|samlib.dll|6.2.18362.1|samlib.pdb|7A51B08B7B0389BF26CBEE88EAFA64E81|0x5f180000|0x5f198fff|0
+Module|dxva2.dll|6.2.18362.1|dxva2.pdb|5E97C38988663BBFD13F14443E105E801|0x60fe0000|0x60ffbfff|0
+Module|d3d9.dll|6.2.18362.387|d3d9.pdb|B218F814D26F8B34809D8ED5191F83361|0x61000000|0x6118dfff|0
+Module|opengl32.dll|6.2.18362.387|opengl32.pdb|D7AD4C316EC91AA76CD2A411CCFC2F691|0x62930000|0x62a2efff|0
+Module|mscms.dll|6.2.18362.836|mscms.pdb|35D3286BA3D7A901EDDD48E4D9D463611|0x62f20000|0x62fb3fff|0
+Module|MMDevAPI.dll|6.2.18362.387|MMDevAPI.pdb|DB3F778BB842A5E0BD4FB1ECEFC84B381|0x63010000|0x63071fff|0
+Module|credui.dll|6.2.18362.1|credui.pdb|CD112941D468203F804A680AC830AB511|0x63250000|0x6325cfff|0
+Module|ColorAdapterClient.dll|6.2.18362.836|ColorAdapterClient.pdb|F5BFEE33831D2E8C26769E1DDF02C4B01|0x63260000|0x63270fff|0
+Module|glu32.dll|6.2.18362.387|glu32.pdb|313652FF265928923C19A2BABCCA09941|0x635c0000|0x635fefff|0
+Module|fontsub.dll|6.2.18362.959|fontsub.pdb|F6AE39755D118A10FB3048E2362CF9181|0x63630000|0x6364bfff|0
+Module|oledlg.dll|6.2.18362.1|oledlg.pdb|17C2BE6D48601E6294E5CAE1DF64A5371|0x641c0000|0x641ebfff|0
+Module|linkinfo.dll|6.2.18362.1|linkinfo.pdb|01ACDCE8BD09C831446DE7FBC8B3DFE21|0x64370000|0x6437afff|0
+Module|Bcp47Langs.dll|6.2.18362.657|Bcp47Langs.pdb|0324646A4F0D06ED62739342DF37E8AF1|0x668e0000|0x66924fff|0
+Module|edputil.dll|6.2.18362.1|edputil.pdb|4751972511335882B6BF235A4D7A6B261|0x66a60000|0x66a7afff|0
+Module|WindowsCodecs.dll|6.2.18362.959|WindowsCodecs.pdb|6CC2E3781689D4C2E1B175ACBFB6B9A41|0x66d80000|0x66ee8fff|0
+Module|explorerframe.dll|6.2.18362.418|ExplorerFrame.pdb|4321C8A0831BD48F109A76A352D645751|0x66ef0000|0x67072fff|0
+Module|PicFace.dll|1.1.0.1870|PicFace.pdb|6000E2EF948647048A529C64C1732CA02f|0x67bb0000|0x67d6afff|0
+Module|SogouTSF.ime|9.6.0.3612|SogouTSF.pdb|09A837D4791642BFB45231E3C300CB10d|0x67d70000|0x67ee1fff|0
+Module|ntasn1.dll|6.2.18362.1|ntasn1.pdb|1665067DA442D1B1264373570E4E68241|0x69b10000|0x69b37fff|0
+Module|ncrypt.dll|6.2.18362.1|ncrypt.pdb|007FDA53C98BE3FD0927F24A1ECC12051|0x69b40000|0x69b60fff|0
+Module|mlang.dll|6.2.18362.1|mlang.pdb|91E65AF47F0864BC43C135047CC181E91|0x69ce0000|0x69d13fff|0
+Module|DWrite.dll|6.2.18362.959|DWrite.pdb|A4E04E59E544BA850A13B77F2619CF861|0x6b5d0000|0x6b84ffff|0
+Module|rmclient.dll|6.2.18362.267|RmClient.pdb|96B792A991B71166F091E0660A14750D1|0x6b850000|0x6b86efff|0
+Module|twinapi.appcore.dll|6.2.18362.959|twinapi.appcore.pdb|881D640EA65183CE76A3AA19B18512211|0x6b870000|0x6ba54fff|0
+Module|dxgi.dll|6.2.18362.815|dxgi.pdb|48F7FCFB1B295BAE4178A32C45C6D2F61|0x6ba60000|0x6bb20fff|0
+Module|d3d11.dll|6.2.18362.387|d3d11.pdb|A36E176FC8D3736E121B6C29EDB741751|0x6bb30000|0x6bd0dfff|0
+Module|dcomp.dll|6.2.18362.959|dcomp.pdb|38115AD345AA4FFC890D0B2F3BA026FC1|0x6bd10000|0x6be79fff|0
+Module|dataexchange.dll|6.2.18362.836|DataExchange.pdb|D3286F3694F219D8D96AF95FF0A318EA1|0x6be80000|0x6beb0fff|0
+Module|dwmapi.dll|6.2.18362.267|dwmapi.pdb|08A8631E517F5DEA3A8BCE509EA12FEA1|0x6bef0000|0x6bf14fff|0
+Module|usp10.dll|6.2.18362.476|usp10.pdb|D48E009B7F894B1051985E92246DA9C21|0x6c820000|0x6c836fff|0
+Module|CoreUIComponents.dll|6.2.18362.207|CoreUIComponents.pdb|9BF4D0543F0D59C9860F7352F33A77831|0x6ea10000|0x6ec6dfff|0
+Module|WinTypes.dll|6.2.18362.900|WinTypes.pdb|09CD256B28AA015DF8B265D3DFF045061|0x6ed40000|0x6ee19fff|0
+Module|CoreMessaging.dll|6.2.18362.836|CoreMessaging.pdb|6C74E5D9962DBDF61E52C4FF67D2C8BA1|0x6f340000|0x6f3c8fff|0
+Module|oleacc.dll|7.2.18362.1|oleacc.pdb|981B0D0DE6B6950163524BED9A012AEF1|0x6f570000|0x6f5c2fff|0
+Module|netbios.dll|6.2.18362.1|netbios.pdb|B409FD7BCB91D3E24B2F4567E2611F9B1|0x70cc0000|0x70cc9fff|0
+Module|GMTClient.dll|3.0.0.1830|gmtclient.pdb|95A3ED8E4CC64EC3A6A79200E3353AAF1|0x70d30000|0x70d9ffff|0
+Module|fltLib.dll|6.2.18362.1|fltLib.pdb|C9AE7C9B11F4F233ADF522C2322F7B031|0x70f00000|0x70f07fff|0
+Module|cldapi.dll|6.2.18362.1|cldapi.pdb|23550C5ED04FC488AC89C97D84A1053C1|0x70f10000|0x70f2afff|0
+Module|devobj.dll|6.2.18362.387|devobj.pdb|72E5546A124F1C1CE6307A163ACAFF111|0x70f30000|0x70f52fff|0
+Module|propsys.dll|7.0.18362.815|propsys.pdb|E24CBEF5BF85EE0C8D42857E885320981|0x70f60000|0x71025fff|0
+Module|gpapi.dll|6.2.18362.1|gpapi.pdb|460161C4ED902E191576D8D485A136DC1|0x71090000|0x710adfff|0
+Module|npmproxy.dll|6.2.18362.815|npmproxy.pdb|F6BC8DD48F60BB5B28BE905F603ACFAD1|0x71180000|0x71188fff|0
+Module|netprofm.dll|6.2.18362.900|netprofm.pdb|F37ECB299C448478193227EEA93674961|0x711a0000|0x711d0fff|0
+Module|hid.dll|6.2.18362.1|hid.pdb|C71BEABE7A9EB89B8BDFB392D20E90AD1|0x71280000|0x7128afff|0
+Module|rsaenh.dll|6.2.18362.1|rsaenh.pdb|7EA5721389DBBFBF81D2D2E133F1986D1|0x71290000|0x712befff|0
+Module|dhcpcsvc6.DLL|6.2.18362.815|dhcpcsvc6.pdb|6186400A2BCBC403E97CFA03900C0E111|0x71460000|0x71472fff|0
+Module|cryptnet.dll|6.2.18362.1|cryptnet.pdb|40DEAF1933F4092CE44ECC49AEB4AAEE1|0x71480000|0x714a5fff|0
+Module|ntmarta.dll|6.2.18362.1|ntmarta.pdb|9002F8E281EB36A51BA0137DAE4741581|0x71520000|0x71548fff|0
+Module|cscapi.dll|6.2.18362.1|cscapi.pdb|D76788BA0EB641FB033CF31FBD8DB4FD1|0x71550000|0x7155dfff|0
+Module|FWPUCLNT.DLL|6.2.18362.113|fwpuclnt.pdb|89899C341C40576CF25BEDC865BE48D71|0x716f0000|0x71740fff|0
+Module|GCMClient.dll|3.0.0.1830|gcmclient.pdb|B46B746464D4410FAD6499E9CAB187C71|0x718f0000|0x71963fff|0
+Module|uxtheme.dll|6.2.18362.449|wUxTheme.pdb|C79930743BC4D41E8CD793F5646674BD1|0x72070000|0x720e9fff|0
+Module|winsta.dll|6.2.18362.836|winsta.pdb|0B71123BA7EEB78DAE4D1C726549672E1|0x720f0000|0x72133fff|0
+Module|dhcpcsvc.dll|6.2.18362.815|dhcpcsvc.pdb|B7C6D24104B6A440B58F7D333BA4920B1|0x72140000|0x72154fff|0
+Module|nlaapi.dll|6.2.18362.1|nlaapi.pdb|D7CFD3CAAABBE9A36705FEF9568832B51|0x72160000|0x72175fff|0
+Module|winrnr.dll|6.2.18362.1|winrnr.pdb|25B746D70C494D28CBB6726ECAECACFD1|0x72180000|0x7218afff|0
+Module|pnrpnsp.dll|6.2.18362.1|pnrpnsp.pdb|6D1D42C2F6C9A41E20A63A5C1493921D1|0x72190000|0x721a5fff|0
+Module|mswsock.dll|6.2.18362.815|wmswsock.pdb|C0ED42524CB12126E05CD6CE707E3D061|0x721b0000|0x72201fff|0
+Module|NapiNSP.dll|6.2.18362.1|NapiNSP.pdb|D5722422AE210660850E93A58441C8601|0x72210000|0x72220fff|0
+Module|rasadhlp.dll|6.2.18362.1|rasadhlp.pdb|3E3D8086B66A6C39526407D0AB0CD5211|0x72230000|0x72237fff|0
+Module|wshbth.dll|6.2.18362.1|wshbth.pdb|730AB7B89C534B6A68512158CA7B4DDB1|0x72250000|0x7225ffff|0
+Module|srvcli.dll|6.2.18362.1|srvcli.pdb|271F5AC3AB1FA4DA931CF7CE163D55391|0x722d0000|0x722ebfff|0
+Module|samcli.dll|6.2.18362.1|samcli.pdb|983AE9574054343DC8900D3CF504D00F1|0x73600000|0x73614fff|0
+Module|dbghelp.dll|6.2.18362.1|dbghelp.pdb|72102E1B245E065F6C5AF3F31B252A4D1|0x73850000|0x739defff|0
+Module|wkscli.dll|6.2.18362.1|wkscli.pdb|8AA71BDDDF42F3B6478929786262B5B01|0x739f0000|0x739fffff|0
+Module|secur32.dll|6.2.18362.1|secur32.pdb|4D7466EA2A3CC1A02E5768D5826F523C1|0x73a00000|0x73a09fff|0
+Module|netutils.dll|6.2.18362.1|netutils.pdb|CB822309D5AAB95E142E798272F44AB11|0x73a10000|0x73a1afff|0
+Module|iertutil.dll|11.0.18362.815|iertutil.pdb|5ADB4A865B727F7BB33CABE208B962E71|0x73a20000|0x73c48fff|0
+Module|winhttp.dll|6.2.18362.778|winhttp.pdb|B34796AA32A204EB3D3718BA693522221|0x73c50000|0x73d0cfff|0
+Module|wsock32.dll|6.2.18362.1|wsock32.pdb|C88330C0C16E24872251827373804DFC1|0x73db0000|0x73db7fff|0
+Module|comctl32.dll|6.10.18362.959|comctl32.pdb|449B9FA3A8C84693D0D87E97D11965641|0x73dc0000|0x73fcefff|0
+Module|mpr.dll|6.2.18362.1|mpr.pdb|B6825D32917ACD8FB4871C1D54F0BD201|0x73fd0000|0x73fe7fff|0
+Module|wininet.dll|11.0.18362.753|wininet.pdb|D633EBC1D2E017BDCCBDB6EB919FC9CD1|0x74020000|0x7447afff|0
+Module|msimg32.dll|6.2.18362.959|msimg32.pdb|9828A27229C38CCDD8D5EA66946759C61|0x74480000|0x74485fff|0
+Module|urlmon.dll|11.0.18362.815|urlmon.pdb|A682E57323A0BE74EE8DE3E1DF799BA11|0x74490000|0x74639fff|0
+Module|dnsapi.dll|6.2.18362.815|dnsapi.pdb|D8B90F6659610B55EBAB859B7BC05F421|0x746f0000|0x74782fff|0
+Module|IPHLPAPI.DLL|6.2.18362.1|iphlpapi.pdb|E273A1053C395EF7D5BC0DBF699874C81|0x74790000|0x747c1fff|0
+Module|GdiPlus.dll|6.2.18362.959|gdiplus.pdb|26CDBA40B0695409F220853DDFA6522F1|0x747d0000|0x74938fff|0
+Module|netapi32.dll|6.2.18362.1|netapi32.pdb|0FBF70F985F3065A46C8C90693010EAF1|0x74940000|0x74952fff|0
+Module|userenv.dll|6.2.18362.387|userenv.pdb|EFEB2B82B75BC7E95FAA123E20C42A241|0x749d0000|0x749edfff|0
+Module|apphelp.dll|6.2.18362.1|apphelp.pdb|0D37A746D2E21547F2B11D6457231F8D1|0x749f0000|0x74a8efff|0
+Module|wtsapi32.dll|6.2.18362.1|wtsapi32.pdb|D2903F19E0F33118A7AD6F88FA6FEE731|0x74a90000|0x74a9efff|0
+Module|version.dll|6.2.18362.1|version.pdb|37947E4990565E1B63C722A8644B7D181|0x74bf0000|0x74bf7fff|0
+Module|msvcr120.dll|12.0.21005.1|msvcr120.i386.pdb|16F5E2EF340A453ABC8B8F67DC6FD8082|0x74c00000|0x74cedfff|0
+Module|msvcp120.dll|12.0.21005.1|msvcp120.i386.pdb|0B631FCA474F4F6FBBE54C497C5821361|0x74cf0000|0x74d60fff|0
+Module|PlayToDevice.dll|6.2.18362.1|PlayToDevice.pdb|E15D5EE955A47340C84CDA00546BDC881|0x74df0000|0x74e38fff|0
+Module|globinputhost.dll|6.2.18362.657|globinputhost.pdb|391839E0EFD66B54F297B98784DA5C8E1|0x74e40000|0x74e5bfff|0
+Module|BCP47mrm.dll|6.2.18362.657|Bcp47mrm.pdb|D54452E5AD3D8597ADABCD99609B40C11|0x74e60000|0x74e82fff|0
+Module|IconCodecService.dll|6.2.18362.1|IconCodecService.pdb|29B239825424E31CBC9DDD795104AFB51|0x74e90000|0x74e97fff|0
+Module|davhlpr.dll|6.2.18362.1|davhlpr.pdb|1A0D79BA307D7527924E35E34B25F42C1|0x74ea0000|0x74ea9fff|0
+Module|davclnt.dll|6.2.18362.1|davclnt.pdb|9E3FA56F633F08910D68FCC4CC83CC7C1|0x74eb0000|0x74ec8fff|0
+Module|ntlanman.dll|6.2.18362.1|ntlanman.pdb|B42455A217D71CE78CF7EE0B55B7F0961|0x74ed0000|0x74ee1fff|0
+Module|thumbcache.dll|6.2.18362.1|thumbcache.pdb|084F66D9F1FC3B0584F1FCD115FF5DB61|0x74ef0000|0x74f39fff|0
+Module|duser.dll|6.2.18362.1|DUser.pdb|10380E953CBF991DBE2F0E72AAF7FC8F1|0x74f40000|0x74fb6fff|0
+Module|DXCore.dll|6.2.18362.1|DXCore.pdb|869B2495A23070D6F61EACB2F68975F31|0x750f0000|0x75108fff|0
+Module|drprov.dll|6.2.18362.1|drprov.pdb|120722AD9DA9C708D958466B671706BD1|0x75160000|0x75168fff|0
+Module|atlthunk.dll|6.2.18362.900|atlthunk.pdb|6D3D3337E50DA161ABF5CA306B40EB331|0x75170000|0x7517cfff|0
+Module|winspool.drv|6.2.18362.693|winspool.pdb|8C19B0208D4C024DD9858F216771F0F31|0x75180000|0x751eafff|0
+Module|WINMMBASE.dll|6.2.18362.1|WINMMBASE.pdb|FA9C43DC68CD9A9E37B97480E8393A131|0x75200000|0x75222fff|0
+Module|winmm.dll|6.2.18362.1|winmm.pdb|B23362A0139A17A9278A28DA8938169E1|0x75250000|0x75273fff|0
+Module|GEH.dll|1.2.9.3|GEH.pdb|95C96E0B3556460BACC4A058544D8ACE2|0x75280000|0x752abfff|0
+Module|CRYPTBASE.dll|6.2.18362.1|cryptbase.pdb|CF045B82A4BA09E8798E6ABE8978753E1|0x752b0000|0x752b9fff|0
+Module|sspicli.dll|6.2.18362.1|wsspicli.pdb|0D9FFB13F8FBFB8914EEAFDEB7CE7FF21|0x752c0000|0x752dffff|0
+Module|ucrtbase.dll|6.2.18362.815|ucrtbase.pdb|31F6F76548480DC547FC6115574A865D1|0x75300000|0x7541efff|0
+Module|wintrust.dll|6.2.18362.387|wintrust.pdb|D4263D1DBEC3B0AC2D6B03BEFC8020C51|0x75420000|0x75465fff|0
+Module|ole32.dll|6.2.18362.693|ole32.pdb|87764F4B5E6E9C33F63CDC927063E7871|0x75470000|0x75566fff|0
+Module|user32.dll|6.2.18362.959|wuser32.pdb|D8151310C41FA6924A249954568C13B21|0x756e0000|0x75876fff|0
+Module|bcryptPrimitives.dll|6.2.18362.836|bcryptprimitives.pdb|97449DF04455A240302D715CFCD49B0C1|0x75880000|0x758defff|0
+Module|nsi.dll|6.2.18362.449|nsi.pdb|4571262913FC7077E246514A5B3F030D1|0x758e0000|0x758e6fff|0
+Module|cryptsp.dll|6.2.18362.1|cryptsp.pdb|E438FC5E36482E9C9DDF2915E9926E011|0x758f0000|0x75902fff|0
+Module|oleaut32.dll|6.2.18362.959|oleaut32.pdb|965FCDE8AF62340ADAEB94DD86E88C781|0x75910000|0x759a1fff|0
+Module|rpcrt4.dll|6.2.18362.628|wrpcrt4.pdb|AEF1E57D84CD1D6F911035F3BB7A79471|0x759b0000|0x75a6afff|0
+Module|windows.storage.dll|6.2.18362.959|Windows.Storage.pdb|B7FDED722C7283EE9143B13807FE6BAB1|0x75a70000|0x76035fff|0
+Module|KERNELBASE.dll|6.2.18362.959|wkernelbase.pdb|00978E61DEFC5ED3BC6110BEE140815C1|0x76490000|0x7668dfff|0
+Module|crypt32.dll|6.2.18362.592|crypt32.pdb|FEE39F56413DA599E88EB1966CFEAF6B1|0x76690000|0x7678afff|0
+Module|shlwapi.dll|6.2.18362.1|shlwapi.pdb|9FA3B3DD1A1CD387B2E3E4A38049BF751|0x76790000|0x767d3fff|0
+Module|clbcatq.dll|2001.12.10941.16384|CLBCatQ.pdb|EBD72BC4D1D2D9014727FA7BAB14610F1|0x767f0000|0x7686ffff|0
+Module|powrprof.dll|6.2.18362.1|powrprof.pdb|B25647B6FB2807B90F08C62ED1FDD3181|0x76870000|0x768b2fff|0
+Module|imm32.dll|6.2.18362.387|wimm32.pdb|AFB23A7345810B3301B1114EEC34E5F21|0x768c0000|0x768e4fff|0
+Module|shell32.dll|6.2.18362.959|shell32.pdb|C673414B24BC003767843F120D16A2691|0x768f0000|0x76e68fff|0
+Module|gdi32.dll|6.2.18362.1|wgdi32.pdb|EC26B17219AF25A2531508809FB3C8821|0x76f00000|0x76f20fff|0
+Module|msvcp_win.dll|6.2.18362.815|msvcp_win.pdb|3AEAB30B7BE292C335CD020E7F921B181|0x76f30000|0x76fabfff|0
+Module|coml2.dll|6.2.18362.1|coml2.pdb|F659CE1C9F54F8B554344A8332D763621|0x76fb0000|0x7700dfff|0
+Module|kernel32.dll|6.2.18362.959|wkernel32.pdb|983A5BCBA20F455A3E11AA50FB3A3FD01|0x77010000|0x770effff|0
+Module|ws2_32.dll|6.2.18362.387|ws2_32.pdb|47A465225050AAE74E436883CBFBDAFE1|0x770f0000|0x7714dfff|0
+Module|bcrypt.dll|6.2.18362.267|bcrypt.pdb|40165D1D08017B1BA24AE9C8E1347A711|0x77150000|0x77168fff|0
+Module|psapi.dll|6.2.18362.1|psapi.pdb|83E2D3283D80A4FE12FB7E7B5E8C7BAE1|0x77170000|0x77175fff|0
+Module|SHCore.dll|6.2.18362.959|shcore.pdb|60B5D761EAF867C62BE2C6DD1340E6E51|0x77180000|0x77203fff|0
+Module|umpdc.dll||UMPDC.pdb|25883FED4EC3EB7E5B727970F4E1947B1|0x77210000|0x7721cfff|0
+Module|sechost.dll|6.2.18362.959|sechost.pdb|CFCC2727B57EC8DA47B6B5803874D01D1|0x77220000|0x77295fff|0
+Module|win32u.dll|6.2.18362.959|wwin32u.pdb|C09DDFC96D57A1CF40F804DF931A3C0C1|0x77300000|0x77316fff|0
+Module|msvcrt.dll|7.0.18362.1|msvcrt.pdb|1EBA660F39B8C2CF4A66A428FAF0D0421|0x77320000|0x773defff|0
+Module|gdi32full.dll|6.2.18362.959|wgdi32full.pdb|8EF7A106030443F3FA0D539459C7ABEB1|0x773e0000|0x7753afff|0
+Module|profapi.dll|6.2.18362.693|profapi.pdb|3D907E9A18B28484FC4EE60B49C0B60C1|0x77540000|0x7755afff|0
+Module|msctf.dll|6.2.18362.900|msctf.pdb|7BCDA5D9ECC60E1E5C4751B8AF51D9FC1|0x77560000|0x77662fff|0
+Module|comdlg32.dll|6.2.18362.900|comdlg32.pdb|4D584E6D0FEE596FD399DCCC62AD110A1|0x77670000|0x7771ffff|0
+Module|kernel.appcore.dll|6.2.18362.1|Kernel.Appcore.pdb|FC4E4AB79BA2A34F9DB5D029FF1AE0E91|0x77720000|0x7772efff|0
+Module|combase.dll|6.2.18362.900|combase.pdb|1C3B6B8C9212132ACFCE3E024BB626CA1|0x77730000|0x779a4fff|0
+Module|cfgmgr32.dll|6.2.18362.387|cfgmgr32.pdb|618B5FD435BB907A41AB25EE57AD442E1|0x77a10000|0x77a4afff|0
+Module|msasn1.dll|6.2.18362.1|msasn1.pdb|77E3B8C8515747F04C85A034C0D557011|0x77a50000|0x77a5dfff|0
+Module|advapi32.dll|6.2.18362.752|advapi32.pdb|1F26D342992E5AF0859C07F85085BDA51|0x77a60000|0x77ad8fff|0
+Module|ntdll.dll|6.2.18362.815|wntdll.pdb|3D038F31BBBF51C701937460DBAB1F531|0x77af0000|0x77c89fff|0
+Module|MrmCoreR.dll|6.2.18362.959|MrmCoreR.pdb|7EC2FC792E456B199608C2E46315D3321|0x780e0000|0x781bafff|0
+Module|windows.staterepositorycore.dll|6.2.18362.900|Windows.StateRepositoryCore.pdb|31744BE9BEA8634397756BCD46EB588A1|0x781c0000|0x781cafff|0
+Module|policymanager.dll|6.2.18362.815|policymanager.pdb|98898748AC85C297DF992E83E00C2CC31|0x79a50000|0x79ac2fff|0
+Module|msvcp110_win.dll|6.2.18362.1|msvcp110_win.pdb|ABE1E7D129C52580674AD8511D92E5F31|0x79ad0000|0x79b34fff|0
+Module|UIAutomationCore.DLL|7.2.18362.693|UIAutomationCore.pdb|51534C365B07310DBFCAE25DBE67FBE91|0x79bc0000|0x79db2fff|0
+Module|fms.dll|6.2.18362.1|fms.pdb|6013D066410B80C377D81F5879A58D2B1|0x7a150000|0x7a17bfff|0
+Module|skshaper.dll||skshaper.dll.pdb|66EE863FD7CF73294C4C44205044422E1|0x7a3d0000|0x7a52cfff|0
+Module|skia.dll||skia.dll.pdb|09AF7878831E69AB4C4C44205044422E1|0x7a530000|0x7abc6fff|0
+Module|ss_user_login.dll||||0x7abd0000|0x7ad1bfff|0
+Module|msftedit.dll|6.2.18362.329|msftedit.pdb|79620AAB460291B267B9F1981E0445AD1|0x7af00000|0x7b1a3fff|0
+Module|Windows.Globalization.dll|6.2.18362.959|Windows.Globalization.pdb|85BD5BEEB1BCC860503178649C2C29981|0x7b360000|0x7b4affff|0
+Module|dui70.dll|6.2.18362.1|DUI70.pdb|461660C3B493E8CF4CCC580B433556FA1|0x7b5b0000|0x7b716fff|0
+Module|StructuredQuery.dll|7.0.18362.959|StructuredQuery.pdb|4567F9ACB2050E061C702DE05390B6D31|0x7b7b0000|0x7b834fff|0
+Module|ntshrui.dll|6.2.18362.752|ntshrui.pdb|6AFC9E1B9F1350773DFBDBC3619F03941|0x7b8e0000|0x7b941fff|0
+Module|DevDispItemProvider.dll|6.2.18362.1|DevDispItemProvider.pdb|0D432CF704CD5E9181B1F6D7484187E21|0x7bc70000|0x7bc8afff|0
+Module|NetworkExplorer.dll|6.2.18362.1|NetworkExplorer.pdb|AEAE84B2865619373672E56E96E437A41|0x7bc90000|0x7bca2fff|0
+Module|FileSyncShell.dll|20.114.607.2|FileSyncShell.pdb|ADAC157C257DC6B2880E86E6C9C9E89F1|0x7bcb0000|0x7bde8fff|0
+
+0|0|ntdll.dll||||0xfec75
+[root@bimface breakpad]# 

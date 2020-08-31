@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Sat, 29 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 31 Aug 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>C&#43;&#43;</title>
+      <link>https://kinnylee.github.io/categories/c&#43;&#43;/</link>
+      <pubDate>Mon, 31 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/categories/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>k8s</title>
@@ -63,15 +72,6 @@
       <pubDate>Thu, 27 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>C&#43;&#43;</title>
-      <link>https://kinnylee.github.io/categories/c&#43;&#43;/</link>
-      <pubDate>Sat, 15 Aug 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/categories/c&#43;&#43;/</guid>
       <description></description>
     </item>
     

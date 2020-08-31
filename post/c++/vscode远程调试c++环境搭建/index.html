@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="">
-  <head>  <title>Posts | kinnylee</title>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>vscode远程调试C&#43;&#43;环境搭建 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,16 +12,15 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
-  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="">
+<meta name="description" content="环境准备 配置远程主机 安装 Remote Development vscode插件 ssh-copy-id，将远程机器添加到免密登录列表中 远程连接到该机器 选择远程主机的代码路径（会">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "Posts" />
-<meta property = "og:url" content = "https://kinnylee.github.io/post/" />
-<meta property = "og:title" content = "Posts" />
-<meta property = "og:description" content = "" />
+<meta name = "twitter:title" content = "vscode远程调试C&#43;&#43;环境搭建" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" />
+<meta property = "og:title" content = "vscode远程调试C&#43;&#43;环境搭建" />
+<meta property = "og:description" content = "环境准备 配置远程主机 安装 Remote Development vscode插件 ssh-copy-id，将远程机器添加到免密登录列表中 远程连接到该机器 选择远程主机的代码路径（会" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -31,7 +30,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/post/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/'>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
 
@@ -139,144 +138,182 @@
 </header>
 
     <main>
-
-<div class='grid-inverse wrap content'>
-  <ul class='posts' id = 'posts'>
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/'>client-go源码分析(二) - Informer机制</a>
-      </h3>
-      <div class = 'post_meta'>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'>vscode远程调试C&#43;&#43;环境搭建</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Aug 30, 2018</span>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/client-go' class = 'post_tag button button_translucent'>client-go
+    Aug 31, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/vscode' class = 'post_tag button button_translucent'>vscode
   </a>
 </div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>client-go源码分析(二) - Informer机制 概述 k8s中，组件之间通过http通讯，在不依赖任何中间件的情况下，需要保证消息的可靠</p>
-          <a href='https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 916 字</span>，阅读约<span class="more-meta"> 2 分钟</span>
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=vscode%e8%bf%9c%e7%a8%8b%e8%b0%83%e8%af%95C%2b%2b%e7%8e%af%e5%a2%83%e6%90%ad%e5%bb%ba&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fc%2b%2b%2fvscode%25E8%25BF%259C%25E7%25A8%258B%25E8%25B0%2583%25E8%25AF%2595c%2b%2b%25E7%258E%25AF%25E5%25A2%2583%25E6%2590%25AD%25E5%25BB%25BA%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
+  </a>
   
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'></a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Jan 1, 0001</span>
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fc%2b%2b%2fvscode%25E8%25BF%259C%25E7%25A8%258B%25E8%25B0%2583%25E8%25AF%2595c%2b%2b%25E7%258E%25AF%25E5%25A2%2583%25E6%2590%25AD%25E5%25BB%25BA%2f&t=vscode%e8%bf%9c%e7%a8%8b%e8%b0%83%e8%af%95C%2b%2b%e7%8e%af%e5%a2%83%e6%90%ad%e5%bb%ba" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/c++/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c++%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
 </div>
 
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'></p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sort/'></a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Jan 1, 0001</span>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'></p>
-          <a href='https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sort/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/'></a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Jan 1, 0001</span>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>互斥锁 sync.Mutex 同步锁 sync.RWMutex</p>
-          <a href='https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-    <li>
-<ul class="pagination">
-  <li class="page-item">
-    <a href="/post/" class="page-link" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
-  </li>
-  <li class="page-item">
-    <a href="/post/page/3/" class="page-link" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/">1</a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/page/2/">2</a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/page/3/">3</a>
-  </li>
-  <li class="page-item active">
-    <a class="page-link" href="/post/page/4/">4</a>
-  </li>
-  <li class="page-item disabled">
-    <a  class="page-link" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
-  </li>
-  <li class="page-item">
-    <a href="/post/page/4/" class="page-link" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
-  </li>
-</ul>
-
-
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#环境准备">环境准备</a>
+      <ul>
+        <li><a href="#配置远程主机">配置远程主机</a></li>
+        <li><a href="#配置编译运行环境">配置编译运行环境</a></li>
+      </ul>
+    </li>
+    <li><a href="#其他注意事项">其他注意事项</a>
+      <ul>
+        <li><a href="#编译时启动debug信息">编译时，启动debug信息</a></li>
+      </ul>
     </li>
   </ul>
+</nav>
+    <h2 id="环境准备">环境准备</h2>
+<h3 id="配置远程主机">配置远程主机</h3>
+<ol>
+<li>安装 Remote Development vscode插件</li>
+<li>ssh-copy-id，将远程机器添加到免密登录列表中</li>
+<li>远程连接到该机器</li>
+<li>选择远程主机的代码路径（会打开一个新的vscode窗口）</li>
+</ol>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/927213e5f599488881ea7237a88f5440~tplv-k3u1fbpfcp-zoom-1.image" alt="远程主机配置"></p>
+<h3 id="配置编译运行环境">配置编译运行环境</h3>
+<ol>
+<li>安装C/C++插件（在新打开的vscode窗口上，插件也是会安装到远程机器上，安装完成会提示重新加载窗口</li>
+</ol>
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7eb45845f9e44f3eb840fce6b47c22b7~tplv-k3u1fbpfcp-zoom-1.image" alt="运行环境配置"></p>
+<ol start="2">
+<li>创建task.json文件用于编译</li>
+</ol>
+<p>shift+command+p，搜索<code>Build task</code>，回车会自动在当前目录的.vscode下生成task.json文件</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/57a6043b24004acd92ab9a1a05c5aab1~tplv-k3u1fbpfcp-zoom-1.image" alt="task.json"></p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="ln"> 1</span><span class="p">{</span>
+<span class="ln"> 2</span>    <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;2.0.0&#34;</span><span class="p">,</span>
+<span class="ln"> 3</span>    <span class="nt">&#34;tasks&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln"> 4</span>        <span class="p">{</span>
+<span class="ln"> 5</span>            <span class="err">//</span> <span class="err">唯一标识，后面配置launch.json时会用到</span>
+<span class="ln"> 6</span>            <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;build&#34;</span><span class="p">,</span>
+<span class="ln"> 7</span>            <span class="err">//</span> <span class="err">该任务执行的命令，这里是执行make编译</span>
+<span class="ln"> 8</span>            <span class="nt">&#34;command&#34;</span><span class="p">:</span> <span class="s2">&#34;/usr/bin/make&#34;</span><span class="p">,</span>
+<span class="ln"> 9</span>            <span class="err">//</span> <span class="err">执行命令的类型</span>
+<span class="ln">10</span>            <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;shell&#34;</span><span class="p">,</span>
+<span class="ln">11</span>            <span class="err">//</span> <span class="err">command对应的参数，这里我们设置CPPFLAGS为-O0，表示不需要编译器对代码做优化</span>
+<span class="ln">12</span>            <span class="nt">&#34;args&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">13</span>                <span class="s2">&#34;ver=debug&#34;</span><span class="p">,</span>
+<span class="ln">14</span>                <span class="s2">&#34;-j10&#34;</span><span class="p">,</span>
+<span class="ln">15</span>                <span class="s2">&#34;-e&#34;</span><span class="p">,</span>
+<span class="ln">16</span>                <span class="s2">&#34;CPPFLAGS=-O0&#34;</span>
+<span class="ln">17</span>            <span class="p">],</span>
+<span class="ln">18</span>            <span class="nt">&#34;problemMatcher&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">19</span>            <span class="nt">&#34;group&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">20</span>                <span class="nt">&#34;kind&#34;</span><span class="p">:</span> <span class="s2">&#34;build&#34;</span><span class="p">,</span>
+<span class="ln">21</span>                <span class="nt">&#34;isDefault&#34;</span><span class="p">:</span> <span class="kc">true</span>
+<span class="ln">22</span>            <span class="p">}</span>
+<span class="ln">23</span>        <span class="p">}</span>
+<span class="ln">24</span>    <span class="p">]</span>
+<span class="ln">25</span><span class="p">}</span>
+</code></pre></div><ol start="3">
+<li>创建launch.json文件用于调试</li>
+</ol>
+<blockquote>
+<p>远程主机上要先安装上gcc、gdb、make、zlib-devel（可选）， yum install -y gcc-c++ make gdb zlib-devel</p>
+</blockquote>
+<p>左侧调试菜单，选择新建launch.json，并选择下拉框的C++，回车就自动在.vscode目录下生成launch.json文件</p>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bf5072a699b54fcd953d90f84a4b17f1~tplv-k3u1fbpfcp-zoom-1.image" alt="launch.json"></p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="ln"> 1</span><span class="p">{</span>
+<span class="ln"> 2</span>  <span class="err">//</span> <span class="err">Use</span> <span class="err">IntelliSense</span> <span class="err">to</span> <span class="err">learn</span> <span class="err">about</span> <span class="err">possible</span> <span class="err">attributes.</span>
+<span class="ln"> 3</span>  <span class="err">//</span> <span class="err">Hover</span> <span class="err">to</span> <span class="err">view</span> <span class="err">descriptions</span> <span class="err">of</span> <span class="err">existing</span> <span class="err">attributes.</span>
+<span class="ln"> 4</span>  <span class="err">//</span> <span class="err">For</span> <span class="err">more</span> <span class="err">information,</span> <span class="err">visit:</span> <span class="err">https://go.microsoft.com/fwlink/?linkid=830387</span>
+<span class="ln"> 5</span>  <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;0.2.0&#34;</span><span class="p">,</span>
+<span class="ln"> 6</span>  <span class="nt">&#34;configurations&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln"> 7</span>    <span class="p">{</span>
+<span class="ln"> 8</span>      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;(gdb) Launch&#34;</span><span class="p">,</span>
+<span class="ln"> 9</span>      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;cppdbg&#34;</span><span class="p">,</span>
+<span class="ln">10</span>      <span class="nt">&#34;request&#34;</span><span class="p">:</span> <span class="s2">&#34;launch&#34;</span><span class="p">,</span>
+<span class="ln">11</span>      <span class="err">//</span> <span class="err">调试的入口程序，${workspaceFolder</span><span class="p">}</span><span class="err">是当前工作目录</span>
+<span class="ln">12</span>      <span class="s2">&#34;program&#34;</span><span class="err">:</span> <span class="s2">&#34;${workspaceFolder}/src/processor/minidump_stackwalk&#34;</span><span class="p">,</span>
+<span class="ln">13</span>      <span class="err">//</span> <span class="err">启动程序的参数</span>
+<span class="ln">14</span>      <span class="s2">&#34;args&#34;</span><span class="err">:</span> <span class="p">[</span>
+<span class="ln">15</span>        <span class="s2">&#34;-m&#34;</span><span class="p">,</span>
+<span class="ln">16</span>        <span class="s2">&#34;http://crash-file.glodon.com/ZPert/4.0.0.44/0273e0e2-458d-47af-8a5a-3661041eb3f7.gz&#34;</span><span class="p">,</span>
+<span class="ln">17</span>        <span class="s2">&#34;http://192.168.162.89:50070/webhdfs/v1/gcr/symbols&#34;</span><span class="p">,</span>
+<span class="ln">18</span>        <span class="s2">&#34;http://192.168.162.89:50070/webhdfs/v1/gcr/system_symbols&#34;</span><span class="p">,</span>
+<span class="ln">19</span>        <span class="s2">&#34;http://192.168.162.89:50070/webhdfs/v1/gcr/zpert/4.0.0.44/symbols&#34;</span><span class="p">,</span>
+<span class="ln">20</span>        <span class="s2">&#34;http://192.168.162.89:50070/webhdfs/v1/gcr/default_symbols/qt/x86&#34;</span><span class="p">,</span>
+<span class="ln">21</span>        <span class="s2">&#34;-c&#34;</span><span class="p">,</span>
+<span class="ln">22</span>        <span class="s2">&#34;http://gdl.glodon.com/download/symbols&#34;</span>
+<span class="ln">23</span>      <span class="p">],</span>
+<span class="ln">24</span>      <span class="s2">&#34;stopAtEntry&#34;</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
+<span class="ln">25</span>      <span class="s2">&#34;cwd&#34;</span><span class="err">:</span> <span class="s2">&#34;${workspaceFolder}&#34;</span><span class="p">,</span>
+<span class="ln">26</span>      <span class="s2">&#34;environment&#34;</span><span class="err">:</span> <span class="p">[],</span>
+<span class="ln">27</span>      <span class="s2">&#34;externalConsole&#34;</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
+<span class="ln">28</span>      <span class="err">//</span> <span class="err">调试用到的gdb，需要提前安装好</span>
+<span class="ln">29</span>      <span class="s2">&#34;MIMode&#34;</span><span class="err">:</span> <span class="s2">&#34;gdb&#34;</span><span class="p">,</span>
+<span class="ln">30</span>      <span class="s2">&#34;setupCommands&#34;</span><span class="err">:</span> <span class="p">[</span>
+<span class="ln">31</span>        <span class="p">{</span>
+<span class="ln">32</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;Enable pretty-printing for gdb&#34;</span><span class="p">,</span>
+<span class="ln">33</span>          <span class="nt">&#34;text&#34;</span><span class="p">:</span> <span class="s2">&#34;-enable-pretty-printing&#34;</span><span class="p">,</span>
+<span class="ln">34</span>          <span class="nt">&#34;ignoreFailures&#34;</span><span class="p">:</span> <span class="kc">true</span>
+<span class="ln">35</span>        <span class="p">}</span>
+<span class="ln">36</span>      <span class="p">]</span>
+<span class="ln">37</span>    <span class="err">}</span>
+<span class="ln">38</span>  <span class="p">]</span>
+<span class="ln">39</span><span class="p">}</span>
+</code></pre></div><ol start="4">
+<li>配置launch.json的前置步骤为task.json</li>
+</ol>
+<p>添加<code>preLaunchTask</code>，value为task.json中的label</p>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="ln">1</span><span class="p">{</span>
+<span class="ln">2</span>  <span class="err">...</span>
+<span class="ln">3</span>  <span class="err">//</span> <span class="err">这里配置调试前需要执行的操作，名称是前面的task.json中设置的label</span>
+<span class="ln">4</span>  <span class="nt">&#34;preLaunchTask&#34;</span><span class="p">:</span> <span class="s2">&#34;build&#34;</span><span class="p">,</span>
+<span class="ln">5</span>  <span class="err">...</span>
+<span class="ln">6</span><span class="p">}</span>
+</code></pre></div><ol start="5">
+<li>按F5开始调试代码</li>
+</ol>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9ff69562383d40988a0a3bcdb8375bad~tplv-k3u1fbpfcp-zoom-1.image" alt=""></p>
+<h2 id="其他注意事项">其他注意事项</h2>
+<h3 id="编译时启动debug信息">编译时，启动debug信息</h3>
+<p>编译优化会导致调试时源码信息和断点信息不匹配，并且变量做过优化，无法看到真实值。所以有必要将编译参数改成不优化，调试时才能得到准确的信息</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">1</span><span class="c1"># -j表示启动的线程数</span>
+<span class="ln">2</span><span class="c1"># -O0表示不作编译优化</span>
+<span class="ln">3</span>make -j10 -e <span class="nv">CPPFLAGS</span><span class="o">=</span>-O0
+</code></pre></div>
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -319,9 +356,6 @@
     <h2 class="mt-4">Recent Posts</h2>
     <ul class="flex-column">
       
-      <li>
-        <a href="https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="nav-link">vscode远程调试C&#43;&#43;环境搭建</a>
-      </li>
       <li>
         <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="nav-link">《kubernetes源码剖析》- k8s核心数据结构</a>
       </li>
@@ -573,8 +607,6 @@
 </aside>
 
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>

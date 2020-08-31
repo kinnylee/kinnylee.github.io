@@ -155,7 +155,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1355 字</span>，阅读约<span class="more-meta"> 3 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 1683 字</span>，阅读约<span class="more-meta"> 4 分钟</span>
     <div class='post_share'>
   Share on:
   <a href="https://twitter.com/intent/tweet?text=client-go%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90%28%e4%ba%8c%29%20-%20Informer%e6%9c%ba%e5%88%b6&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fk8s%2f%25E5%259F%25BA%25E6%259C%25AC%25E5%258E%259F%25E7%2590%2586%2f%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2fclient-go%2fclient-go%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%25E4%25BA%258C-informer%25E6%259C%25BA%25E5%2588%25B6%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
@@ -197,7 +197,7 @@
     <li><a href="#资源informer和sharedinformer">资源Informer和SharedInformer</a>
       <ul>
         <li><a href="#资源informer">资源Informer</a></li>
-        <li><a href="#sharedinformer">sharedInformer</a></li>
+        <li><a href="#sharedinformer">SharedInformer</a></li>
       </ul>
     </li>
     <li><a href="#reflector">Reflector</a></li>
@@ -253,8 +253,26 @@
 <li>每一种资源都实现了Informer机制，允许监控不同的资源事件</li>
 <li>每一个Informer都会实现Informer和Lister方法</li>
 </ul>
-<h3 id="sharedinformer">sharedInformer</h3>
-<h2 id="reflector">Reflector</h2>
+<h3 id="sharedinformer">SharedInformer</h3>
+<p>若同一个资源的Informer被实例化了多次，每个Informer使用一个Reflector，那么会运行过多相同的ListAndWatch，太多重复的序列化和反序列化操作会导致api-server负载过重</p>
+<p>SharedInformer可以使同一类资源Informer共享一个Reflector。内部定义了一个map字段，用于存放所有Infromer的字段</p>
+<p>源码位置：vendor/k8s.io/client-go/informer/factory.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">sharedInformerFactory</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">client</span>           <span class="nx">kubernetes</span><span class="p">.</span><span class="nx">Interface</span>
+<span class="ln"> 3</span>  <span class="nx">namespace</span>        <span class="kt">string</span>
+<span class="ln"> 4</span>  <span class="nx">tweakListOptions</span> <span class="nx">internalinterfaces</span><span class="p">.</span><span class="nx">TweakListOptionsFunc</span>
+<span class="ln"> 5</span>  <span class="nx">lock</span>             <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+<span class="ln"> 6</span>  <span class="nx">defaultResync</span>    <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="ln"> 7</span>  <span class="nx">customResync</span>     <span class="kd">map</span><span class="p">[</span><span class="nx">reflect</span><span class="p">.</span><span class="nx">Type</span><span class="p">]</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="c1">// 按照类型存放共享的informer
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nx">informers</span> <span class="kd">map</span><span class="p">[</span><span class="nx">reflect</span><span class="p">.</span><span class="nx">Type</span><span class="p">]</span><span class="nx">cache</span><span class="p">.</span><span class="nx">SharedIndexInformer</span>
+<span class="ln">11</span>
+<span class="ln">12</span>  <span class="c1">// 这个字段用来追踪informers是否被启动了
+</span><span class="ln">13</span><span class="c1"></span>  <span class="c1">// 可以保证Start()方法安全的重复调用多次（幂等性）
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">startedInformers</span> <span class="kd">map</span><span class="p">[</span><span class="nx">reflect</span><span class="p">.</span><span class="nx">Type</span><span class="p">]</span><span class="kt">bool</span>
+<span class="ln">15</span><span class="p">}</span>
+</code></pre></div><h2 id="reflector">Reflector</h2>
 <p>流程包括：</p>
 <ul>
 <li>获取资源列表数据</li>
@@ -352,6 +370,9 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="nav-link">vscode远程调试C&#43;&#43;环境搭建</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="nav-link">《kubernetes源码剖析》- k8s核心数据结构</a>
       </li>
       <li>
@@ -372,9 +393,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
-      </li>
     </ul> 
     
     <div>
@@ -392,7 +410,7 @@
         
         <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
           C&#43;&#43;
-          <span class='button_tally'>2</span>
+          <span class='button_tally'>3</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
@@ -576,6 +594,10 @@
             
             
             <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
             </a>
             
             
