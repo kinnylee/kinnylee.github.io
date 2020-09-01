@@ -14,13 +14,13 @@
 </script>
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="runtime.Object runtime.Object是k8s类型系统的基石，所有的资源类型都有一个共同的结构叫做runtime.Object, 它被设计为接口类型，">
+<meta name="description" content="">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "《kubernetes源码剖析》- runtime.Object" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-runtime.object/" />
 <meta property = "og:title" content = "《kubernetes源码剖析》- runtime.Object" />
-<meta property = "og:description" content = "runtime.Object runtime.Object是k8s类型系统的基石，所有的资源类型都有一个共同的结构叫做runtime.Object, 它被设计为接口类型，" />
+<meta property = "og:description" content = "" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/k8s.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -152,7 +152,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 134 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 0 字</span>，阅读约<span class="more-meta"> 0 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-runtime.object/" title="Copy Link" class="link link_yank">
@@ -165,25 +165,8 @@
     
     
     <h2>Overview</h2>
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#runtimeobject">runtime.Object</a></li>
-  </ul>
-</nav>
-    <h2 id="runtimeobject">runtime.Object</h2>
-<p>runtime.Object是k8s类型系统的基石，所有的资源类型都有一个共同的结构叫做runtime.Object, 它被设计为接口类型，作为资源对象的通用资源类型</p>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Object</span> <span class="kd">interface</span> <span class="p">{</span>
-<span class="ln"> 2</span>  <span class="c1">// 设置并返回ObjectKind
-</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nf">GetObjectKind</span><span class="p">()</span> <span class="nx">schema</span><span class="p">.</span><span class="nx">ObjectKind</span>
-<span class="ln"> 4</span>  <span class="c1">// 深拷贝当前资源对象
-</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nf">DeepCopyObject</span><span class="p">()</span> <span class="nx">Object</span>
-<span class="ln"> 6</span><span class="p">}</span>
-<span class="ln"> 7</span>
-<span class="ln"> 8</span><span class="kd">type</span> <span class="nx">ObjectKind</span> <span class="kd">interface</span> <span class="p">{</span>
-<span class="ln"> 9</span>  <span class="nf">SetGroupVersionKind</span><span class="p">(</span><span class="nx">kind</span> <span class="nx">GroupVersionKind</span><span class="p">)</span>
-<span class="ln">10</span>  <span class="nf">GroupVersionKind</span><span class="p">()</span> <span class="nx">GroupVersionKind</span>
-<span class="ln">11</span><span class="p">}</span>
-</code></pre></div>
+    <nav id="TableOfContents"></nav>
+    
   </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
