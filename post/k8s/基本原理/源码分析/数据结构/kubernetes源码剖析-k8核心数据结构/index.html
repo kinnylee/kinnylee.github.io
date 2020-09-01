@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="">
-  <head>  <title>go基础入门 | kinnylee</title>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>《kubernetes源码剖析》- k8s核心数据结构 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -14,14 +14,14 @@
 </script>
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="">
+<meta name="description" content="《kubernetes源码剖析》- k8s核心数据结构 概述 k8s是一个完全以资源为中心的系统，本质是一个资源控制系统。包括：注册、管理、调度资">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go基础入门" />
-<meta property = "og:url" content = "https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" />
-<meta property = "og:title" content = "go基础入门" />
-<meta property = "og:description" content = "" />
-<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<meta name = "twitter:title" content = "《kubernetes源码剖析》- k8s核心数据结构" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" />
+<meta property = "og:title" content = "《kubernetes源码剖析》- k8s核心数据结构" />
+<meta property = "og:description" content = "《kubernetes源码剖析》- k8s核心数据结构 概述 k8s是一个完全以资源为中心的系统，本质是一个资源控制系统。包括：注册、管理、调度资" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/k8s.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
@@ -30,7 +30,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/'>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
 
@@ -138,222 +138,337 @@
 </header>
 
     <main>
-
-<div class='grid-inverse wrap content'>
-  <ul class='posts' id = 'posts'>
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/'>go触发调度机制</a>
-      </h3>
-      <div class = 'post_meta'>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'>《kubernetes源码剖析》- k8s核心数据结构</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Aug 28, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
+    Aug 29, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/k8s' class = 'post_tag button button_translucent'>k8s
   </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 2703 字</span>，阅读约<span class="more-meta"> 6 分钟</span>
+    <div class='post_share'>
+  Share on:
+  <a href="https://twitter.com/intent/tweet?text=%e3%80%8akubernetes%e6%ba%90%e7%a0%81%e5%89%96%e6%9e%90%e3%80%8b-%20k8s%e6%a0%b8%e5%bf%83%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84&url=https%3a%2f%2fkinnylee.github.io%2fpost%2fk8s%2f%25E5%259F%25BA%25E6%259C%25AC%25E5%258E%259F%25E7%2590%2586%2f%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2f%25E6%2595%25B0%25E6%258D%25AE%25E7%25BB%2593%25E6%259E%2584%2fkubernetes%25E6%25BA%2590%25E7%25A0%2581%25E5%2589%2596%25E6%259E%2590-k8%25E6%25A0%25B8%25E5%25BF%2583%25E6%2595%25B0%25E6%258D%25AE%25E7%25BB%2593%25E6%259E%2584%2f&tw_p=tweetbutton" class="twitter" title="Share on Twitter" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#twitter"></use>
+    </svg>
   </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  
+  <a href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fkinnylee.github.io%2fpost%2fk8s%2f%25E5%259F%25BA%25E6%259C%25AC%25E5%258E%259F%25E7%2590%2586%2f%25E6%25BA%2590%25E7%25A0%2581%25E5%2588%2586%25E6%259E%2590%2f%25E6%2595%25B0%25E6%258D%25AE%25E7%25BB%2593%25E6%259E%2584%2fkubernetes%25E6%25BA%2590%25E7%25A0%2581%25E5%2589%2596%25E6%259E%2590-k8%25E6%25A0%25B8%25E5%25BF%2583%25E6%2595%25B0%25E6%258D%25AE%25E7%25BB%2593%25E6%259E%2584%2f&t=%e3%80%8akubernetes%e6%ba%90%e7%a0%81%e5%89%96%e6%9e%90%e3%80%8b-%20k8s%e6%a0%b8%e5%bf%83%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84" class="facebook" title="Share on Facebook" target="_blank" rel="nofollow">
+    <svg class="icon">
+      <use xlink:href="#facebook"></use>
+    </svg>
+  </a>
+  <script>
+    function shareViaLinkedin() {
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url='+encodeURIComponent("https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"), '', 'left=0,top=0,width=650,height=420,personalbar=0,toolbar=0,scrollbars=0,resizable=0');
+    }
+  </script>
+  <a href="#linkedinshare" id = "linkedinshare" class="linkedin" title="Share on LinkedIn" rel="nofollow" onclick="shareViaLinkedin()">
+    <svg class="icon">
+      <use xlink:href="#linkedin"></use>
+    </svg>
+  </a>
+  <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
   </a>
 </div>
 
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/go.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>go调度机制 gopark 和上面的 goready 对应，互为逆操作。gopark 和 goready 在 runtime 的源码中会经常遇到，涉及了 goroutine 的调度过程，</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/'>go进程启动分析</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 28, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/go.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>Go进程启动分析 我们都知道，go语言执行的入口为：main包下面的main()函数，但是底层指令真的是从这开始执行的吗？ 这一篇内容用到上一篇</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>go-select源码分析</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 27, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/go.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>select简介 select使用 下面是select的最简单的用法： 1 select源码入口 select在源码中也没有对应的实现，而是通过编译器</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>go-channel源码分析</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 26, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/go.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>go-channel源码分析 channel简介 channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/'>go协程原理</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 25, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/go.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>协程原理 并发编程模型 从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性 CSP模型 go语言的并发特性是由197</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/'>go协程入门</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 17, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/go.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>协程在手，说Go就Go 协程概述 协程：轻量级、用户级线程。 协程的调度： 由用户程序进行协作式调度，不像内核进程、线程一样是抢占式调度 协程的优势：</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%85%A5%E9%97%A8/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-    <li>
-
-
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#概述">概述</a>
+      <ul>
+        <li><a href="#资源的分类">资源的分类</a></li>
+      </ul>
     </li>
+    <li><a href="#资源数据结构">资源数据结构</a>
+      <ul>
+        <li><a href="#单个资源信息apiresource">单个资源信息：APIResource</a></li>
+        <li><a href="#所有的资源列表apiresourcelist">所有的资源列表：APIResourceList</a></li>
+        <li><a href="#最常用的资源对象gvr">最常用的资源对象：GVR</a></li>
+        <li><a href="#资源组apigroup">资源组：APIGroup</a></li>
+        <li><a href="#版本apiversions">版本：APIVersions</a></li>
+      </ul>
+    </li>
+    <li><a href="#资源外部版本与内部版本">资源外部版本与内部版本</a></li>
+    <li><a href="#资源代码定义">资源代码定义</a></li>
+    <li><a href="#将资源注册到资源注册表中">将资源注册到资源注册表中</a></li>
+    <li><a href="#资源首选版本">资源首选版本</a></li>
+    <li><a href="#资源操作方法">资源操作方法</a></li>
   </ul>
+</nav>
+    <h1 id="kubernetes源码剖析--k8s核心数据结构">《kubernetes源码剖析》- k8s核心数据结构</h1>
+<h2 id="概述">概述</h2>
+<p>k8s是一个完全以资源为中心的系统，本质是一个资源控制系统。包括：注册、管理、调度资源并维护资源的状态。文章围绕资源展开，介绍k8s核心的数据结构</p>
+<ul>
+<li>Group：资源组</li>
+<li>Version：资源版本</li>
+<li>Resource：资源</li>
+<li>Kind：资源种类</li>
+</ul>
+<p>k8s系统支持多个Group，每个Group支持多个Version，每个Version支持多个Resource，部分资源同时会拥有自己的子资源。完整资源表示：<code>&lt;group&gt;/&lt;version&gt;/&lt;resource&gt;/&lt;subresource&gt;</code></p>
+<p>资源操作的8中方法：Verbs</p>
+<ul>
+<li>create</li>
+<li>delete</li>
+<li>deletecollection</li>
+<li>get</li>
+<li>list</li>
+<li>path</li>
+<li>update</li>
+<li>watch</li>
+</ul>
+<h3 id="资源的分类">资源的分类</h3>
+<p>每一个资源至少有两个版本，分别是外部版本和内部版本：</p>
+<ul>
+<li>外部版本：用于对外暴露给用户请求的接口所使用的资源对象</li>
+<li>内部版本：不对外暴露，仅在api-server内部使用</li>
+</ul>
+<p>从另外一个维度，也可以把资源分为：</p>
+<ul>
+<li>内置资源：k8s默认自带的资源</li>
+<li>自定义资源：用户通过CRD自己实现</li>
+</ul>
+<h2 id="资源数据结构">资源数据结构</h2>
+<blockquote>
+<p>使用的是k8s的1.14版本的代码</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="k">go</span> <span class="nx">get</span> <span class="o">-</span><span class="nx">D</span> <span class="nx">k8s</span><span class="p">.</span><span class="nx">io</span><span class="o">/</span><span class="nx">kubernetes</span>
+</code></pre></div><p>源码位置：vendor/k8s.io/apimachinery/pkg/apis/meta/v1</p>
+<h3 id="单个资源信息apiresource">单个资源信息：APIResource</h3>
+<p>k8s中每个资源都可以使用metav1.APIResource结构进行描述</p>
+<p>源码位置：vendor/k8s.io/apimachinery/pkg/apis/meta/v1/types.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">APIResource</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 资源名称（复数形式）
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nx">Name</span> <span class="kt">string</span> <span class="s">`json:&#34;name&#34; protobuf:&#34;bytes,1,opt,name=name&#34;`</span>
+<span class="ln"> 4</span>
+<span class="ln"> 5</span>  <span class="c1">// 资源名称（单数形式）
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="nx">SingularName</span> <span class="kt">string</span> <span class="s">`json:&#34;singularName&#34; protobuf:&#34;bytes,6,opt,name=singularName&#34;`</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span>  <span class="c1">// 命名空间
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="nx">Namespaced</span> <span class="kt">bool</span> <span class="s">`json:&#34;namespaced&#34; protobuf:&#34;varint,2,opt,name=namespaced&#34;`</span>
+<span class="ln">10</span>
+<span class="ln">11</span>  <span class="c1">// 资源分组
+</span><span class="ln">12</span><span class="c1"></span>  <span class="nx">Group</span> <span class="kt">string</span> <span class="s">`json:&#34;group,omitempty&#34; protobuf:&#34;bytes,8,opt,name=group&#34;`</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="c1">// 资源版本
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">Version</span> <span class="kt">string</span> <span class="s">`json:&#34;version,omitempty&#34; protobuf:&#34;bytes,9,opt,name=version&#34;`</span>
+<span class="ln">16</span>
+<span class="ln">17</span>  <span class="c1">// 资源类型
+</span><span class="ln">18</span><span class="c1"></span>  <span class="nx">Kind</span> <span class="kt">string</span> <span class="s">`json:&#34;kind&#34; protobuf:&#34;bytes,3,opt,name=kind&#34;`</span>
+<span class="ln">19</span>
+<span class="ln">20</span>  <span class="c1">// 资源可操作的方法列表
+</span><span class="ln">21</span><span class="c1"></span>  <span class="nx">Verbs</span> <span class="nx">Verbs</span> <span class="s">`json:&#34;verbs&#34; protobuf:&#34;bytes,4,opt,name=verbs&#34;`</span>
+<span class="ln">22</span>
+<span class="ln">23</span>  <span class="c1">// 资源的简称
+</span><span class="ln">24</span><span class="c1"></span>  <span class="nx">ShortNames</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;shortNames,omitempty&#34; protobuf:&#34;bytes,5,rep,name=shortNames&#34;`</span>
+<span class="ln">25</span>
+<span class="ln">26</span>  <span class="c1">// 资源所属的类别列表
+</span><span class="ln">27</span><span class="c1"></span>  <span class="nx">Categories</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;categories,omitempty&#34; protobuf:&#34;bytes,7,rep,name=categories&#34;`</span>
+<span class="ln">28</span>
+<span class="ln">29</span>  <span class="c1">// 存储版本的hash值，这只是一个试用的功能，将来可能改变或者移除
+</span><span class="ln">30</span><span class="c1"></span>  <span class="nx">StorageVersionHash</span> <span class="kt">string</span> <span class="s">`json:&#34;storageVersionHash,omitempty&#34; protobuf:&#34;bytes,10,opt,name=storageVersionHash&#34;`</span>
+<span class="ln">31</span><span class="p">}</span>
+</code></pre></div><h3 id="所有的资源列表apiresourcelist">所有的资源列表：APIResourceList</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">APIResourceList</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+<span class="ln">3</span>  <span class="c1">// groupVersion is the group and version this APIResourceList is for.
+</span><span class="ln">4</span><span class="c1"></span>  <span class="nx">GroupVersion</span> <span class="kt">string</span> <span class="s">`json:&#34;groupVersion&#34; protobuf:&#34;bytes,1,opt,name=groupVersion&#34;`</span>
+<span class="ln">5</span>  <span class="c1">// resources contains the name of the resources and if they are namespaced.
+</span><span class="ln">6</span><span class="c1"></span>  <span class="nx">APIResources</span> <span class="p">[]</span><span class="nx">APIResource</span> <span class="s">`json:&#34;resources&#34; protobuf:&#34;bytes,2,rep,name=resources&#34;`</span>
+<span class="ln">7</span><span class="p">}</span>
+</code></pre></div><h3 id="最常用的资源对象gvr">最常用的资源对象：GVR</h3>
+<p>源码位置：vendor/k8s.io/apimachinery/pkg/runtime/schema/group_version.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">GroupVersionResource</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="nx">Group</span>    <span class="kt">string</span>
+<span class="ln">3</span>  <span class="nx">Version</span>  <span class="kt">string</span>
+<span class="ln">4</span>  <span class="nx">Resource</span> <span class="kt">string</span>
+<span class="ln">5</span><span class="p">}</span>
+</code></pre></div><h3 id="资源组apigroup">资源组：APIGroup</h3>
+<p>资源组按照不同功能将资源进行划分，资源组的特征：</p>
+<ul>
+<li>允许单独启动、禁用资源组，也允许单独启用、禁用资源组内的资源</li>
+<li>支持同名资源在不同的资源组内</li>
+<li>支持CRD自定义资源扩展</li>
+</ul>
+<p>源码位置：vendor/k8s.io/apimachinery/pkg/apis/meta/v1/types.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">APIGroup</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span>  <span class="c1">// 资源组名称
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">Name</span> <span class="kt">string</span> <span class="s">`json:&#34;name&#34; protobuf:&#34;bytes,1,opt,name=name&#34;`</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// 资源组下所支持的资源版本
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">Versions</span> <span class="p">[]</span><span class="nx">GroupVersionForDiscovery</span> <span class="s">`json:&#34;versions&#34; protobuf:&#34;bytes,2,rep,name=versions&#34;`</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>  <span class="c1">// 首选版本，当存在多个资源版本时，优先选择的版本
+</span><span class="ln">11</span><span class="c1"></span>  <span class="nx">PreferredVersion</span> <span class="nx">GroupVersionForDiscovery</span> <span class="s">`json:&#34;preferredVersion,omitempty&#34; protobuf:&#34;bytes,3,opt,name=preferredVersion&#34;`</span>
+<span class="ln">12</span>
+<span class="ln">13</span>  <span class="nx">ServerAddressByClientCIDRs</span> <span class="p">[]</span><span class="nx">ServerAddressByClientCIDR</span> <span class="s">`json:&#34;serverAddressByClientCIDRs,omitempty&#34; protobuf:&#34;bytes,4,rep,name=serverAddressByClientCIDRs&#34;`</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div><h3 id="版本apiversions">版本：APIVersions</h3>
+<p>资源的版本控制。k8s的资源版本分为三种：</p>
+<ul>
+<li>Alpha：内部测试版本。</li>
+<li>Beta：修复大部分bug，给特定用户群体使用的版本</li>
+<li>Stable：稳定运行版本</li>
+</ul>
+<h4 id="alpha版本">Alpha版本</h4>
+<ul>
+<li>该版本不稳定，可能存在很多缺陷和漏洞</li>
+<li>官方随时可能放弃支持该版本。</li>
+<li>默认处于该版本的功能会被禁用。</li>
+<li>版本名称一般为：v1alpha1、v1alpha2、v2alpha1</li>
+</ul>
+<h4 id="beta版本">Beta版本</h4>
+<ul>
+<li>相对稳定的版本，经过官方和社区很多次测试</li>
+<li>功能迭代时，版本会有改变，但是不会被删除</li>
+<li>默认该版本的功能会被开启</li>
+<li>版本名称一般为：v1beta1、v1beta2、v2beta1</li>
+</ul>
+<h4 id="stable版本">Stable版本</h4>
+<ul>
+<li>正式发布的版本</li>
+<li>基本形成的产品，版本不会被删除</li>
+<li>功能全部被开启</li>
+<li>版本名称一般为：v1、v2、v3</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">APIVersions</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+<span class="ln">3</span>  <span class="c1">// 所支持的资源版本列表
+</span><span class="ln">4</span><span class="c1"></span>  <span class="nx">Versions</span> <span class="p">[]</span><span class="kt">string</span> <span class="s">`json:&#34;versions&#34; protobuf:&#34;bytes,1,rep,name=versions&#34;`</span>
+<span class="ln">5</span>
+<span class="ln">6</span>  <span class="nx">ServerAddressByClientCIDRs</span> <span class="p">[]</span><span class="nx">ServerAddressByClientCIDR</span> <span class="s">`json:&#34;serverAddressByClientCIDRs&#34; protobuf:&#34;bytes,2,rep,name=serverAddressByClientCIDRs&#34;`</span>
+<span class="ln">7</span><span class="p">}</span>
+</code></pre></div><h2 id="资源外部版本与内部版本">资源外部版本与内部版本</h2>
+<p>资源代码定义在pkg/apis目录下。在k8s中，同一资源对应两个版本，分别是外部版本和内部版本。</p>
+<ul>
+<li>外部版本：用于对外暴露给用户请求的接口使用的资源对象，比如通过yaml创建资源对象</li>
+<li>内部版本：不对外暴露，用于多资源版本的转换。比如v1beta1 -&gt; v1， 需要经过v1beta1 -&gt; internal -&gt; v1 的转换</li>
+</ul>
+<p>代码存放路径：</p>
+<ul>
+<li>外部版本：vendor/k8s.io/api/core/v1/types.go
+<ul>
+<li>有tag信息：proto、json等</li>
+</ul>
+</li>
+<li>内部版本：pkg/apis/core/types.go
+<ul>
+<li>没有tag信息</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 外部版本
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Pod</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+<span class="ln"> 4</span>  <span class="c1">// Standard object&#39;s metadata.
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="c1">// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">ObjectMeta</span> <span class="s">`json:&#34;metadata,omitempty&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="c1">// Specification of the desired behavior of the pod.
+</span><span class="ln">10</span><span class="c1"></span>  <span class="c1">// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+</span><span class="ln">11</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">12</span><span class="c1"></span>  <span class="nx">Spec</span> <span class="nx">PodSpec</span> <span class="s">`json:&#34;spec,omitempty&#34; protobuf:&#34;bytes,2,opt,name=spec&#34;`</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="c1">// Most recently observed status of the pod.
+</span><span class="ln">15</span><span class="c1"></span>  <span class="c1">// This data may not be up to date.
+</span><span class="ln">16</span><span class="c1"></span>  <span class="c1">// Populated by the system.
+</span><span class="ln">17</span><span class="c1"></span>  <span class="c1">// Read-only.
+</span><span class="ln">18</span><span class="c1"></span>  <span class="c1">// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+</span><span class="ln">19</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">20</span><span class="c1"></span>  <span class="nx">Status</span> <span class="nx">PodStatus</span> <span class="s">`json:&#34;status,omitempty&#34; protobuf:&#34;bytes,3,opt,name=status&#34;`</span>
+<span class="ln">21</span><span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 内部版本
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Pod</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span>
+<span class="ln"> 4</span>  <span class="c1">// +optional
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">ObjectMeta</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// Spec defines the behavior of a pod.
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="nx">Spec</span> <span class="nx">PodSpec</span>
+<span class="ln">10</span>
+<span class="ln">11</span>  <span class="c1">// Status represents the current information about a pod. This data may not be up
+</span><span class="ln">12</span><span class="c1"></span>  <span class="c1">// to date.
+</span><span class="ln">13</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">Status</span> <span class="nx">PodStatus</span>
+<span class="ln">15</span><span class="p">}</span>
+</code></pre></div><h2 id="资源代码定义">资源代码定义</h2>
+<p>资源代码定义在pkg/apis目录下，同一资源对应内部版本和外部版本，代码结构并不相同。</p>
+<ul>
+<li>内部版本：
+<ul>
+<li>支持的资源类型：types.go</li>
+<li>资源验证方法：validation.go</li>
+<li>注册方法：install.go</li>
+</ul>
+</li>
+<li>外部版本：
+<ul>
+<li>转换方法：conversion.go</li>
+<li>默认值：default.go</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span>├── BUILD
+<span class="ln"> 2</span>├── OWNERS
+<span class="ln"> 3</span>├── doc.go // 定义包注释信息
+<span class="ln"> 4</span>├── fuzzer
+<span class="ln"> 5</span>├── install
+<span class="ln"> 6</span>├── register.go // 定义了资源组、资源版本、资源注册信息
+<span class="ln"> 7</span>├── types.go // 定了了在当前资源组、资源版本下支持的资源信息
+<span class="ln"> 8</span>├── v1       // 定义了资源组下拥有的v1版本资源
+<span class="ln"> 9</span>│   ├── BUILD
+<span class="ln">10</span>│   ├── conversion.go  // 定义了资源转换函数（默认的），并将转换函数注册到资源注册表中
+<span class="ln">11</span>│   ├── conversion_test.go
+<span class="ln">12</span>│   ├── defaults.go    // 定义了资源默认函数
+<span class="ln">13</span>│   ├── defaults_test.go
+<span class="ln">14</span>│   ├── doc.go
+<span class="ln">15</span>│   ├── register.go
+<span class="ln">16</span>│   ├── zz_generated.conversion.go // 定义了资源转换函数（自动生成的），由代码生成器生成
+<span class="ln">17</span>│   └── zz_generated.defaults.go   // 定义了资源默认值（自动生成的）
+<span class="ln">18</span>├── v1beta1  // 定义了资源组下拥有的v1beta1版本资源
+<span class="ln">19</span>├── v1beta2  // 定义了资源组下拥有的v1beta2版本资源
+<span class="ln">20</span>├── validation // 定义了资源的验证方法
+<span class="ln">21</span>└── zz_generated.deepcopy.go // 定义了资源的深拷贝操作，该文件由代码生成器自动生成
+</code></pre></div><h2 id="将资源注册到资源注册表中">将资源注册到资源注册表中</h2>
+<p>在每一个k8s资源组目录中，都有一个install/install.go代码文件，负责将资源信息注册到资源注册表中</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span>
+<span class="ln"> 2</span><span class="kd">func</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="c1">// legacyscheme.Scheme 是api-server的全局资源注册表
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="nf">Install</span><span class="p">(</span><span class="nx">legacyscheme</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">)</span>
+<span class="ln"> 5</span><span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="c1">// Install registers the API group and adds types to a scheme
+</span><span class="ln"> 8</span><span class="c1"></span><span class="kd">func</span> <span class="nf">Install</span><span class="p">(</span><span class="nx">scheme</span> <span class="o">*</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">Scheme</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 9</span>  <span class="c1">// 注册内部版本的资源
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">Must</span><span class="p">(</span><span class="nx">core</span><span class="p">.</span><span class="nf">AddToScheme</span><span class="p">(</span><span class="nx">scheme</span><span class="p">))</span>
+<span class="ln">11</span>  <span class="c1">// 注册外部版本的资源
+</span><span class="ln">12</span><span class="c1"></span>  <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">Must</span><span class="p">(</span><span class="nx">v1</span><span class="p">.</span><span class="nf">AddToScheme</span><span class="p">(</span><span class="nx">scheme</span><span class="p">))</span>
+<span class="ln">13</span>  <span class="c1">// 注册资源组的版本顺序，第一个为首选版本
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">Must</span><span class="p">(</span><span class="nx">scheme</span><span class="p">.</span><span class="nf">SetVersionPriority</span><span class="p">(</span><span class="nx">v1</span><span class="p">.</span><span class="nx">SchemeGroupVersion</span><span class="p">))</span>
+<span class="ln">15</span><span class="p">}</span>
+</code></pre></div><h2 id="资源首选版本">资源首选版本</h2>
+<p>一个资源组下拥有多个资源版本，在一些场景下，如不指定资源版本，则使用该资源的首选版本</p>
+<h2 id="资源操作方法">资源操作方法</h2>
+<p>对资源的增删改查方法可以通过metav1.Verbs数据结构进行描述</p>
+
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -401,9 +516,6 @@
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="nav-link">vscode远程调试C&#43;&#43;环境搭建</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="nav-link">《kubernetes源码剖析》- k8s核心数据结构</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-runtime.object/" class="nav-link">《kubernetes源码剖析》- runtime.Object</a>
@@ -650,8 +762,6 @@
 </aside>
 
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
