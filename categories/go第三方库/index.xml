@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>go第三方库 on kinnylee</title>
+    <link>https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/</link>
+    <description>Recent content in go第三方库 on kinnylee</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
+    <lastBuildDate>Tue, 01 Sep 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>go第三方库 - Cobra</title>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/</link>
+      <pubDate>Tue, 01 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/</guid>
+      <description>k8s的命令行工具-cobra框架 简介 Cobra 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli</description>
+    </item>
+    
+  </channel>
+</rss>

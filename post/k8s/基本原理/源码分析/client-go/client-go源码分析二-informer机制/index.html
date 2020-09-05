@@ -155,7 +155,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1683 字</span>，阅读约<span class="more-meta"> 4 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 2044 字</span>，阅读约<span class="more-meta"> 5 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/" title="Copy Link" class="link link_yank">
@@ -189,6 +189,7 @@
 <h2 id="概述">概述</h2>
 <p>k8s中，组件之间通过http通讯，在不依赖任何中间件的情况下，需要保证消息的可靠性、实时性、顺序性等？k8s是如何做到的呢？&mdash; 答案就是Informer。k8s的其他组件都是通过informer与api-server通讯的。</p>
 <h2 id="informer运行原理">Informer运行原理</h2>
+<p><img src="http://assets.processon.com/chart_image/5e7b5f29e4b06b852ff8ab56.png" alt="k8s-informer"></p>
 <p>各个组件包括：</p>
 <ul>
 <li>Reflector：用于监控（watch）指定的资源，当监控的资源发生变化时，触发相应的变更事件。并将资源对象存放到本地缓存DeltaFIFO中</li>
@@ -225,14 +226,56 @@
 </li>
 <li>Run方法运行当前的informer</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 通过informer机制，实现k8s资源的监控
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">func</span> <span class="nf">informer</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="c1">// 因为informer是一个持久运行的groutine，channel作用：进程退出前通知informer退出
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="nx">stopChan</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+<span class="ln"> 5</span>  <span class="k">defer</span> <span class="nb">close</span><span class="p">(</span><span class="nx">stopChan</span><span class="p">)</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// 创建连接k8s的client对象
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">clientSet</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">kubernetes</span><span class="p">.</span><span class="nf">NewForConfig</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span>
+<span class="ln"> 9</span>  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">10</span>    <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;init clientset error.&#34;</span><span class="p">)</span>
+<span class="ln">11</span>    <span class="k">return</span>
+<span class="ln">12</span>  <span class="p">}</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="c1">// 创建sharedInformer对象，第二个参数为重新同步数据的间隔时间
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">sharedInformers</span> <span class="o">:=</span> <span class="nx">informers</span><span class="p">.</span><span class="nf">NewSharedInformerFactory</span><span class="p">(</span><span class="nx">clientSet</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Minute</span><span class="p">)</span>
+<span class="ln">16</span>  <span class="c1">// 每个资源都有informer对象，这里获取pod资源的informer
+</span><span class="ln">17</span><span class="c1"></span>  <span class="nx">podInformer</span> <span class="o">:=</span> <span class="nx">sharedInformers</span><span class="p">.</span><span class="nf">Core</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">Pods</span><span class="p">().</span><span class="nf">Informer</span><span class="p">()</span>
+<span class="ln">18</span>  <span class="c1">// 添加回调函数
+</span><span class="ln">19</span><span class="c1"></span>  <span class="nx">podInformer</span><span class="p">.</span><span class="nf">AddEventHandler</span><span class="p">(</span><span class="nx">cache</span><span class="p">.</span><span class="nx">ResourceEventHandlerFuncs</span><span class="p">{</span>
+<span class="ln">20</span>    <span class="c1">// 添加资源的回调函数，返回的是接口类型，需要强制转换为真正的类型
+</span><span class="ln">21</span><span class="c1"></span>    <span class="nx">AddFunc</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">22</span>      <span class="nx">mObj</span> <span class="o">:=</span> <span class="nx">obj</span><span class="p">.(</span><span class="nx">v1</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln">23</span>      <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;New pod added: %s&#34;</span><span class="p">,</span> <span class="nx">mObj</span><span class="p">.</span><span class="nf">GetName</span><span class="p">())</span>
+<span class="ln">24</span>    <span class="p">},</span>
+<span class="ln">25</span>    <span class="c1">// 更新资源的回调函数
+</span><span class="ln">26</span><span class="c1"></span>    <span class="nx">UpdateFunc</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">oldObj</span><span class="p">,</span> <span class="nx">newObj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">27</span>      <span class="nx">oObj</span> <span class="o">:=</span> <span class="nx">oldObj</span><span class="p">.(</span><span class="nx">v1</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln">28</span>      <span class="nx">nObj</span> <span class="o">:=</span> <span class="nx">newObj</span><span class="p">.(</span><span class="nx">v1</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln">29</span>      <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;%s pod updated to %s&#34;</span><span class="p">,</span> <span class="nx">oObj</span><span class="p">.</span><span class="nf">GetName</span><span class="p">(),</span> <span class="nx">nObj</span><span class="p">.</span><span class="nf">GetName</span><span class="p">())</span>
+<span class="ln">30</span>    <span class="p">},</span>
+<span class="ln">31</span>    <span class="c1">// 删除资源的回调函数
+</span><span class="ln">32</span><span class="c1"></span>    <span class="nx">DeleteFunc</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">33</span>      <span class="nx">mObj</span> <span class="o">:=</span> <span class="nx">obj</span><span class="p">.(</span><span class="nx">v1</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln">34</span>      <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;pod deleted from store: %s&#34;</span><span class="p">,</span> <span class="nx">mObj</span><span class="p">.</span><span class="nf">GetName</span><span class="p">())</span>
+<span class="ln">35</span>    <span class="p">},</span>
+<span class="ln">36</span>  <span class="p">})</span>
+<span class="ln">37</span>  <span class="c1">// 开始运行协程
+</span><span class="ln">38</span><span class="c1"></span>  <span class="nx">podInformer</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">stopChan</span><span class="p">)</span>
+<span class="ln">39</span><span class="p">}</span>
 </code></pre></div><h2 id="资源informer和sharedinformer">资源Informer和SharedInformer</h2>
 <h3 id="资源informer">资源Informer</h3>
 <ul>
 <li>每一种资源都实现了Informer机制，允许监控不同的资源事件</li>
 <li>每一个Informer都会实现Informer和Lister方法</li>
 </ul>
-<h3 id="sharedinformer">SharedInformer</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">PodInformer</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="nf">Informer</span><span class="p">()</span> <span class="nx">cache</span><span class="p">.</span><span class="nx">SharedIndexInformer</span>
+<span class="ln">3</span>  <span class="nf">Lister</span><span class="p">()</span> <span class="nx">v1</span><span class="p">.</span><span class="nx">PodLister</span>
+<span class="ln">4</span><span class="p">}</span>
+</code></pre></div><h3 id="sharedinformer">SharedInformer</h3>
 <p>若同一个资源的Informer被实例化了多次，每个Informer使用一个Reflector，那么会运行过多相同的ListAndWatch，太多重复的序列化和反序列化操作会导致api-server负载过重</p>
 <p>SharedInformer可以使同一类资源Informer共享一个Reflector。内部定义了一个map字段，用于存放所有Infromer的字段</p>
 <p>源码位置：vendor/k8s.io/client-go/informer/factory.go</p>
@@ -349,10 +392,16 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6/" class="nav-link">java基础-集合框架</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/" class="nav-link">《kubernetes源码剖析》- 资源创建流程</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/" class="nav-link">client-go源码分析(一) - 四种客户端对象</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-cobra%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%A7%A3%E6%9E%90/" class="nav-link">《kubernetes源码剖析》- Cobra命令行解析</a>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" class="nav-link">go第三方库 - Cobra</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="nav-link">vscode远程调试C&#43;&#43;环境搭建</a>
@@ -366,12 +415,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-select源码分析</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/mysql/%E4%B8%BA%E4%BB%80%E4%B9%88mysql%E4%BD%BF%E7%94%A8b&#43;%E6%A0%91%E8%80%8Cmongo%E4%BD%BF%E7%94%A8b%E6%A0%91/" class="nav-link">为什么mysql使用B&#43;树，而mongo使用B树</a>
-      </li>
     </ul> 
     
     <div>
@@ -384,7 +427,7 @@
         
         <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
           K8S
-          <span class='button_tally'>5</span>
+          <span class='button_tally'>6</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
@@ -397,13 +440,18 @@
           <span class='button_tally'>3</span>
         </a>
         
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>2</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
           ANSIBLE
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
-          JAVA
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
           <span class='button_tally'>1</span>
         </a>
         
@@ -466,7 +514,7 @@
         
         <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
           K8S
-          <span class='button_tally'>3</span>
+          <span class='button_tally'>4</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
@@ -494,6 +542,11 @@
           <span class='button_tally'>1</span>
         </a>
         
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>1</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
           JVM
           <span class='button_tally'>1</span>
@@ -506,11 +559,6 @@
         
         <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
           MYSQL
-          <span class='button_tally'>1</span>
-        </a>
-        
-        <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent">
-          PYTHON
           <span class='button_tally'>1</span>
         </a>
         
@@ -552,11 +600,15 @@
             </a>
             
             
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=1>JAVA基础<span class='button_tally'>1</span>
+            </a>
+            
+            
             <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=3>K8S<span class='button_tally'>3</span>
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=4>K8S<span class='button_tally'>4</span>
             </a>
             
             
