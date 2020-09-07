@@ -155,7 +155,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 2044 字</span>，阅读约<span class="more-meta"> 5 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 7531 字</span>，阅读约<span class="more-meta"> 16 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/" title="Copy Link" class="link link_yank">
@@ -177,12 +177,39 @@
       <ul>
         <li><a href="#资源informer">资源Informer</a></li>
         <li><a href="#sharedinformer">SharedInformer</a></li>
+        <li><a href="#start方法">Start方法</a></li>
+        <li><a href="#run方法">Run方法</a></li>
       </ul>
     </li>
-    <li><a href="#reflector">Reflector</a></li>
-    <li><a href="#deltafifo">DeltaFIFO</a></li>
-    <li><a href="#indexer">Indexer</a></li>
-    <li><a href="#workqueue">WorkQueue</a></li>
+    <li><a href="#reflector">Reflector</a>
+      <ul>
+        <li><a href="#reflector类">Reflector类</a></li>
+        <li><a href="#核心方法run">核心方法：Run</a></li>
+      </ul>
+    </li>
+    <li><a href="#deltafifo">DeltaFIFO</a>
+      <ul>
+        <li><a href="#生产者方法">生产者方法</a></li>
+        <li><a href="#queueactionlocked方法">queueActionLocked方法</a></li>
+        <li><a href="#消费者方法">消费者方法</a></li>
+        <li><a href="#process函数handledeltas">process函数：HandleDeltas</a></li>
+        <li><a href="#resync机制">Resync机制</a></li>
+      </ul>
+    </li>
+    <li><a href="#indexer">Indexer</a>
+      <ul>
+        <li><a href="#四个重要的数据结构">四个重要的数据结构</a></li>
+        <li><a href="#threadsafemap">ThreadSafeMap</a></li>
+      </ul>
+    </li>
+    <li><a href="#workqueue">WorkQueue</a>
+      <ul>
+        <li><a href="#fifo队列">FIFO队列</a></li>
+        <li><a href="#延迟队列">延迟队列</a></li>
+        <li><a href="#限速队列">限速队列</a></li>
+      </ul>
+    </li>
+    <li><a href="#事件管理器">事件管理器</a></li>
   </ul>
 </nav>
     <h1 id="client-go源码分析二---informer机制">client-go源码分析(二) - Informer机制</h1>
@@ -294,14 +321,243 @@
 </span><span class="ln">13</span><span class="c1"></span>  <span class="c1">// 可以保证Start()方法安全的重复调用多次（幂等性）
 </span><span class="ln">14</span><span class="c1"></span>  <span class="nx">startedInformers</span> <span class="kd">map</span><span class="p">[</span><span class="nx">reflect</span><span class="p">.</span><span class="nx">Type</span><span class="p">]</span><span class="kt">bool</span>
 <span class="ln">15</span><span class="p">}</span>
+</code></pre></div><h3 id="start方法">Start方法</h3>
+<p>k8s中的Controller-Manager组件，源码中的Run方法调用了SharedInformerFactory的Start方法</p>
+<p>源码位置：cmd/kube-controller-manager/app/controllermanager.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">func</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">config</span><span class="p">.</span><span class="nx">CompletedConfig</span><span class="p">,</span> <span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="o">...</span>
+<span class="ln">3</span>  <span class="nx">controllerContext</span><span class="p">.</span><span class="nx">InformerFactory</span><span class="p">.</span><span class="nf">Start</span><span class="p">(</span><span class="nx">controllerContext</span><span class="p">.</span><span class="nx">Stop</span><span class="p">)</span>
+<span class="ln">4</span>  <span class="o">...</span>
+<span class="ln">5</span><span class="p">}</span>
+</code></pre></div><p>源码位置：k8s.io/client-go/informers/factory.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">sharedInformerFactory</span><span class="p">)</span> <span class="nf">Start</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="o">...</span>
+<span class="ln"> 3</span>  <span class="c1">// 遍历所有的informers
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">informerType</span><span class="p">,</span> <span class="nx">informer</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">f</span><span class="p">.</span><span class="nx">informers</span> <span class="p">{</span>
+<span class="ln"> 5</span>    <span class="k">if</span> <span class="p">!</span><span class="nx">f</span><span class="p">.</span><span class="nx">startedInformers</span><span class="p">[</span><span class="nx">informerType</span><span class="p">]</span> <span class="p">{</span>
+<span class="ln"> 6</span>      <span class="c1">// 每一种informer启动一个协程，运行Run方法
+</span><span class="ln"> 7</span><span class="c1"></span>      <span class="k">go</span> <span class="nx">informer</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln"> 8</span>      <span class="nx">f</span><span class="p">.</span><span class="nx">startedInformers</span><span class="p">[</span><span class="nx">informerType</span><span class="p">]</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln"> 9</span>    <span class="p">}</span>
+<span class="ln">10</span>  <span class="p">}</span>
+<span class="ln">11</span><span class="p">}</span>
+</code></pre></div><h3 id="run方法">Run方法</h3>
+<p>源码位置：k8s.io/client-go/tools/cache/shared_informer.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">sharedIndexInformer</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span>  <span class="nx">fifo</span> <span class="o">:=</span> <span class="nf">NewDeltaFIFOWithOptions</span><span class="p">(</span><span class="nx">DeltaFIFOOptions</span><span class="p">{</span>
+<span class="ln"> 4</span>    <span class="nx">KnownObjects</span><span class="p">:</span>          <span class="nx">s</span><span class="p">.</span><span class="nx">indexer</span><span class="p">,</span>
+<span class="ln"> 5</span>    <span class="nx">EmitDeltaTypeReplaced</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+<span class="ln"> 6</span>  <span class="p">})</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span>  <span class="nx">cfg</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Config</span><span class="p">{</span>
+<span class="ln"> 9</span>    <span class="nx">Queue</span><span class="p">:</span>            <span class="nx">fifo</span><span class="p">,</span>
+<span class="ln">10</span>    <span class="c1">// ListAndWatch对象
+</span><span class="ln">11</span><span class="c1"></span>    <span class="nx">ListerWatcher</span><span class="p">:</span>    <span class="nx">s</span><span class="p">.</span><span class="nx">listerWatcher</span><span class="p">,</span>
+<span class="ln">12</span>    <span class="nx">ObjectType</span><span class="p">:</span>       <span class="nx">s</span><span class="p">.</span><span class="nx">objectType</span><span class="p">,</span>
+<span class="ln">13</span>    <span class="nx">FullResyncPeriod</span><span class="p">:</span> <span class="nx">s</span><span class="p">.</span><span class="nx">resyncCheckPeriod</span><span class="p">,</span>
+<span class="ln">14</span>    <span class="nx">RetryOnError</span><span class="p">:</span>     <span class="kc">false</span><span class="p">,</span>
+<span class="ln">15</span>    <span class="nx">ShouldResync</span><span class="p">:</span>     <span class="nx">s</span><span class="p">.</span><span class="nx">processor</span><span class="p">.</span><span class="nx">shouldResync</span><span class="p">,</span>
+<span class="ln">16</span>    <span class="c1">// 注册回调函数 HandleDeltas,资源变更时，存到到本地Indexer
+</span><span class="ln">17</span><span class="c1"></span>    <span class="nx">Process</span><span class="p">:</span>           <span class="nx">s</span><span class="p">.</span><span class="nx">HandleDeltas</span><span class="p">,</span>
+<span class="ln">18</span>    <span class="nx">WatchErrorHandler</span><span class="p">:</span> <span class="nx">s</span><span class="p">.</span><span class="nx">watchErrorHandler</span><span class="p">,</span>
+<span class="ln">19</span>  <span class="p">}</span>
+<span class="ln">20</span>
+<span class="ln">21</span>  <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">22</span>    <span class="nx">s</span><span class="p">.</span><span class="nx">startedLock</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+<span class="ln">23</span>    <span class="k">defer</span> <span class="nx">s</span><span class="p">.</span><span class="nx">startedLock</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+<span class="ln">24</span>    <span class="c1">// 初始化Controller对象
+</span><span class="ln">25</span><span class="c1"></span>    <span class="nx">s</span><span class="p">.</span><span class="nx">controller</span> <span class="p">=</span> <span class="nf">New</span><span class="p">(</span><span class="nx">cfg</span><span class="p">)</span>
+<span class="ln">26</span>    <span class="nx">s</span><span class="p">.</span><span class="nx">controller</span><span class="p">.(</span><span class="o">*</span><span class="nx">controller</span><span class="p">).</span><span class="nx">clock</span> <span class="p">=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">clock</span>
+<span class="ln">27</span>    <span class="nx">s</span><span class="p">.</span><span class="nx">started</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln">28</span>  <span class="p">}()</span>
+<span class="ln">29</span>  <span class="c1">// s.cacheMutationDetector.Run检查缓存对象是否存在
+</span><span class="ln">30</span><span class="c1"></span>  <span class="nx">wg</span><span class="p">.</span><span class="nf">StartWithChannel</span><span class="p">(</span><span class="nx">processorStopCh</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">cacheMutationDetector</span><span class="p">.</span><span class="nx">Run</span><span class="p">)</span>
+<span class="ln">31</span>  <span class="c1">// 执行sharedProcessor.run方法
+</span><span class="ln">32</span><span class="c1"></span>  <span class="nx">wg</span><span class="p">.</span><span class="nf">StartWithChannel</span><span class="p">(</span><span class="nx">processorStopCh</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">processor</span><span class="p">.</span><span class="nx">run</span><span class="p">)</span>
+<span class="ln">33</span>  <span class="o">...</span>
+<span class="ln">34</span>  <span class="c1">// 调用Controller的Run方法
+</span><span class="ln">35</span><span class="c1"></span>  <span class="nx">s</span><span class="p">.</span><span class="nx">controller</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">36</span><span class="p">}</span>
+</code></pre></div><p>源码位置：k8s.io/client-go/tools/cache/controller.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">controller</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 调用NewReflector初始化一个Reflector
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="c1">// 必须传入ListWatcher数据接口对象
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="nx">r</span> <span class="o">:=</span> <span class="nf">NewReflector</span><span class="p">(</span>
+<span class="ln"> 5</span>    <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">ListerWatcher</span><span class="p">,</span>
+<span class="ln"> 6</span>    <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">ObjectType</span><span class="p">,</span>
+<span class="ln"> 7</span>    <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">Queue</span><span class="p">,</span>
+<span class="ln"> 8</span>    <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">FullResyncPeriod</span><span class="p">,</span>
+<span class="ln"> 9</span>  <span class="p">)</span>
+<span class="ln">10</span>  <span class="o">...</span>
+<span class="ln">11</span>  <span class="c1">// 调用Reflector的Run方法，启动监控，并处理监控事件
+</span><span class="ln">12</span><span class="c1"></span>  <span class="nx">wg</span><span class="p">.</span><span class="nf">StartWithChannel</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Run</span><span class="p">)</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="c1">// processLoop负责从DeltaFIFO取出数据并消费
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">wait</span><span class="p">.</span><span class="nf">Until</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">processLoop</span><span class="p">,</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">16</span><span class="p">}</span>
 </code></pre></div><h2 id="reflector">Reflector</h2>
-<p>流程包括：</p>
+<p>Reflector用于监控指定的k8s资源，并触发相应的变更事件。</p>
+<ul>
+<li>NewReflector：创建Reflector对象，需传入ListerWatcher数据接口对象</li>
+<li>Run：启动监控，并处理事件</li>
+</ul>
+<p>Run中的核心函数是ListAndWatch，流程包括：</p>
 <ul>
 <li>获取资源列表数据</li>
-<li>监控资源对象</li>
+<li>监控资源对象：使用http协议的分块传输编码</li>
 </ul>
-<h2 id="deltafifo">DeltaFIFO</h2>
-<p>队列中会存在拥有不同操作类型的同一个资源对象</p>
+<h3 id="reflector类">Reflector类</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Reflector</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 名称
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nx">name</span> <span class="kt">string</span>
+<span class="ln"> 4</span>  <span class="nx">expectedTypeName</span> <span class="kt">string</span>
+<span class="ln"> 5</span>  <span class="c1">// 期望放入缓存store的资源类型
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="nx">expectedType</span> <span class="nx">reflect</span><span class="p">.</span><span class="nx">Type</span>
+<span class="ln"> 7</span>  <span class="c1">// The GVK of the object we expect to place in the store if unstructured.
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">expectedGVK</span> <span class="o">*</span><span class="nx">schema</span><span class="p">.</span><span class="nx">GroupVersionKind</span>
+<span class="ln"> 9</span>  <span class="c1">// 存放同步监听到的资源，这里是DeltaFIFO类
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nx">store</span> <span class="nx">Store</span>
+<span class="ln">11</span>  <span class="c1">// 用来执行List和Watch的对象
+</span><span class="ln">12</span><span class="c1"></span>  <span class="nx">listerWatcher</span> <span class="nx">ListerWatcher</span>
+<span class="ln">13</span>  <span class="nx">backoffManager</span> <span class="nx">wait</span><span class="p">.</span><span class="nx">BackoffManager</span>
+<span class="ln">14</span>  <span class="c1">// resync周期
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">resyncPeriod</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="ln">16</span>  <span class="nx">ShouldResync</span> <span class="kd">func</span><span class="p">()</span> <span class="kt">bool</span>
+<span class="ln">17</span>  <span class="nx">clock</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
+<span class="ln">18</span>  <span class="nx">paginatedResult</span> <span class="kt">bool</span>
+<span class="ln">19</span>  <span class="c1">// 最新一次看到的资源版本号
+</span><span class="ln">20</span><span class="c1"></span>  <span class="nx">lastSyncResourceVersion</span> <span class="kt">string</span>
+<span class="ln">21</span>  <span class="nx">isLastSyncResourceVersionUnavailable</span> <span class="kt">bool</span>
+<span class="ln">22</span>  <span class="nx">lastSyncResourceVersionMutex</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+<span class="ln">23</span>  <span class="nx">WatchListPageSize</span> <span class="kt">int64</span>
+<span class="ln">24</span>  <span class="nx">watchErrorHandler</span> <span class="nx">WatchErrorHandler</span>
+<span class="ln">25</span><span class="p">}</span>
+</code></pre></div><h3 id="核心方法run">核心方法：Run</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">  1</span><span class="c1">// Run函数
+</span><span class="ln">  2</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reflector</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">  3</span>  <span class="o">...</span>
+<span class="ln">  4</span>  <span class="nx">wait</span><span class="p">.</span><span class="nf">BackoffUntil</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">  5</span>    <span class="c1">// 核心函数：ListAndWatch
+</span><span class="ln">  6</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">ListAndWatch</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">  7</span>      <span class="nx">r</span><span class="p">.</span><span class="nf">watchErrorHandler</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln">  8</span>    <span class="p">}</span>
+<span class="ln">  9</span>  <span class="p">},</span> <span class="nx">r</span><span class="p">.</span><span class="nx">backoffManager</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln"> 10</span>  <span class="o">...</span>
+<span class="ln"> 11</span><span class="p">}</span>
+<span class="ln"> 12</span>
+<span class="ln"> 13</span><span class="c1">// ListAndWatch函数
+</span><span class="ln"> 14</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reflector</span><span class="p">)</span> <span class="nf">ListAndWatch</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 15</span>  <span class="o">...</span>
+<span class="ln"> 16</span>  <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 17</span>    <span class="o">...</span>
+<span class="ln"> 18</span>    <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 19</span>      <span class="o">...</span>
+<span class="ln"> 20</span>      <span class="nx">pager</span> <span class="o">:=</span> <span class="nx">pager</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">pager</span><span class="p">.</span><span class="nf">SimplePageFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">opts</span> <span class="nx">metav1</span><span class="p">.</span><span class="nx">ListOptions</span><span class="p">)</span> <span class="p">(</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">Object</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 21</span>        <span class="c1">// 调用List方法获取资源对象下所有的数据
+</span><span class="ln"> 22</span><span class="c1"></span>        <span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">listerWatcher</span><span class="p">.</span><span class="nf">List</span><span class="p">(</span><span class="nx">opts</span><span class="p">)</span>
+<span class="ln"> 23</span>      <span class="p">}))</span>
+<span class="ln"> 24</span>      <span class="o">...</span>
+<span class="ln"> 25</span>    <span class="p">}()</span>
+<span class="ln"> 26</span>    <span class="o">...</span>
+<span class="ln"> 27</span>    <span class="c1">// 获取资源版本号
+</span><span class="ln"> 28</span><span class="c1"></span>    <span class="nx">resourceVersion</span> <span class="p">=</span> <span class="nx">listMetaInterface</span><span class="p">.</span><span class="nf">GetResourceVersion</span><span class="p">()</span>
+<span class="ln"> 29</span>    <span class="nx">initTrace</span><span class="p">.</span><span class="nf">Step</span><span class="p">(</span><span class="s">&#34;Resource version extracted&#34;</span><span class="p">)</span>
+<span class="ln"> 30</span>    <span class="c1">// 将资源数据转换为资源对象列表
+</span><span class="ln"> 31</span><span class="c1"></span>    <span class="nx">items</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">meta</span><span class="p">.</span><span class="nf">ExtractList</span><span class="p">(</span><span class="nx">list</span><span class="p">)</span>
+<span class="ln"> 32</span>    <span class="c1">// 将资源信息存储到DeltaFIFO中，全量替换本地缓存
+</span><span class="ln"> 33</span><span class="c1"></span>    <span class="c1">// 内部调用了replace方法
+</span><span class="ln"> 34</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">syncWith</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="nx">resourceVersion</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 35</span>      <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;unable to sync list result: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln"> 36</span>    <span class="p">}</span>
+<span class="ln"> 37</span>    <span class="c1">// 设置最新的资源版本号
+</span><span class="ln"> 38</span><span class="c1"></span>    <span class="nx">r</span><span class="p">.</span><span class="nf">setLastSyncResourceVersion</span><span class="p">(</span><span class="nx">resourceVersion</span><span class="p">)</span>
+<span class="ln"> 39</span>    <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln"> 40</span>  <span class="p">}();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 41</span>    <span class="k">return</span> <span class="nx">err</span>
+<span class="ln"> 42</span>  <span class="p">}</span>
+<span class="ln"> 43</span>
+<span class="ln"> 44</span>  <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 45</span>    <span class="o">...</span>
+<span class="ln"> 46</span>    <span class="k">for</span> <span class="p">{</span>
+<span class="ln"> 47</span>      <span class="o">...</span>
+<span class="ln"> 48</span>      <span class="c1">// 同步资源
+</span><span class="ln"> 49</span><span class="c1"></span>      <span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">ShouldResync</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">||</span> <span class="nx">r</span><span class="p">.</span><span class="nf">ShouldResync</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 50</span>        <span class="c1">// 调用DeltaFIFO的Resync方法
+</span><span class="ln"> 51</span><span class="c1"></span>        <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nf">Resync</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 52</span>          <span class="o">...</span>
+<span class="ln"> 53</span>        <span class="p">}</span>
+<span class="ln"> 54</span>      <span class="p">}</span>
+<span class="ln"> 55</span>      <span class="nx">resyncCh</span><span class="p">,</span> <span class="nx">cleanup</span> <span class="p">=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">resyncChan</span><span class="p">()</span>
+<span class="ln"> 56</span>    <span class="p">}</span>
+<span class="ln"> 57</span>  <span class="p">}()</span>
+<span class="ln"> 58</span>
+<span class="ln"> 59</span>  <span class="k">for</span> <span class="p">{</span>
+<span class="ln"> 60</span>    <span class="o">...</span>
+<span class="ln"> 61</span>    <span class="c1">// 监听资源
+</span><span class="ln"> 62</span><span class="c1"></span>    <span class="nx">w</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">listerWatcher</span><span class="p">.</span><span class="nf">Watch</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span>
+<span class="ln"> 63</span>    <span class="c1">// 处理handler事件，用户注册的Add，Delete，Update函数
+</span><span class="ln"> 64</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nf">watchHandler</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">resourceVersion</span><span class="p">,</span> <span class="nx">resyncerrc</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">);</span>
+<span class="ln"> 65</span>    <span class="o">...</span>
+<span class="ln"> 66</span>  <span class="p">}</span>
+<span class="ln"> 67</span><span class="p">}</span>
+<span class="ln"> 68</span>
+<span class="ln"> 69</span><span class="c1">// syncWith函数
+</span><span class="ln"> 70</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reflector</span><span class="p">)</span> <span class="nf">syncWith</span><span class="p">(</span><span class="nx">items</span> <span class="p">[]</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">Object</span><span class="p">,</span> <span class="nx">resourceVersion</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 71</span>  <span class="nx">found</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kd">interface</span><span class="p">{},</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">items</span><span class="p">))</span>
+<span class="ln"> 72</span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">item</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">items</span> <span class="p">{</span>
+<span class="ln"> 73</span>    <span class="nx">found</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">found</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span>
+<span class="ln"> 74</span>  <span class="p">}</span>
+<span class="ln"> 75</span>  <span class="c1">// 调用cache.Replace
+</span><span class="ln"> 76</span><span class="c1"></span>  <span class="k">return</span> <span class="nx">r</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nf">Replace</span><span class="p">(</span><span class="nx">found</span><span class="p">,</span> <span class="nx">resourceVersion</span><span class="p">)</span>
+<span class="ln"> 77</span><span class="p">}</span>
+<span class="ln"> 78</span>
+<span class="ln"> 79</span><span class="c1">// cache.Replace
+</span><span class="ln"> 80</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">cache</span><span class="p">)</span> <span class="nf">Replace</span><span class="p">(</span><span class="nx">list</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{},</span> <span class="nx">resourceVersion</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 81</span>  <span class="nx">items</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{},</span> <span class="nb">len</span><span class="p">(</span><span class="nx">list</span><span class="p">))</span>
+<span class="ln"> 82</span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">item</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">list</span> <span class="p">{</span>
+<span class="ln"> 83</span>    <span class="nx">key</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">keyFunc</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
+<span class="ln"> 84</span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 85</span>      <span class="k">return</span> <span class="nx">KeyError</span><span class="p">{</span><span class="nx">item</span><span class="p">,</span> <span class="nx">err</span><span class="p">}</span>
+<span class="ln"> 86</span>    <span class="p">}</span>
+<span class="ln"> 87</span>    <span class="nx">items</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="p">=</span> <span class="nx">item</span>
+<span class="ln"> 88</span>  <span class="p">}</span>
+<span class="ln"> 89</span>  <span class="nx">c</span><span class="p">.</span><span class="nx">cacheStorage</span><span class="p">.</span><span class="nf">Replace</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="nx">resourceVersion</span><span class="p">)</span>
+<span class="ln"> 90</span>  <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln"> 91</span><span class="p">}</span>
+<span class="ln"> 92</span>
+<span class="ln"> 93</span><span class="c1">// watchHandler函数
+</span><span class="ln"> 94</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Reflector</span><span class="p">)</span> <span class="nf">watchHandler</span><span class="p">(</span><span class="nx">start</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span><span class="p">,</span> <span class="nx">w</span> <span class="nx">watch</span><span class="p">.</span><span class="nx">Interface</span><span class="p">,</span> <span class="nx">resourceVersion</span> <span class="o">*</span><span class="kt">string</span><span class="p">,</span> <span class="nx">errc</span> <span class="kd">chan</span> <span class="kt">error</span><span class="p">,</span> <span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 95</span>  <span class="o">...</span>
+<span class="ln"> 96</span>  <span class="k">for</span> <span class="p">{</span>
+<span class="ln"> 97</span>    <span class="k">select</span> <span class="p">{</span>
+<span class="ln"> 98</span>    <span class="o">...</span>
+<span class="ln"> 99</span>    <span class="c1">// 获取watch接口中的事件的channel
+</span><span class="ln">100</span><span class="c1"></span>    <span class="k">case</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">w</span><span class="p">.</span><span class="nf">ResultChan</span><span class="p">():</span>
+<span class="ln">101</span>      <span class="o">...</span>
+<span class="ln">102</span>      <span class="k">switch</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Type</span> <span class="p">{</span>
+<span class="ln">103</span>      <span class="c1">// 处理Add函数
+</span><span class="ln">104</span><span class="c1"></span>      <span class="k">case</span> <span class="nx">watch</span><span class="p">.</span><span class="nx">Added</span><span class="p">:</span>
+<span class="ln">105</span>        <span class="c1">// store是DeltaFIFO类
+</span><span class="ln">106</span><span class="c1"></span>        <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln">107</span>      <span class="c1">// 处理Modified函数
+</span><span class="ln">108</span><span class="c1"></span>      <span class="k">case</span> <span class="nx">watch</span><span class="p">.</span><span class="nx">Modified</span><span class="p">:</span>
+<span class="ln">109</span>        <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln">110</span>      <span class="c1">// 处理Deleted函数
+</span><span class="ln">111</span><span class="c1"></span>      <span class="k">case</span> <span class="nx">watch</span><span class="p">.</span><span class="nx">Deleted</span><span class="p">:</span>
+<span class="ln">112</span>        <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">store</span><span class="p">.</span><span class="nf">Delete</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln">113</span>      <span class="p">}</span>
+<span class="ln">114</span>      <span class="o">*</span><span class="nx">resourceVersion</span> <span class="p">=</span> <span class="nx">newResourceVersion</span>
+<span class="ln">115</span>      <span class="c1">// 设置资源版本
+</span><span class="ln">116</span><span class="c1"></span>      <span class="nx">r</span><span class="p">.</span><span class="nf">setLastSyncResourceVersion</span><span class="p">(</span><span class="nx">newResourceVersion</span><span class="p">)</span>
+<span class="ln">117</span>      <span class="nx">eventCount</span><span class="o">++</span>
+<span class="ln">118</span>    <span class="p">}</span>
+<span class="ln">119</span>  <span class="p">}</span>
+<span class="ln">120</span>  <span class="o">...</span>
+<span class="ln">121</span><span class="p">}</span>
+</code></pre></div><h2 id="deltafifo">DeltaFIFO</h2>
+<p>DeltaFIFO用来存储Watch API返回的各种事件，队列中会存在拥有不同操作类型的同一个资源对象
+DeltaFIFO实现了Queue接口，Queue继承了Store接口</p>
 <p>源码路径：vendor/k8s.io/client-go/tools/cache/delta_fifo.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">DeltaFIFO</span> <span class="kd">struct</span> <span class="p">{</span>
 <span class="ln"> 2</span>  <span class="c1">// lock/cond protects access to &#39;items&#39; and &#39;queue&#39;.
@@ -328,26 +584,451 @@
 </span><span class="ln">23</span><span class="c1"></span>  <span class="c1">// insertion and retrieval, and should be deterministic.
 </span><span class="ln">24</span><span class="c1"></span>  <span class="nx">keyFunc</span> <span class="nx">KeyFunc</span>
 <span class="ln">25</span>
-<span class="ln">26</span>  <span class="c1">// knownObjects list keys that are &#34;known&#34;, for the
-</span><span class="ln">27</span><span class="c1"></span>  <span class="c1">// purpose of figuring out which items have been deleted
-</span><span class="ln">28</span><span class="c1"></span>  <span class="c1">// when Replace() or Delete() is called.
-</span><span class="ln">29</span><span class="c1"></span>  <span class="nx">knownObjects</span> <span class="nx">KeyListerGetter</span>
-<span class="ln">30</span>
-<span class="ln">31</span>  <span class="c1">// Indication the queue is closed.
-</span><span class="ln">32</span><span class="c1"></span>  <span class="c1">// Used to indicate a queue is closed so a control loop can exit when a queue is empty.
-</span><span class="ln">33</span><span class="c1"></span>  <span class="c1">// Currently, not used to gate any of CRED operations.
-</span><span class="ln">34</span><span class="c1"></span>  <span class="nx">closed</span>     <span class="kt">bool</span>
-<span class="ln">35</span>  <span class="nx">closedLock</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
-<span class="ln">36</span><span class="p">}</span>
+<span class="ln">26</span>  <span class="c1">// Index本地存储对象
+</span><span class="ln">27</span><span class="c1"></span>  <span class="nx">knownObjects</span> <span class="nx">KeyListerGetter</span>
+<span class="ln">28</span>
+<span class="ln">29</span>  <span class="nx">closed</span>     <span class="kt">bool</span>
+<span class="ln">30</span>  <span class="nx">closedLock</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+<span class="ln">31</span><span class="p">}</span>
 </code></pre></div><p>核心功能包括：</p>
 <ul>
 <li>生产者方法</li>
 <li>消费者方法</li>
 <li>Resync机制</li>
 </ul>
-<h2 id="indexer">Indexer</h2>
-<h2 id="workqueue">WorkQueue</h2>
-
+<h3 id="生产者方法">生产者方法</h3>
+<p>Reflector监听到资源变化后，将Add、Delete、Update等资源变更信息加入到DeltaFIFO。也就是队列的生产者，方法如下，内部都调用了</p>
+<blockquote>
+<p>入口函数是 r.store.Add(event.Object)，在前面的watchHandler介绍过</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">DeltaFIFO</span><span class="p">)</span> <span class="nf">Add</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="o">...</span>
+<span class="ln"> 3</span>  <span class="k">return</span> <span class="nx">f</span><span class="p">.</span><span class="nf">queueActionLocked</span><span class="p">(</span><span class="nx">Added</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span>
+<span class="ln"> 4</span><span class="p">}</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">DeltaFIFO</span><span class="p">)</span> <span class="nf">Update</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 7</span>  <span class="o">...</span>
+<span class="ln"> 8</span>  <span class="k">return</span> <span class="nx">f</span><span class="p">.</span><span class="nf">queueActionLocked</span><span class="p">(</span><span class="nx">Updated</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span>
+<span class="ln"> 9</span><span class="p">}</span>
+<span class="ln">10</span>
+<span class="ln">11</span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">DeltaFIFO</span><span class="p">)</span> <span class="nf">Delete</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">12</span>  <span class="o">...</span>
+<span class="ln">13</span>  <span class="k">return</span> <span class="nx">f</span><span class="p">.</span><span class="nf">queueActionLocked</span><span class="p">(</span><span class="nx">Deleted</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div><h3 id="queueactionlocked方法">queueActionLocked方法</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">DeltaFIFO</span><span class="p">)</span> <span class="nf">queueActionLocked</span><span class="p">(</span><span class="nx">actionType</span> <span class="nx">DeltaType</span><span class="p">,</span> <span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 对象Obj作为参数，调用KeyOf方法，计算出资源对象的key
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nx">id</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">KeyOf</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
+<span class="ln"> 4</span>  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 5</span>    <span class="k">return</span> <span class="nx">KeyError</span><span class="p">{</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">err</span><span class="p">}</span>
+<span class="ln"> 6</span>  <span class="p">}</span>
+<span class="ln"> 7</span>  <span class="c1">// 根据actionType构造Delta
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">newDeltas</span> <span class="o">:=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="nx">id</span><span class="p">],</span> <span class="nx">Delta</span><span class="p">{</span><span class="nx">actionType</span><span class="p">,</span> <span class="nx">obj</span><span class="p">})</span>
+<span class="ln"> 9</span>  <span class="c1">// 去重操作
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nx">newDeltas</span> <span class="p">=</span> <span class="nf">dedupDeltas</span><span class="p">(</span><span class="nx">newDeltas</span><span class="p">)</span>
+<span class="ln">11</span>
+<span class="ln">12</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">newDeltas</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">13</span>    <span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">exists</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span> <span class="p">!</span><span class="nx">exists</span> <span class="p">{</span>
+<span class="ln">14</span>      <span class="nx">f</span><span class="p">.</span><span class="nx">queue</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">queue</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
+<span class="ln">15</span>    <span class="p">}</span>
+<span class="ln">16</span>    <span class="nx">f</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span> <span class="p">=</span> <span class="nx">newDeltas</span>
+<span class="ln">17</span>    <span class="c1">// 广播操作通知所有的消费者
+</span><span class="ln">18</span><span class="c1"></span>    <span class="nx">f</span><span class="p">.</span><span class="nx">cond</span><span class="p">.</span><span class="nf">Broadcast</span><span class="p">()</span>
+<span class="ln">19</span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">20</span>    <span class="nb">delete</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">items</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
+<span class="ln">21</span>  <span class="p">}</span>
+<span class="ln">22</span>  <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">23</span><span class="p">}</span>
+</code></pre></div><h3 id="消费者方法">消费者方法</h3>
+<p>前面介绍过一个processLoop方法，它是DeltaFIFO队列的消费入口</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">controller</span><span class="p">)</span> <span class="nf">processLoop</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="k">for</span> <span class="p">{</span>
+<span class="ln">3</span>    <span class="c1">// 从DeltaFIFO队列中取出数据，并交给process处理
+</span><span class="ln">4</span><span class="c1"></span>    <span class="c1">// process函数保存在config.Process中，也就是前面传入的 HandleDeltas
+</span><span class="ln">5</span><span class="c1"></span>    <span class="nx">obj</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">Queue</span><span class="p">.</span><span class="nf">Pop</span><span class="p">(</span><span class="nf">PopProcessFunc</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">Process</span><span class="p">))</span>
+<span class="ln">6</span>    <span class="o">...</span>
+<span class="ln">7</span>  <span class="p">}</span>
+<span class="ln">8</span><span class="p">}</span>
+</code></pre></div><p>DeltaFIFO的消费方法为Pop，该函数需要传入process函数，用于接收并处理对象的回调方法</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">DeltaFIFO</span><span class="p">)</span> <span class="nf">Pop</span><span class="p">(</span><span class="nx">process</span> <span class="nx">PopProcessFunc</span><span class="p">)</span> <span class="p">(</span><span class="kd">interface</span><span class="p">{},</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="k">for</span> <span class="p">{</span>
+<span class="ln"> 3</span>    <span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">queue</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 4</span>      <span class="c1">// 当队列为空时，Pop函数阻塞住，知道新的数据入队列才唤醒
+</span><span class="ln"> 5</span><span class="c1"></span>      <span class="c1">// 如果Close函数被调用，closed状态被设置，并且广播
+</span><span class="ln"> 6</span><span class="c1"></span>      <span class="k">if</span> <span class="nx">f</span><span class="p">.</span><span class="nx">closed</span> <span class="p">{</span>
+<span class="ln"> 7</span>        <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">ErrFIFOClosed</span>
+<span class="ln"> 8</span>      <span class="p">}</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>      <span class="nx">f</span><span class="p">.</span><span class="nx">cond</span><span class="p">.</span><span class="nf">Wait</span><span class="p">()</span>
+<span class="ln">11</span>    <span class="p">}</span>
+<span class="ln">12</span>    <span class="c1">// 走到这里，说明队列中有数据，取出数据
+</span><span class="ln">13</span><span class="c1"></span>    <span class="nx">id</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nx">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="ln">14</span>    <span class="o">...</span>
+<span class="ln">15</span>    <span class="c1">// 将数据交给上层回调函数处理
+</span><span class="ln">16</span><span class="c1"></span>    <span class="nx">err</span> <span class="o">:=</span> <span class="nf">process</span><span class="p">(</span><span class="nx">item</span><span class="p">)</span>
+<span class="ln">17</span>    <span class="c1">// 出错则将数据重新放入队列
+</span><span class="ln">18</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">e</span><span class="p">,</span> <span class="nx">ok</span> <span class="o">:=</span> <span class="nx">err</span><span class="p">.(</span><span class="nx">ErrRequeue</span><span class="p">);</span> <span class="nx">ok</span> <span class="p">{</span>
+<span class="ln">19</span>      <span class="nx">f</span><span class="p">.</span><span class="nf">addIfNotPresent</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span>
+<span class="ln">20</span>      <span class="nx">err</span> <span class="p">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">Err</span>
+<span class="ln">21</span>    <span class="p">}</span>
+<span class="ln">22</span>    <span class="k">return</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">err</span>
+<span class="ln">23</span>  <span class="p">}</span>
+<span class="ln">24</span><span class="p">}</span>
+</code></pre></div><h3 id="process函数handledeltas">process函数：HandleDeltas</h3>
+<ul>
+<li>Run方法中传入一个回调函数 HandleDeltas</li>
+<li>processLoop内部执行的pop对象就是上面传入的HandleDeltas</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">sharedIndexInformer</span><span class="p">)</span> <span class="nf">HandleDeltas</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 获取所有的Delta资源
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">d</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">obj</span><span class="p">.(</span><span class="nx">Deltas</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 4</span>    <span class="c1">// 判断资源类型
+</span><span class="ln"> 5</span><span class="c1"></span>    <span class="k">switch</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Type</span> <span class="p">{</span>
+<span class="ln"> 6</span>    <span class="c1">// 如果是下列类型，将资源存储到Indexer
+</span><span class="ln"> 7</span><span class="c1"></span>    <span class="k">case</span> <span class="nx">Sync</span><span class="p">,</span> <span class="nx">Replaced</span><span class="p">,</span> <span class="nx">Added</span><span class="p">,</span> <span class="nx">Updated</span><span class="p">:</span>
+<span class="ln"> 8</span>      <span class="nx">s</span><span class="p">.</span><span class="nx">cacheMutationDetector</span><span class="p">.</span><span class="nf">AddObject</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">)</span>
+<span class="ln"> 9</span>      <span class="k">if</span> <span class="nx">old</span><span class="p">,</span> <span class="nx">exists</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">indexer</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">);</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">exists</span> <span class="p">{</span>
+<span class="ln">10</span>        <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">indexer</span><span class="p">.</span><span class="nf">Update</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">11</span>          <span class="k">return</span> <span class="nx">err</span>
+<span class="ln">12</span>        <span class="p">}</span>
+<span class="ln">13</span>
+<span class="ln">14</span>        <span class="nx">isSync</span> <span class="o">:=</span> <span class="kc">false</span>
+<span class="ln">15</span>        <span class="k">switch</span> <span class="p">{</span>
+<span class="ln">16</span>        <span class="k">case</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Type</span> <span class="o">==</span> <span class="nx">Sync</span><span class="p">:</span>
+<span class="ln">17</span>          <span class="nx">isSync</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln">18</span>        <span class="k">case</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Type</span> <span class="o">==</span> <span class="nx">Replaced</span><span class="p">:</span>
+<span class="ln">19</span>          <span class="k">if</span> <span class="nx">accessor</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">meta</span><span class="p">.</span><span class="nf">Accessor</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">);</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">20</span>            <span class="k">if</span> <span class="nx">oldAccessor</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">meta</span><span class="p">.</span><span class="nf">Accessor</span><span class="p">(</span><span class="nx">old</span><span class="p">);</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">21</span>              <span class="nx">isSync</span> <span class="p">=</span> <span class="nx">accessor</span><span class="p">.</span><span class="nf">GetResourceVersion</span><span class="p">()</span> <span class="o">==</span> <span class="nx">oldAccessor</span><span class="p">.</span><span class="nf">GetResourceVersion</span><span class="p">()</span>
+<span class="ln">22</span>            <span class="p">}</span>
+<span class="ln">23</span>          <span class="p">}</span>
+<span class="ln">24</span>        <span class="p">}</span>
+<span class="ln">25</span>        <span class="c1">// 将资源对象分发至 SharedInformer 的事件处理函数中
+</span><span class="ln">26</span><span class="c1"></span>        <span class="nx">s</span><span class="p">.</span><span class="nx">processor</span><span class="p">.</span><span class="nf">distribute</span><span class="p">(</span><span class="nx">updateNotification</span><span class="p">{</span><span class="nx">oldObj</span><span class="p">:</span> <span class="nx">old</span><span class="p">,</span> <span class="nx">newObj</span><span class="p">:</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">},</span> <span class="nx">isSync</span><span class="p">)</span>
+<span class="ln">27</span>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">28</span>        <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">indexer</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">29</span>          <span class="k">return</span> <span class="nx">err</span>
+<span class="ln">30</span>        <span class="p">}</span>
+<span class="ln">31</span>        <span class="nx">s</span><span class="p">.</span><span class="nx">processor</span><span class="p">.</span><span class="nf">distribute</span><span class="p">(</span><span class="nx">addNotification</span><span class="p">{</span><span class="nx">newObj</span><span class="p">:</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">},</span> <span class="kc">false</span><span class="p">)</span>
+<span class="ln">32</span>      <span class="p">}</span>
+<span class="ln">33</span>    <span class="k">case</span> <span class="nx">Deleted</span><span class="p">:</span>
+<span class="ln">34</span>      <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">indexer</span><span class="p">.</span><span class="nf">Delete</span><span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">35</span>        <span class="k">return</span> <span class="nx">err</span>
+<span class="ln">36</span>      <span class="p">}</span>
+<span class="ln">37</span>      <span class="nx">s</span><span class="p">.</span><span class="nx">processor</span><span class="p">.</span><span class="nf">distribute</span><span class="p">(</span><span class="nx">deleteNotification</span><span class="p">{</span><span class="nx">oldObj</span><span class="p">:</span> <span class="nx">d</span><span class="p">.</span><span class="nx">Object</span><span class="p">},</span> <span class="kc">false</span><span class="p">)</span>
+<span class="ln">38</span>    <span class="p">}</span>
+<span class="ln">39</span>  <span class="p">}</span>
+<span class="ln">40</span>  <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">41</span><span class="p">}</span>
+<span class="ln">42</span>
+<span class="ln">43</span><span class="c1">// distribute函数
+</span><span class="ln">44</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">sharedProcessor</span><span class="p">)</span> <span class="nf">distribute</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">sync</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">45</span>  <span class="nx">p</span><span class="p">.</span><span class="nx">listenersLock</span><span class="p">.</span><span class="nf">RLock</span><span class="p">()</span>
+<span class="ln">46</span>  <span class="k">defer</span> <span class="nx">p</span><span class="p">.</span><span class="nx">listenersLock</span><span class="p">.</span><span class="nf">RUnlock</span><span class="p">()</span>
+<span class="ln">47</span>
+<span class="ln">48</span>  <span class="k">if</span> <span class="nx">sync</span> <span class="p">{</span>
+<span class="ln">49</span>    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">listener</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">p</span><span class="p">.</span><span class="nx">syncingListeners</span> <span class="p">{</span>
+<span class="ln">50</span>      <span class="nx">listener</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
+<span class="ln">51</span>    <span class="p">}</span>
+<span class="ln">52</span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">53</span>    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">listener</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">p</span><span class="p">.</span><span class="nx">listeners</span> <span class="p">{</span>
+<span class="ln">54</span>      <span class="nx">listener</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span>
+<span class="ln">55</span>    <span class="p">}</span>
+<span class="ln">56</span>  <span class="p">}</span>
+<span class="ln">57</span><span class="p">}</span>
+<span class="ln">58</span>
+<span class="ln">59</span><span class="c1">// listener.add方法
+</span><span class="ln">60</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">processorListener</span><span class="p">)</span> <span class="nf">add</span><span class="p">(</span><span class="nx">notification</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">61</span>  <span class="c1">// 不同更新类型的对象加入到channel中
+</span><span class="ln">62</span><span class="c1"></span>  <span class="c1">// 供给processorListener的Run方法使用
+</span><span class="ln">63</span><span class="c1"></span>  <span class="nx">p</span><span class="p">.</span><span class="nx">addCh</span> <span class="o">&lt;-</span> <span class="nx">notification</span>
+<span class="ln">64</span><span class="p">}</span>
+<span class="ln">65</span>
+<span class="ln">66</span><span class="c1">// processorListener的Run方法
+</span><span class="ln">67</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">processorListener</span><span class="p">)</span> <span class="nf">run</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">68</span>  <span class="c1">// this call blocks until the channel is closed.  When a panic happens during the notification
+</span><span class="ln">69</span><span class="c1"></span>  <span class="c1">// we will catch it, **the offending item will be skipped!**, and after a short delay (one second)
+</span><span class="ln">70</span><span class="c1"></span>  <span class="c1">// the next notification will be attempted.  This is usually better than the alternative of never
+</span><span class="ln">71</span><span class="c1"></span>  <span class="c1">// delivering again.
+</span><span class="ln">72</span><span class="c1"></span>  <span class="nx">stopCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+<span class="ln">73</span>  <span class="nx">wait</span><span class="p">.</span><span class="nf">Until</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">74</span>    <span class="k">for</span> <span class="nx">next</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">p</span><span class="p">.</span><span class="nx">nextCh</span> <span class="p">{</span>
+<span class="ln">75</span>      <span class="k">switch</span> <span class="nx">notification</span> <span class="o">:=</span> <span class="nx">next</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">76</span>      <span class="k">case</span> <span class="nx">updateNotification</span><span class="p">:</span>
+<span class="ln">77</span>        <span class="nx">p</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nf">OnUpdate</span><span class="p">(</span><span class="nx">notification</span><span class="p">.</span><span class="nx">oldObj</span><span class="p">,</span> <span class="nx">notification</span><span class="p">.</span><span class="nx">newObj</span><span class="p">)</span>
+<span class="ln">78</span>      <span class="k">case</span> <span class="nx">addNotification</span><span class="p">:</span>
+<span class="ln">79</span>        <span class="nx">p</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nf">OnAdd</span><span class="p">(</span><span class="nx">notification</span><span class="p">.</span><span class="nx">newObj</span><span class="p">)</span>
+<span class="ln">80</span>      <span class="k">case</span> <span class="nx">deleteNotification</span><span class="p">:</span>
+<span class="ln">81</span>        <span class="nx">p</span><span class="p">.</span><span class="nx">handler</span><span class="p">.</span><span class="nf">OnDelete</span><span class="p">(</span><span class="nx">notification</span><span class="p">.</span><span class="nx">oldObj</span><span class="p">)</span>
+<span class="ln">82</span>      <span class="k">default</span><span class="p">:</span>
+<span class="ln">83</span>        <span class="nx">utilruntime</span><span class="p">.</span><span class="nf">HandleError</span><span class="p">(</span><span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;unrecognized notification: %T&#34;</span><span class="p">,</span> <span class="nx">next</span><span class="p">))</span>
+<span class="ln">84</span>      <span class="p">}</span>
+<span class="ln">85</span>    <span class="p">}</span>
+<span class="ln">86</span>    <span class="c1">// the only way to get here is if the p.nextCh is empty and closed
+</span><span class="ln">87</span><span class="c1"></span>    <span class="nb">close</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">88</span>  <span class="p">},</span> <span class="mi">1</span><span class="o">*</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">89</span><span class="p">}</span>
+</code></pre></div><h3 id="resync机制">Resync机制</h3>
+<p>ListAndWatch方法中的三步：</p>
+<ul>
+<li>List</li>
+<li>Rsync</li>
+<li>Watch</li>
+</ul>
+<p>RSync负责将Indexer本地存储的资源对象同步到DeltaFIFO中，并设置资源类型为Sync类型。在Reflector中定时执行</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="o">*</span><span class="nx">DeltaFIFO</span><span class="p">)</span> <span class="nf">Resync</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 获取indexer本地存储对象
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nx">keys</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nx">knownObjects</span><span class="p">.</span><span class="nf">ListKeys</span><span class="p">()</span>
+<span class="ln"> 4</span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">k</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">keys</span> <span class="p">{</span>
+<span class="ln"> 5</span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">f</span><span class="p">.</span><span class="nf">syncKeyLocked</span><span class="p">(</span><span class="nx">k</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 6</span>      <span class="k">return</span> <span class="nx">err</span>
+<span class="ln"> 7</span>    <span class="p">}</span>
+<span class="ln"> 8</span>  <span class="p">}</span>
+<span class="ln"> 9</span>  <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">10</span><span class="p">}</span>
+</code></pre></div><h2 id="indexer">Indexer</h2>
+<ul>
+<li>Indexer是client-go用来存储资源对象，并自带索引功能的本地存储</li>
+<li>Reflector从DeltaFIFO中消费出来的资源对象存储至Indexer</li>
+<li>Indexer数据与Etcd一致，client-go可以方便的从本地读取，减轻api-server的压力</li>
+</ul>
+<h3 id="四个重要的数据结构">四个重要的数据结构</h3>
+<p>源码位置：k8s.io/client-go/tools/cache/index.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 存储缓存数据
+</span><span class="ln"> 2</span><span class="c1">// type Empty struct{}
+</span><span class="ln"> 3</span><span class="c1">// type String map[string]Empty
+</span><span class="ln"> 4</span><span class="c1">// 这里的sets.String是用map模拟set，map中的value都是空结构体
+</span><span class="ln"> 5</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Index</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">sets</span><span class="p">.</span><span class="nx">String</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="c1">// 索引器函数，接收资源对象，返回检索结果列表
+</span><span class="ln"> 8</span><span class="c1"></span><span class="kd">type</span> <span class="nx">IndexFunc</span> <span class="kd">func</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span><span class="c1">// 存储索引器，key为索引器名称，value为索引器实现函数
+</span><span class="ln">11</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Indexers</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">IndexFunc</span>
+<span class="ln">12</span>
+<span class="ln">13</span><span class="c1">// 存储缓存器，key为缓存器名称，value为缓存数据
+</span><span class="ln">14</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Indices</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">Index</span>
+</code></pre></div><h3 id="threadsafemap">ThreadSafeMap</h3>
+<p>Indexer基于ThreadSafeMap做了封装，先看一下ThreadSafeMap</p>
+<ul>
+<li>ThreadSafeMap是一个内存存储，数据不会存入磁盘</li>
+<li>增删改查都会加锁，保证数据一致性</li>
+<li>内部用到了索引器、缓存器</li>
+</ul>
+<p>源码位置：k8s.io/tools/cache/thread_safe_store.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">threadSafeMap</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">lock</span>  <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+<span class="ln"> 3</span>  <span class="c1">// map结构存储资源数据
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="c1">// map中的key是通过keyFunc函数计算得出，默认使用MetaNamespaceFunc函数
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="c1">// 该函数根据资源对象计算出&lt;namespace&gt;/&lt;name&gt;格式的key
+</span><span class="ln"> 6</span><span class="c1"></span>  <span class="nx">items</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span>
+<span class="ln"> 7</span>  <span class="c1">// 存储索引器，key为索引器名称，value为索引器实现函数
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">indexers</span> <span class="nx">Indexers</span>
+<span class="ln"> 9</span>  <span class="c1">// 存储缓存器，key为缓存器名称，value为缓存数据
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nx">indices</span> <span class="nx">Indices</span>
+<span class="ln">11</span><span class="p">}</span>
+<span class="ln">12</span>
+<span class="ln">13</span><span class="c1">// 通过执行索引器函数得到索引结果
+</span><span class="ln">14</span><span class="c1">// 需要两个参数：索引器名称、需要检索的key
+</span><span class="ln">15</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">threadSafeMap</span><span class="p">)</span> <span class="nf">ByIndex</span><span class="p">(</span><span class="nx">indexName</span><span class="p">,</span> <span class="nx">indexedValue</span> <span class="kt">string</span><span class="p">)</span> <span class="p">([]</span><span class="kd">interface</span><span class="p">{},</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">16</span>  <span class="c1">// 查找指定的索引器函数
+</span><span class="ln">17</span><span class="c1"></span>  <span class="nx">indexFunc</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">indexers</span><span class="p">[</span><span class="nx">indexName</span><span class="p">]</span>
+<span class="ln">18</span>  <span class="k">if</span> <span class="nx">indexFunc</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">19</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;Index with name %s does not exist&#34;</span><span class="p">,</span> <span class="nx">indexName</span><span class="p">)</span>
+<span class="ln">20</span>  <span class="p">}</span>
+<span class="ln">21</span>  <span class="c1">// 查找指定的缓存器函数
+</span><span class="ln">22</span><span class="c1"></span>  <span class="nx">index</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">indices</span><span class="p">[</span><span class="nx">indexName</span><span class="p">]</span>
+<span class="ln">23</span>
+<span class="ln">24</span>  <span class="c1">// 从缓存数据中查找并返回数据
+</span><span class="ln">25</span><span class="c1"></span>  <span class="nx">set</span> <span class="o">:=</span> <span class="nx">index</span><span class="p">[</span><span class="nx">indexedValue</span><span class="p">]</span>
+<span class="ln">26</span>  <span class="nx">list</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kd">interface</span><span class="p">{},</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">set</span><span class="p">.</span><span class="nf">Len</span><span class="p">())</span>
+<span class="ln">27</span>  <span class="k">for</span> <span class="nx">key</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">set</span> <span class="p">{</span>
+<span class="ln">28</span>    <span class="nx">list</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">items</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span>
+<span class="ln">29</span>  <span class="p">}</span>
+<span class="ln">30</span>
+<span class="ln">31</span>  <span class="k">return</span> <span class="nx">list</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="ln">32</span><span class="p">}</span>
+</code></pre></div><h2 id="workqueue">WorkQueue</h2>
+<p>WorkQueue称为工作队列，比普通的FIFO负责，主要功能在于标记和去重，并支持如下特性：</p>
+<ul>
+<li>有序</li>
+<li>去重</li>
+<li>并发性</li>
+<li>标记机制：标记是否被处理过</li>
+<li>通知机制</li>
+<li>延迟</li>
+<li>限速</li>
+<li>Metric：支持监控指标</li>
+</ul>
+<p>WorkQueue支持三种队列，并提供了3种接口，不同的实现应对不同的场景</p>
+<ul>
+<li>Interface：FIFO队列，去重队列</li>
+<li>DelayingInterface：延时队列</li>
+<li>RateLimitingInterface：限速队列</li>
+</ul>
+<h3 id="fifo队列">FIFO队列</h3>
+<p>源码位置：k8s.io/client-go/util/workqueue/quque.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Interface</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 添加元素
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nf">Add</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln"> 4</span>  <span class="c1">// 队列长度
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span>
+<span class="ln"> 6</span>  <span class="c1">// 获取队列头部第一个元素
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nf">Get</span><span class="p">()</span> <span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">shutdown</span> <span class="kt">bool</span><span class="p">)</span>
+<span class="ln"> 8</span>  <span class="c1">// 标记队列中该元素已被处理
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="nf">Done</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln">10</span>  <span class="c1">// 关闭队列
+</span><span class="ln">11</span><span class="c1"></span>  <span class="nf">ShutDown</span><span class="p">()</span>
+<span class="ln">12</span>  <span class="c1">// 查询队列是否关闭
+</span><span class="ln">13</span><span class="c1"></span>  <span class="nf">ShuttingDown</span><span class="p">()</span> <span class="kt">bool</span>
+<span class="ln">14</span><span class="p">}</span>
+<span class="ln">15</span>
+<span class="ln">16</span><span class="c1">// FIFO数据结构
+</span><span class="ln">17</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Type</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">18</span>  <span class="c1">// 实际存储数据的地方
+</span><span class="ln">19</span><span class="c1"></span>  <span class="nx">queue</span> <span class="p">[]</span><span class="nx">t</span>
+<span class="ln">20</span>
+<span class="ln">21</span>  <span class="c1">// 保证去重
+</span><span class="ln">22</span><span class="c1"></span>  <span class="nx">dirty</span> <span class="nx">set</span>
+<span class="ln">23</span>  <span class="c1">// 标记元素是否正在被处理
+</span><span class="ln">24</span><span class="c1"></span>  <span class="nx">processing</span> <span class="nx">set</span>
+<span class="ln">25</span>
+<span class="ln">26</span>  <span class="nx">cond</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Cond</span>
+<span class="ln">27</span>
+<span class="ln">28</span>  <span class="nx">shuttingDown</span> <span class="kt">bool</span>
+<span class="ln">29</span>
+<span class="ln">30</span>  <span class="nx">metrics</span> <span class="nx">queueMetrics</span>
+<span class="ln">31</span>
+<span class="ln">32</span>  <span class="nx">unfinishedWorkUpdatePeriod</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="ln">33</span>  <span class="nx">clock</span>                      <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
+<span class="ln">34</span><span class="p">}</span>
+</code></pre></div><h3 id="延迟队列">延迟队列</h3>
+<p>延迟队列基于FIFO队列，增加了AddAfter方法，原理是：延迟一段时间后再将元素插入FIFO。</p>
+<p>AddAfter方法会插入一个参数，并附带一个时间，指定插入元素的延迟时间</p>
+<p>源码位置：k8s.io/client-go/util/workqueue/delaying_queue.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">DelayingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">Interface</span>
+<span class="ln"> 3</span>  <span class="c1">// AddAfter adds an item to the workqueue after the indicated duration has passed
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">duration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span>
+<span class="ln"> 5</span><span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="kd">type</span> <span class="nx">delayingType</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 8</span>  <span class="nx">Interface</span>
+<span class="ln"> 9</span>  <span class="nx">clock</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
+<span class="ln">10</span>  <span class="nx">stopCh</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>
+<span class="ln">11</span>  <span class="nx">stopOnce</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
+<span class="ln">12</span>  <span class="nx">heartbeat</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Ticker</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="c1">// 插入的元素数量阈值，超过该值延迟队列会阻塞
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">waitingForAddCh</span> <span class="kd">chan</span> <span class="o">*</span><span class="nx">waitFor</span>
+<span class="ln">16</span>  <span class="nx">metrics</span> <span class="nx">retryMetrics</span>
+<span class="ln">17</span><span class="p">}</span>
+</code></pre></div><h3 id="限速队列">限速队列</h3>
+<p>限速队列基于延迟队列和FIFO队列接口封装，新增了以下方法：</p>
+<ul>
+<li>AddRateLimited</li>
+<li>Forget</li>
+<li>NumRequeues</li>
+</ul>
+<p>源码位置：k8s.io/client-go/util/workqueue/rate_limiting_queue.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">RateLimitingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">DelayingInterface</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span>  <span class="c1">// AddRateLimited adds an item to the workqueue after the rate limiter says it&#39;s ok
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// Forget indicates that an item is finished being retried.  Doesn&#39;t matter whether it&#39;s for perm failing
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="c1">// or for success, we&#39;ll stop the rate limiter from tracking it.  This only clears the `rateLimiter`, you
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="c1">// still have to call `Done` on the queue.
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln">11</span>
+<span class="ln">12</span>  <span class="c1">// NumRequeues returns back how many times the item was requeued
+</span><span class="ln">13</span><span class="c1"></span>  <span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div><p>限速队列提供了4中限速算法接口，利用延迟队列的特性达到限速目的：</p>
+<ul>
+<li>令牌桶算法</li>
+<li>排队指数算法</li>
+<li>计数器算法</li>
+<li>混合模式</li>
+</ul>
+<p>源码位置：k8s.io/client-go/util/workqueue/default_rate_limiters.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">RateLimiter</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="c1">// 获取指定元素应该等待的时间
+</span><span class="ln">3</span><span class="c1"></span>  <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="ln">4</span>  <span class="c1">// 释放指定元素，清空该元素的排队数
+</span><span class="ln">5</span><span class="c1"></span>  <span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln">6</span>  <span class="c1">// 获取指定元素的排队数
+</span><span class="ln">7</span><span class="c1"></span>  <span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
+<span class="ln">8</span><span class="p">}</span>
+</code></pre></div><h2 id="事件管理器">事件管理器</h2>
+<p>事件是一种资源管理器，用于展示集群内发生的情况。各组件会将事件上报给api-serverer。</p>
+<p>源码位置：k8s.io/api/core/v1/types.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Event</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+<span class="ln"> 3</span>  <span class="c1">// Standard object&#39;s metadata.
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="c1">// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">ObjectMeta</span> <span class="s">`json:&#34;metadata&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// The object that this event is about.
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">InvolvedObject</span> <span class="nx">ObjectReference</span> <span class="s">`json:&#34;involvedObject&#34; protobuf:&#34;bytes,2,opt,name=involvedObject&#34;`</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>  <span class="c1">// This should be a short, machine understandable string that gives the reason
+</span><span class="ln">11</span><span class="c1"></span>  <span class="c1">// for the transition into the object&#39;s current status.
+</span><span class="ln">12</span><span class="c1"></span>  <span class="c1">// TODO: provide exact specification for format.
+</span><span class="ln">13</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">Reason</span> <span class="kt">string</span> <span class="s">`json:&#34;reason,omitempty&#34; protobuf:&#34;bytes,3,opt,name=reason&#34;`</span>
+<span class="ln">15</span>
+<span class="ln">16</span>  <span class="c1">// A human-readable description of the status of this operation.
+</span><span class="ln">17</span><span class="c1"></span>  <span class="c1">// TODO: decide on maximum length.
+</span><span class="ln">18</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">19</span><span class="c1"></span>  <span class="nx">Message</span> <span class="kt">string</span> <span class="s">`json:&#34;message,omitempty&#34; protobuf:&#34;bytes,4,opt,name=message&#34;`</span>
+<span class="ln">20</span>
+<span class="ln">21</span>  <span class="c1">// The component reporting this event. Should be a short machine understandable string.
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">23</span><span class="c1"></span>  <span class="nx">Source</span> <span class="nx">EventSource</span> <span class="s">`json:&#34;source,omitempty&#34; protobuf:&#34;bytes,5,opt,name=source&#34;`</span>
+<span class="ln">24</span>
+<span class="ln">25</span>  <span class="c1">// The time at which the event was first recorded. (Time of server receipt is in TypeMeta.)
+</span><span class="ln">26</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">27</span><span class="c1"></span>  <span class="nx">FirstTimestamp</span> <span class="nx">metav1</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;firstTimestamp,omitempty&#34; protobuf:&#34;bytes,6,opt,name=firstTimestamp&#34;`</span>
+<span class="ln">28</span>
+<span class="ln">29</span>  <span class="c1">// The time at which the most recent occurrence of this event was recorded.
+</span><span class="ln">30</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">31</span><span class="c1"></span>  <span class="nx">LastTimestamp</span> <span class="nx">metav1</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;lastTimestamp,omitempty&#34; protobuf:&#34;bytes,7,opt,name=lastTimestamp&#34;`</span>
+<span class="ln">32</span>
+<span class="ln">33</span>  <span class="c1">// The number of times this event has occurred.
+</span><span class="ln">34</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">35</span><span class="c1"></span>  <span class="nx">Count</span> <span class="kt">int32</span> <span class="s">`json:&#34;count,omitempty&#34; protobuf:&#34;varint,8,opt,name=count&#34;`</span>
+<span class="ln">36</span>
+<span class="ln">37</span>  <span class="c1">// Type of this event (Normal, Warning), new types could be added in the future
+</span><span class="ln">38</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">39</span><span class="c1"></span>  <span class="nx">Type</span> <span class="kt">string</span> <span class="s">`json:&#34;type,omitempty&#34; protobuf:&#34;bytes,9,opt,name=type&#34;`</span>
+<span class="ln">40</span>
+<span class="ln">41</span>  <span class="c1">// Time when this Event was first observed.
+</span><span class="ln">42</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">43</span><span class="c1"></span>  <span class="nx">EventTime</span> <span class="nx">metav1</span><span class="p">.</span><span class="nx">MicroTime</span> <span class="s">`json:&#34;eventTime,omitempty&#34; protobuf:&#34;bytes,10,opt,name=eventTime&#34;`</span>
+<span class="ln">44</span>
+<span class="ln">45</span>  <span class="c1">// Data about the Event series this event represents or nil if it&#39;s a singleton Event.
+</span><span class="ln">46</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">47</span><span class="c1"></span>  <span class="nx">Series</span> <span class="o">*</span><span class="nx">EventSeries</span> <span class="s">`json:&#34;series,omitempty&#34; protobuf:&#34;bytes,11,opt,name=series&#34;`</span>
+<span class="ln">48</span>
+<span class="ln">49</span>  <span class="c1">// What action was taken/failed regarding to the Regarding object.
+</span><span class="ln">50</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">51</span><span class="c1"></span>  <span class="nx">Action</span> <span class="kt">string</span> <span class="s">`json:&#34;action,omitempty&#34; protobuf:&#34;bytes,12,opt,name=action&#34;`</span>
+<span class="ln">52</span>
+<span class="ln">53</span>  <span class="c1">// Optional secondary object for more complex actions.
+</span><span class="ln">54</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">55</span><span class="c1"></span>  <span class="nx">Related</span> <span class="o">*</span><span class="nx">ObjectReference</span> <span class="s">`json:&#34;related,omitempty&#34; protobuf:&#34;bytes,13,opt,name=related&#34;`</span>
+<span class="ln">56</span>
+<span class="ln">57</span>  <span class="c1">// Name of the controller that emitted this Event, e.g. `kubernetes.io/kubelet`.
+</span><span class="ln">58</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">59</span><span class="c1"></span>  <span class="nx">ReportingController</span> <span class="kt">string</span> <span class="s">`json:&#34;reportingComponent&#34; protobuf:&#34;bytes,14,opt,name=reportingComponent&#34;`</span>
+<span class="ln">60</span>
+<span class="ln">61</span>  <span class="c1">// ID of the controller instance, e.g. `kubelet-xyzf`.
+</span><span class="ln">62</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">63</span><span class="c1"></span>  <span class="nx">ReportingInstance</span> <span class="kt">string</span> <span class="s">`json:&#34;reportingInstance&#34; protobuf:&#34;bytes,15,opt,name=reportingInstance&#34;`</span>
+<span class="ln">64</span><span class="p">}</span>
+</code></pre></div>
   </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
@@ -392,7 +1073,19 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" class="nav-link">Docker核心原理</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java%E5%8F%8D%E5%B0%84/" class="nav-link">java反射</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java-io%E6%B5%81/" class="nav-link">java基础-io流</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/java/jdk/java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6/" class="nav-link">java基础-集合框架</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java%E5%A4%9A%E7%BA%BF%E7%A8%8B/" class="nav-link">java多线程</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/" class="nav-link">《kubernetes源码剖析》- 资源创建流程</a>
@@ -402,18 +1095,6 @@
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" class="nav-link">go第三方库 - Cobra</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/c&#43;&#43;/vscode%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95c&#43;&#43;%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" class="nav-link">vscode远程调试C&#43;&#43;环境搭建</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="nav-link">《kubernetes源码剖析》- k8s核心数据结构</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
       </li>
     </ul> 
     
@@ -430,6 +1111,11 @@
           <span class='button_tally'>6</span>
         </a>
         
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>5</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
           C&#43;&#43;
           <span class='button_tally'>3</span>
@@ -440,13 +1126,13 @@
           <span class='button_tally'>3</span>
         </a>
         
-        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
-          JAVA
-          <span class='button_tally'>2</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
           ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent">
+          DOCKER
           <span class='button_tally'>1</span>
         </a>
         
@@ -512,6 +1198,11 @@
           <span class='button_tally'>6</span>
         </a>
         
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>4</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
           K8S
           <span class='button_tally'>4</span>
@@ -519,7 +1210,7 @@
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
           C&#43;&#43;
-          <span class='button_tally'>2</span>
+          <span class='button_tally'>3</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
@@ -529,6 +1220,11 @@
         
         <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
           ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
           <span class='button_tally'>1</span>
         </a>
         
@@ -542,11 +1238,6 @@
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
-          JAVA基础
-          <span class='button_tally'>1</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
           JVM
           <span class='button_tally'>1</span>
@@ -554,11 +1245,6 @@
         
         <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent">
           MONGODB
-          <span class='button_tally'>1</span>
-        </a>
-        
-        <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
-          MYSQL
           <span class='button_tally'>1</span>
         </a>
         
@@ -576,11 +1262,15 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=2>C&#43;&#43;<span class='button_tally'>2</span>
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
             </a>
             
             
             <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=2>CLIENT-GO<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
             </a>
             
             
@@ -600,7 +1290,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=1>JAVA基础<span class='button_tally'>1</span>
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=4>JAVA基础<span class='button_tally'>4</span>
             </a>
             
             

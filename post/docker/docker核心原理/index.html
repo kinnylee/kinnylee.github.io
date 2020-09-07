@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>Docker核心原理 | kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.74.3" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="Docker核心原理 内容整理自《docker容器与容器云》第三章，该书豆瓣评分8.2。确实是一本不错的书，不过难度较高，很多内容非常晦涩，涉">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "Docker核心原理" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" />
+<meta property = "og:title" content = "Docker核心原理" />
+<meta property = "og:description" content = "Docker核心原理 内容整理自《docker容器与容器云》第三章，该书豆瓣评分8.2。确实是一本不错的书，不过难度较高，很多内容非常晦涩，涉" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/docker.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/'>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity = "sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" as="script" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous">
+
+    
+    <link rel="stylesheet" type="text/css" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity="sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" crossorigin="anonymous">
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <div>
+          <svg class="icon">
+            <use xlink:href="#open-menu"></use>
+          </svg>
+          <svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg>
+        </div>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>Mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>Redis</a>
+          <a href = 'https://kinnylee.github.io/categories/rocketmq' class = 'nav_child nav_item'>RocketMQ</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/categories/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/docker' class = 'nav_child nav_item'>Docker</a>
+          <a href = 'https://kinnylee.github.io/categories/linux' class = 'nav_child nav_item'>Linux内核</a>
+          <a href = 'https://kinnylee.github.io/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0' class = 'nav_child nav_item'>机器学习</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'>Docker核心原理</h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Sep 7, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/docker' class = 'post_tag button button_translucent'>docker
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/c&#43;&#43;' class = 'post_tag button button_translucent'>C&#43;&#43;
+  </a>
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 12232 字</span>，阅读约<span class="more-meta"> 25 分钟</span>
+    <div class='post_share'>
+  | 复制链接:
+  <a href="https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#docker背后的内核知识">Docker背后的内核知识</a>
+      <ul>
+        <li><a href="#一-namespace资源隔离">一. namespace资源隔离</a></li>
+        <li><a href="#二-cgroups资源限制">二. cgroups资源限制</a></li>
+      </ul>
+    </li>
+    <li><a href="#docker架构概览">Docker架构概览</a>
+      <ul>
+        <li><a href="#docker-daemon">Docker Daemon</a></li>
+        <li><a href="#docker-client">Docker client</a></li>
+        <li><a href="#镜像管理">镜像管理</a></li>
+        <li><a href="#驱动相关driver">驱动相关（Driver）</a></li>
+        <li><a href="#network">Network</a></li>
+      </ul>
+    </li>
+    <li><a href="#client和daemon工作原理">Client和Daemon工作原理</a>
+      <ul>
+        <li><a href="#client模式">Client模式</a></li>
+        <li><a href="#daemon模式">Daemon模式</a></li>
+        <li><a href="#3-daemon如何处理客户端请求">3. daemon如何处理客户端请求</a></li>
+        <li><a href="#4-libcontainer">4. libcontainer</a></li>
+        <li><a href="#5-镜像管理">5. 镜像管理</a></li>
+        <li><a href="#6-存储管理">6. 存储管理</a></li>
+        <li><a href="#7-数据卷">7. 数据卷</a></li>
+        <li><a href="#8-网络管理">8. 网络管理</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+    <h1 id="docker核心原理">Docker核心原理</h1>
+<blockquote>
+<p>内容整理自《docker容器与容器云》第三章，该书豆瓣评分8.2。确实是一本不错的书，不过难度较高，很多内容非常晦涩，涉及很多linux底层知识和docker源码分析，不过关于编排部分，除了k8s，其他的有些过时了（现在k8s已经成为事实编排标准），本文只对docker原理章节做简单的整理，对docker原理有大体的了解。</p>
+</blockquote>
+<h2 id="docker背后的内核知识">Docker背后的内核知识</h2>
+<ul>
+<li>Docker的本质是宿主机上的进程</li>
+<li>通过namespace实现资源隔离</li>
+<li>通过cgroups实现资源限制</li>
+<li>通过写时复制（Copy on write, COW）实现文件高效操作</li>
+</ul>
+<h3 id="一-namespace资源隔离">一. namespace资源隔离</h3>
+<h4 id="linux内核提供了6种namespace的隔离的系统调用">linux内核提供了6种namespace的隔离的系统调用</h4>
+<table>
+<thead>
+<tr>
+<th>namespace</th>
+<th>系统调用参数</th>
+<th>隔离内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UTS</td>
+<td>CLONE_NEWUTS</td>
+<td>主机名与域名</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>CLONE_NEWNET</td>
+<td>网络设备、网络栈、端口</td>
+</tr>
+<tr>
+<td>Mount</td>
+<td>CLONE_NEWNS</td>
+<td>文件系统</td>
+</tr>
+<tr>
+<td>User</td>
+<td>CLONE_NEWUSER</td>
+<td>用户、用户组</td>
+</tr>
+<tr>
+<td>PID</td>
+<td>CLONE_NEWPID</td>
+<td>进程号</td>
+</tr>
+<tr>
+<td>IPC</td>
+<td>CLONE_NEWIPC</td>
+<td>信号量、消息队列和共享内存</td>
+</tr>
+</tbody>
+</table>
+<h4 id="1-进行namespace-api操作的四种方式">1. 进行namespace api操作的四种方式</h4>
+<ul>
+<li>clone</li>
+<li>setns</li>
+<li>unshare</li>
+<li>查看/proc/{pid}/ns文件</li>
+</ul>
+<blockquote>
+<p>调用这些api时，需要通过flag指定隔离的是哪种namespace，多种类型使用 | 符号组合</p>
+</blockquote>
+<h5 id="11-clone在创建进程时创建namespace">1.1 clone()在创建进程时创建namespace</h5>
+<ul>
+<li>clone()是fork()更通用的实现，flag参数控制使用多少功能</li>
+</ul>
+<h5 id="12-查看procpidns文件">1.2 查看/proc/{pid}/ns文件</h5>
+<ul>
+<li>/proc/{pid}/ns下有六个文件，分别指向6中不同namesapce的namespace号</li>
+<li>两个进程的namespace号相同，则说明他们在同一个namespace下</li>
+<li>docker中通过文件描述符fd加入一个存在的namespace是基本的方式</li>
+<li>使用mount &ndash;bind /proc/{pid}/ns/uts ~/uts也可以达到效果</li>
+</ul>
+<h5 id="13-setns">1.3 setns()</h5>
+<ul>
+<li>setns用于加入一个已经存在的namespace</li>
+<li>函数原型：int setns(int fd, int nstype)</li>
+<li>配合execve()函数，可以实现加入namespae后执行用户命令，比如/bin/bash</li>
+</ul>
+<h5 id="14-unshare">1.4 unshare()</h5>
+<ul>
+<li>unshare()实现在原先进程上的隔离</li>
+<li>unshare和clone很像，不过unshare工作在原先的进程，不需要创建新的进程</li>
+<li>函数原型：int unshare(int flags)</li>
+<li>docker的实现中没有使用这个函数</li>
+</ul>
+<h4 id="2-扩展知识-fork系统调用">2. 扩展知识-fork系统调用</h4>
+<ul>
+<li>unix系统中fork()函数被调用时，系统会创建新的进程，为其分配资源</li>
+<li>资源包括存储数据和代码空间</li>
+<li>把原来进程的数据都复制到新进程，只有少量值与原来进程不同</li>
+<li>fork被调用一次，却在父进程和子进程中各返回一次</li>
+<li>父进程中返回创建的子进程的进程id</li>
+<li>子进程中返回0</li>
+<li>如果出错，返回一个负值</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="ln"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="ln"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="ln"> 3</span><span class="cp"></span>
+<span class="ln"> 4</span><span class="c1">//编译：gcc fork_example.c
+</span><span class="ln"> 5</span><span class="c1">//运行：./a.out
+</span><span class="ln"> 6</span><span class="c1">//输出：I am parent process.
+</span><span class="ln"> 7</span><span class="c1">//      I am child process.
+</span><span class="ln"> 8</span><span class="c1"></span>
+<span class="ln"> 9</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">10</span>    <span class="kt">int</span> <span class="n">pid</span><span class="p">,</span> <span class="n">fpid</span><span class="p">;</span>
+<span class="ln">11</span>    <span class="n">fpid</span> <span class="o">=</span> <span class="n">fork</span><span class="p">();</span> <span class="c1">//这个函数执行后，变成父子两个进程执行之后的代码
+</span><span class="ln">12</span><span class="c1"></span>    <span class="k">if</span><span class="p">(</span><span class="n">fpid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">13</span>	    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;fork error.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">14</span>    <span class="p">}</span>
+<span class="ln">15</span>    <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">fpid</span> <span class="o">==</span><span class="mi">0</span><span class="p">){</span>
+<span class="ln">16</span>	    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;I am child process.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">17</span>    <span class="p">}</span>
+<span class="ln">18</span>    <span class="k">else</span> <span class="p">{</span>
+<span class="ln">19</span>	    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;I am parent process.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">20</span>    <span class="p">}</span>
+<span class="ln">21</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln">22</span><span class="p">}</span>
+</code></pre></div><h4 id="3-uts-namespace">3. UTS namespace</h4>
+<ul>
+<li>unix time sharing namespace.</li>
+<li>提供主机名和域名的隔离，这样每个docker容器就拥有独立的主机名和域名</li>
+<li>docker将不再是宿主机的进程，而是一个独立的节点</li>
+<li>docker中每个镜像都以服务名来命名hostname，原理就是UTS</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="ln"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="ln"> 2</span><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span><span class="ln"> 3</span><span class="cp">#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp">
+</span><span class="ln"> 4</span><span class="cp">#include</span> <span class="cpf">&lt;sched.h&gt;</span><span class="cp">
+</span><span class="ln"> 5</span><span class="cp">#include</span> <span class="cpf">&lt;signal.h&gt;</span><span class="cp">
+</span><span class="ln"> 6</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="ln"> 7</span><span class="cp"></span>
+<span class="ln"> 8</span><span class="cp">#define STACK_SIZE (1024 * 1024)
+</span><span class="ln"> 9</span><span class="cp"></span>
+<span class="ln">10</span><span class="k">static</span> <span class="kt">char</span> <span class="n">child_stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="p">];</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="kt">char</span><span class="o">*</span> <span class="k">const</span> <span class="n">child_args</span> <span class="o">=</span> <span class="p">{</span>
+<span class="ln">13</span>    <span class="s">&#34;/bin/bash&#34;</span><span class="p">,</span>
+<span class="ln">14</span>    <span class="nb">NULL</span>
+<span class="ln">15</span><span class="p">};</span>
+<span class="ln">16</span>
+<span class="ln">17</span><span class="kt">int</span> <span class="nf">child_main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">18</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;child process.&#34;</span><span class="p">);</span>
+<span class="ln">19</span>    <span class="n">execv</span><span class="p">(</span><span class="n">child_args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">child_args</span><span class="p">);</span>
+<span class="ln">20</span>    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="ln">21</span><span class="p">}</span>
+<span class="ln">22</span>
+<span class="ln">23</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">24</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;strt process:...&#34;</span><span class="p">);</span>
+<span class="ln">25</span>    <span class="c1">// 创建子进程时，指定新的命名空间，同时设置新进程的hostname
+</span><span class="ln">26</span><span class="c1"></span>    <span class="kt">int</span> <span class="n">child_pid</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">child_main</span><span class="p">,</span> <span class="n">child_stack</span> <span class="o">+</span> <span class="n">STACK_SIZE</span><span class="p">,</span> <span class="n">SIGCHLD</span> <span class="o">|</span> <span class="n">CLONE_NEWNTS</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="ln">27</span>    <span class="n">sethostname</span><span class="p">(</span><span class="s">&#34;NewNamespace&#34;</span><span class="p">,</span> <span class="mi">12</span><span class="p">);</span>
+<span class="ln">28</span>    <span class="n">waitpid</span><span class="p">(</span><span class="n">child_pid</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="ln">29</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;exit.&#34;</span><span class="p">);</span>
+<span class="ln">30</span>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln">31</span><span class="p">}</span>
+</code></pre></div><h4 id="4-ipc-namespace">4. IPC Namespace</h4>
+<ul>
+<li>IPC(进程间通信)包括信号量、消息队列、共享内存</li>
+<li>申请IPC就申请了一个全局唯一的32位ID</li>
+<li>ipc隔离的代码只需在前面的代码中添加CLONE_NEWIPC标识</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="ln"> 1</span><span class="cp">#define _GNU_SOURCE
+</span><span class="ln"> 2</span><span class="cp"></span>
+<span class="ln"> 3</span><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span><span class="ln"> 4</span><span class="cp">#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp">
+</span><span class="ln"> 5</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="ln"> 6</span><span class="cp">#include</span> <span class="cpf">&lt;sched.h&gt;</span><span class="cp">
+</span><span class="ln"> 7</span><span class="cp">#include</span> <span class="cpf">&lt;signal.h&gt;</span><span class="cp">
+</span><span class="ln"> 8</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="ln"> 9</span><span class="cp"></span>
+<span class="ln">10</span><span class="cp"># define STACK_SIZE (1024 * 1024)
+</span><span class="ln">11</span><span class="cp"></span>
+<span class="ln">12</span><span class="k">static</span> <span class="kt">char</span> <span class="n">child_stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="p">];</span>
+<span class="ln">13</span><span class="kt">char</span><span class="o">*</span> <span class="k">const</span> <span class="n">child_args</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="ln">14</span>  <span class="s">&#34;/bin/sh&#34;</span><span class="p">,</span>
+<span class="ln">15</span>  <span class="nb">NULL</span>
+<span class="ln">16</span><span class="p">};</span>
+<span class="ln">17</span>
+<span class="ln">18</span><span class="kt">int</span> <span class="nf">child_main</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">args</span><span class="p">){</span>
+<span class="ln">19</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;in child process now. </span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">20</span>  <span class="k">if</span><span class="p">(</span><span class="n">execv</span><span class="p">(</span><span class="n">child_args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">child_args</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+<span class="ln">21</span>    <span class="n">perror</span><span class="p">(</span><span class="s">&#34;error on execve&#34;</span><span class="p">);</span>
+<span class="ln">22</span>  <span class="p">}</span>
+<span class="ln">23</span>  <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="ln">24</span><span class="p">}</span>
+<span class="ln">25</span>
+<span class="ln">26</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">27</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;start process: </span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">28</span>  <span class="kt">int</span> <span class="n">child_pid</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">child_main</span><span class="p">,</span> <span class="n">child_stack</span> <span class="o">+</span> <span class="n">STACK_SIZE</span><span class="p">,</span> <span class="n">SIGCHLD</span> <span class="o">|</span> <span class="n">CLONE_NEWUTS</span> <span class="o">|</span> <span class="n">CLONE_NEWIPC</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="ln">29</span>  <span class="n">waitpid</span><span class="p">(</span><span class="n">child_pid</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="ln">30</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;exit.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">31</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln">32</span><span class="p">}</span>
+</code></pre></div><h4 id="5-pid-namespace">5. PID Namespace</h4>
+<ul>
+<li>进程号隔离对进程PID重新标号，两个不同namespace下的进程可以有相同的PID</li>
+<li>每个PID namespace都有自己的计数程序</li>
+<li>内核为所有的PID namespace维护一个树状结构，最顶层为root namespace，系统初始时创建</li>
+<li>它创建的新的PID namespace成为child namespace</li>
+<li>父节点可以看到子节点的进程，单是子节点看不到父节点的进程</li>
+<li>pid隔离的代码在前面代码中添加CLONE_NEWPID标识，执行<code>echo $$</code>打印当前进程号验证结论</li>
+<li>与其他namspace不同，PID namespace需要做一些额外的任务才能保证进程运行顺利，具体包括以下内容</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="ln"> 1</span><span class="cp">#define _GNU_SOURCE
+</span><span class="ln"> 2</span><span class="cp"></span>
+<span class="ln"> 3</span><span class="cp">#include</span> <span class="cpf">&lt;sys/types.h&gt;</span><span class="cp">
+</span><span class="ln"> 4</span><span class="cp">#include</span> <span class="cpf">&lt;sys/wait.h&gt;</span><span class="cp">
+</span><span class="ln"> 5</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="ln"> 6</span><span class="cp">#include</span> <span class="cpf">&lt;sched.h&gt;</span><span class="cp">
+</span><span class="ln"> 7</span><span class="cp">#include</span> <span class="cpf">&lt;signal.h&gt;</span><span class="cp">
+</span><span class="ln"> 8</span><span class="cp">#include</span> <span class="cpf">&lt;unistd.h&gt;</span><span class="cp">
+</span><span class="ln"> 9</span><span class="cp"></span>
+<span class="ln">10</span><span class="cp"># define STACK_SIZE (1024 * 1024)
+</span><span class="ln">11</span><span class="cp"></span>
+<span class="ln">12</span><span class="k">static</span> <span class="kt">char</span> <span class="n">child_stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="p">];</span>
+<span class="ln">13</span><span class="kt">char</span><span class="o">*</span> <span class="k">const</span> <span class="n">child_args</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+<span class="ln">14</span>  <span class="s">&#34;/bin/sh&#34;</span><span class="p">,</span>
+<span class="ln">15</span>  <span class="nb">NULL</span>
+<span class="ln">16</span><span class="p">};</span>
+<span class="ln">17</span>
+<span class="ln">18</span><span class="kt">int</span> <span class="nf">child_main</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">args</span><span class="p">){</span>
+<span class="ln">19</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;in child process now. </span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">20</span>  <span class="k">if</span><span class="p">(</span><span class="n">execv</span><span class="p">(</span><span class="n">child_args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">child_args</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+<span class="ln">21</span>    <span class="n">perror</span><span class="p">(</span><span class="s">&#34;error on execve&#34;</span><span class="p">);</span>
+<span class="ln">22</span>  <span class="p">}</span>
+<span class="ln">23</span>  <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="ln">24</span><span class="p">}</span>
+<span class="ln">25</span>
+<span class="ln">26</span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">27</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;start process: </span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">28</span>  <span class="kt">int</span> <span class="n">child_pid</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">child_main</span><span class="p">,</span> <span class="n">child_stack</span> <span class="o">+</span> <span class="n">STACK_SIZE</span><span class="p">,</span>
+<span class="ln">29</span>    <span class="n">SIGCHLD</span> <span class="o">|</span> <span class="n">CLONE_NEWUTS</span> <span class="o">|</span> <span class="n">CLONE_NEWIPC</span> <span class="o">|</span> <span class="n">CLONE_NEWPID</span><span class="p">,</span>
+<span class="ln">30</span>    <span class="nb">NULL</span><span class="p">);</span>
+<span class="ln">31</span>  <span class="n">waitpid</span><span class="p">(</span><span class="n">child_pid</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="ln">32</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;exit.</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+<span class="ln">33</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="ln">34</span><span class="p">}</span>
+</code></pre></div><h5 id="51-pid-namespace中的init进程">5.1 PID namespace中的init进程</h5>
+<ul>
+<li>pid为1的进程是init进程，地位特殊，作为所有进程的父进程</li>
+<li>某些进程因为父进程异常，成为孤儿进程时，将由init进程负责资源的监控和回收</li>
+</ul>
+<h5 id="52-信号与init进程">5.2 信号与init进程</h5>
+<ul>
+<li>内核还为init进程赋予特殊权利&ndash;信号屏蔽</li>
+<li>该功能是防止init进程被误杀</li>
+<li>init进程一旦被销毁，同一pid namespace中的其他进程也被销毁</li>
+<li>docker内的init进程也提供这样的功能，对信号进行捕获，结束信号来临时回收相关资源</li>
+</ul>
+<h5 id="53-挂载proc文件系统">5.3 挂载proc文件系统</h5>
+<ul>
+<li>在新的namespace中使用ps命令查看，看到的还是所有进程。因为相关的/proc系统没有被挂载到新的路径</li>
+<li>如果只想看到相关pid namespace的进程，需要单独挂载proc文件系统</li>
+<li>不过此时并没有实现mount namespace的隔离，会影响到宿主机的mount系统，退出namespace，宿主机执行ps会报错</li>
+<li>要实现完整的docker隔离，需要共同完成多个namespace的隔离</li>
+</ul>
+<h5 id="54-unshare和setns">5.4 unshare和setns</h5>
+<ul>
+<li>通过unshare和setns创建新的namespace时，pid的namespace和其他namespace有不同的地方</li>
+<li>这两个函数创建pid namespace时，调用者进程不会进入新的namespace，只有创建的子进程才会进入新的namespace</li>
+<li>但是创建其他类型namespace时，会直接进入新的namespace</li>
+</ul>
+<h4 id="6-mount-namespace">6. mount namespace</h4>
+<ul>
+<li>通过隔离文件系统挂载点对隔离文件系统提供支持</li>
+<li>它是历史上第一个namespace，所以名称毕竟特殊，是CLONE_NEWNS</li>
+<li>可以通过/proc/{pid}/mounts查看所有挂载到当前namespace的文件系统</li>
+<li>创建mount namespace时，会复制旧的文件结构给新namespace，新namespace操作不会影响外界。这种组发雅阁限制了隔离，但是有些情况不适用</li>
+<li>后来引入挂载传播解决该问题，挂载传播定了了挂载对象的关系，包括：共享关系，从属关系</li>
+</ul>
+<h4 id="7-network-namespace">7. network namespace</h4>
+<ul>
+<li>network namespace提供了网络资源隔离</li>
+<li>包括网络设备，ipv4、ipv6协议栈，ip路由、防火墙等</li>
+<li>由于一个物理设备最多存在于一个namespace，所以需要通过veth pair，即虚拟网络设备对，联通两个namespace，以达到通信目的</li>
+</ul>
+<h4 id="8-user-namespace">8. user namespace</h4>
+<ul>
+<li>主要隔离安全相关的标识符和属性，包括用户id，用户组id，root目录等</li>
+<li>user namespace创建的也是树形结构，和pid namespace非常相似。最上层是root，后续的每个节点都有一个父节点和0个或多个子节点</li>
+<li>创建完成后要进行用户绑定操作，绑定文件路径为/proc/{pid}/uid_map, /proc/{pid}/gid_map</li>
+</ul>
+<h4 id="runc库中关于namespace的定义">runc库中关于namespace的定义</h4>
+<p><img src="https://user-gold-cdn.xitu.io/2019/10/14/16dc940eeb83e84c?w=1330&amp;h=988&amp;f=png&amp;s=284687" alt=""></p>
+<h3 id="二-cgroups资源限制">二. cgroups资源限制</h3>
+<ul>
+<li>cgroups不仅可以限制任务的资源使用，包括cpu，内存，io等</li>
+<li>还可以为资源设置权重，计算资源使用量，操控进程启停</li>
+</ul>
+<h4 id="1-特点">1. 特点</h4>
+<ul>
+<li>cgroups本质上是内核附加在程序上的一系列钩子（hook），通过运行时对资源的调度触发相应钩子达到资源追踪和限制的目的</li>
+<li>cgroups api以一个伪文件系统的方式实现，通过操作文件以管理cgroups</li>
+<li>管理可以细粒度到进程级别</li>
+</ul>
+<h4 id="2-作用">2. 作用</h4>
+<ul>
+<li>资源限制</li>
+<li>优先级分配</li>
+<li>资源统计：统计系统资源使用量</li>
+<li>任务控制：任务挂起、恢复等操作</li>
+</ul>
+<h4 id="3-术语表">3. 术语表</h4>
+<ul>
+<li>Task：任务，表示系统的一个进程或者线程</li>
+<li>Cgroup：控制组，资源控制的基本单位，按照某种资源控制标准划分而成的任务组。包含一个或多个子系统。任务可以加入控制组，也可以迁移到其他控制组</li>
+<li>Subsystem：一个资源调度控制器。cpu子系统可以控制cpu分配时间</li>
+<li>Hierarchy：层级，由一系列cgroup以树状结构排列而成，每个层级通过绑定子系统进行资源控制</li>
+</ul>
+<h4 id="4-组织结构和基本规则">4. 组织结构和基本规则</h4>
+<ul>
+<li>同一个层级可以附加一个或多个子系统</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/9/30/16d8147662b31eb6?w=454&amp;h=438&amp;f=png&amp;s=50299" alt="规则1"></p>
+<ul>
+<li>一个子系统可以附加到多个层级，当且仅当目标层级只有一个子系统</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/9/30/16d814b1c17c7bdd?w=870&amp;h=538&amp;f=png&amp;s=111413" alt="规则2"></p>
+<ul>
+<li>一个任务不能存在于一个层级的多个cgroups中，但可以存在于不同层级的多个cgroups中</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/9/30/16d814eb0f6bdb2b?w=984&amp;h=502&amp;f=png&amp;s=115679" alt="规则3"></p>
+<ul>
+<li>fork或clone的子任务和原任务在同一个cgroups，但是子任务允许被移动到其他cgroups</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/9/30/16d8150be8cf217e?w=760&amp;h=528&amp;f=png&amp;s=100829" alt="规则4"></p>
+<h4 id="5-子系统简介">5. 子系统简介</h4>
+<ul>
+<li>子系统是cgroups的资源控制系统，每种子系统独立的控制一种资源</li>
+<li>docker使用如下9种子系统：
+<ul>
+<li>blkio：磁盘、硬盘等设备输入输出限制</li>
+<li>cpu：控制对cpu的使用</li>
+<li>cpuacct：自动生成cgroups中任务对cpu资源使用情况的报告</li>
+<li>cpuset：多处理系统中为任务分配cpu和内存</li>
+<li>devices：开启或关闭对设备的访问</li>
+<li>freezer：挂起或恢复任务</li>
+<li>memory：限定cpu的使用，并自动生成报告</li>
+<li>perf_even：统一的性能测试</li>
+<li>net_cls：docker没有直接使用，控制流量</li>
+</ul>
+</li>
+<li>linux中：cgroups表现为文件系统，需要挂载（mount)mount)才能看到各类子系统</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/10/14/16dc8d74347ff5ea?w=1555&amp;h=486&amp;f=png&amp;s=98207" alt=""></p>
+<ul>
+<li>docker中：会在子系统的控制组目录下创建名为docker的控制组，文件内再创建以docker id为名称的容器控制组。docker内所有进程写入目录下task中，资源限额写入cpu.cfs_quota_us文件</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/9/30/16d8160610ac2bfa?w=1294&amp;h=346&amp;f=png&amp;s=105431" alt=""></p>
+<ul>
+<li>docker实现cgroups主要由libcontainer完成</li>
+</ul>
+<h4 id="6-cgroups实现方式和工作原理">6. cgroups实现方式和工作原理</h4>
+<ul>
+<li>cgroups的本质的给任务挂上钩子，当任务运行过程中涉及某种资源时，就会触发钩子上的子系统进行检查并进行控制</li>
+</ul>
+<h5 id="61-如何判断资源超限以及超限后的措施">6.1 如何判断资源超限以及超限后的措施</h5>
+<ul>
+<li>不同的子系统，cgroups提供了统一的接口对资源进行控制和统计，但限制的方式不尽相同</li>
+<li>比如memory子系统，会将限额保存在描述内存的mm_struct结构体中，申请内存时，会触发cgroups检查</li>
+<li>超额后的措施：如果设置了OOM Control，进程会收到OOM信号并结束。否则线程会休眠等待。Docker默认设置了OOM Control</li>
+</ul>
+<h5 id="62-cgroup与任务的关联关系">6.2 cgroup与任务的关联关系</h5>
+<ul>
+<li>cgroup与任务是多对多的关系，所以并不直接关联，而是通过中间结构关联起来</li>
+<li>任务结构体task_struct中包含指针指向cgroup</li>
+<li>子系统中也包含指向任务的指针</li>
+<li>同时为了好理解，内核按照虚拟文件系统VFS实现了一套cgroup文件系统，把子系统的实现都封装到文件中</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-c" data-lang="c"><span class="ln"> 1</span><span class="cp"># sched.h
+</span><span class="ln"> 2</span><span class="cp"></span><span class="k">struct</span> <span class="n">task_struct</span> <span class="p">{</span>
+<span class="ln"> 3</span>    <span class="p">...</span>
+<span class="ln"> 4</span>    <span class="cp">#ifdef CONFIG_CGROUPS
+</span><span class="ln"> 5</span><span class="cp"></span>    	<span class="cm">/* Control Group info protected by css_set_lock: */</span>
+<span class="ln"> 6</span>    	<span class="k">struct</span> <span class="n">css_set</span> <span class="n">__rcu</span>		<span class="o">*</span><span class="n">cgroups</span><span class="p">;</span>
+<span class="ln"> 7</span>    	<span class="cm">/* cg_list protected by css_set_lock and tsk-&gt;alloc_lock: */</span>
+<span class="ln"> 8</span>    	<span class="k">struct</span> <span class="n">list_head</span>		<span class="n">cg_list</span><span class="p">;</span>
+<span class="ln"> 9</span>    <span class="cp">#endif
+</span><span class="ln">10</span><span class="cp"></span>    <span class="p">...</span>
+<span class="ln">11</span><span class="p">}</span>
+</code></pre></div><h5 id="63-docker在使用cgroups的注意事项">6.3 docker在使用cgroups的注意事项</h5>
+<ul>
+<li>docker需要挂载cgroup文件系统，挂载时指定要绑定的子系统</li>
+<li>挂载后就可以像操作文件一样对cgroup进行管理和操作</li>
+<li>操作cgroups只能通过文件操作，内核没有提供相关系统调用</li>
+<li>要绑定的子系统如果被别的层级绑定，就会报挂载失败的错误</li>
+<li>激活的层级无法被再挂载或者删除子系统</li>
+</ul>
+<h5 id="64-docker下cgroup文件系统说明">6.4 docker下cgroup文件系统说明</h5>
+<ul>
+<li>目录：/sys/fs/cgroup/{子系统，如cpu}/docker/{container id}</li>
+<li>tasks: 该cgroup中所有进程或线程id</li>
+<li>cgroup.procs：该cgroup的线程组id（TGID）</li>
+<li>notify_on_release：填0或1，默认0.是否在最后一个任务退出时通知release agent</li>
+<li>release_agent：release_agent执行脚本路径</li>
+</ul>
+<h2 id="docker架构概览">Docker架构概览</h2>
+<p><img src="https://user-gold-cdn.xitu.io/2019/9/30/16d823f8d8188d25?w=1184&amp;h=462&amp;f=png&amp;s=162001" alt=""></p>
+<ul>
+<li>docker使用了client-server架构</li>
+<li>通过docker client与docker daemon建立通信，将请求发送给后者</li>
+<li>通过driver模块实现对docker容器执行环境的创建和管理</li>
+<li>通过network模块创建和管理网络环境</li>
+<li>通过vloume模块创建数据卷和挂载任务</li>
+<li>通过execdriver模块执行用户命令和限制运行资源</li>
+<li>libcontainer是对namespace和cgroups的二次封装</li>
+<li>execdriver通过libcontainer实现对容器的具体管理</li>
+<li>docker1.9版本以后，volume和network生命周期独立于docker，可以单独创建，并按需配置给docker</li>
+</ul>
+<h3 id="docker-daemon">Docker Daemon</h3>
+<ul>
+<li>docker daemon是docker最核心的后台进程，负责相应client的请求，并转换为对容器的操作</li>
+<li>该进程会在后台启动一个API Server，负责接受client请求，并分发调度到具体的函数执行</li>
+</ul>
+<h3 id="docker-client">Docker client</h3>
+<ul>
+<li>docker client是一个泛称，用来向dameon发送请求</li>
+<li>既包括命令行工具，也包括遵循了Docker API的客户端</li>
+</ul>
+<h3 id="镜像管理">镜像管理</h3>
+<ul>
+<li>几个模块统称为镜像管理模块</li>
+<li>具体包括的模块有：
+<ul>
+<li>distribution：负责与registry交互，上传下载镜像，以及存储元数据</li>
+<li>registry：负责registry的身份验证、镜像查找、镜像验证、管理的操作</li>
+<li>image：负责与镜像元数据有关的存储、查找、索引、tar有关的导入导出</li>
+<li>reference：负责存储本地所有镜像的repository和tag，并维护与镜像id的映射关系</li>
+<li>layer：镜像层与容器层元数据有关的增删改查</li>
+</ul>
+</li>
+</ul>
+<h3 id="驱动相关driver">驱动相关（Driver）</h3>
+<ul>
+<li>docker daemon将请求转成系统调用，进而创建和管理容器。为了将这些系统调用抽象成统一的操作接口方便调用者调用。docker把这些操作封装成相关的驱动。</li>
+</ul>
+<h4 id="execdriver">execdriver</h4>
+<ul>
+<li>对linux操作系统的namespace，cgroups，selinux等容器运行所需的系统操作进行二次封装</li>
+<li>execdriver现在最主要的实现，也是现在的默认实现。就是官方提供的libcontainer库</li>
+</ul>
+<h4 id="volumedriver">volumedriver</h4>
+<ul>
+<li>vloume数据存储操作的最终执行者，负责volume的增删改查，屏蔽不同驱动实现的区别</li>
+<li>docker中volumedriver的默认实现的local，默认将文件存储于docker根目录下的volume文件里。其他的实现通过外部插件实现</li>
+</ul>
+<h4 id="graphdriver">graphdriver</h4>
+<ul>
+<li>graphdriver是与容器镜像相关操作的最终执行者</li>
+<li>graphdriver会在docker工作目录下维护一组与镜像层对应的目录，并记下镜像层的关系</li>
+<li>对镜像的操作会被映射为对文件目录以及元数据的操作</li>
+</ul>
+<h3 id="network">Network</h3>
+<ul>
+<li>由libnetwork库维护，它抽象出了一个容器网络模型，并给调用者提供统一的抽象接口</li>
+</ul>
+<h2 id="client和daemon工作原理">Client和Daemon工作原理</h2>
+<ul>
+<li>docker命令包含两种模式：client模式、daemon模式</li>
+<li>docker命令如果有daemon子命令，则为daemon模式，启动daemon进程。其他命令则为client模式</li>
+</ul>
+<h3 id="client模式">Client模式</h3>
+<ul>
+<li>client模式的docker工作流程包括以下流程：</li>
+</ul>
+<h4 id="1-解析flag信息">1. 解析flag信息</h4>
+<p>docker支持大量的参数信息，重要的几个包括：</p>
+<ul>
+<li>Debug: -D, &ndash;debug。日志显示调试级别</li>
+<li>LogLevel: -l, &ndash;log-level。日志基本，默认为info</li>
+<li>Hosts： -H， &ndash;host。client模式该值为要连接的daemon地址，daemon模式该值为监听的地址</li>
+<li>ProtoAddrParts：协议和host的全路径</li>
+</ul>
+<h4 id="2-创建client实例">2. 创建client实例</h4>
+<ul>
+<li>调用NewDockerCli创建实例</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/9/30/16d827578ffa0f86?w=2032&amp;h=728&amp;f=png&amp;s=214640" alt=""></p>
+<h4 id="3-执行具体的命令">3. 执行具体的命令</h4>
+<h5 id="31-从命令映射到对应的方法">3.1 从命令映射到对应的方法</h5>
+<ul>
+<li>通过反射机制，从输入命令(比如run)得到匹配的执行方法(比如CmdRun)</li>
+</ul>
+<h5 id="32-执行对应的方法发起请求">3.2 执行对应的方法，发起请求</h5>
+<ul>
+<li>解析传入的参数，并针对参数进行配置处理</li>
+<li>获取与docker daemon通信所需的认证配置信息</li>
+<li>给docker daemon发送Post和Get请求</li>
+<li>读取来自Docker Daemon的返回结果</li>
+</ul>
+<h3 id="daemon模式">Daemon模式</h3>
+<p>docker运行时，如果指定docker daemon子命令，就运行daemon模式，docker daemon通过一个server模块接受来自client的请求，docker daemon启动和初始化过程包括：</p>
+<h4 id="1-api-server的配置和初始化">1. API Server的配置和初始化</h4>
+<ul>
+<li>整理解析各项参数</li>
+<li>创建PID文件</li>
+<li>加载所需的server辅助配置，包括日志，远程访问，TLS等</li>
+<li>通过goroutine启动API Server</li>
+<li>创建一个负责处理业务的Daemon对象，作为负责处理用户请求的逻辑实体</li>
+<li>对API Server中的路由表进行初始化，用户请求和处理函数做映射</li>
+<li>设置一个channel，保证上述goroutine只有在server出错时才会退出</li>
+<li>设置捕捉信号，当收到INT，TERM，QUIT信号时，关闭API Server，调用shutdownDaemon关闭daemon</li>
+<li>APiserver与daemon绑定，接受来自客户端的请求</li>
+<li>daemon进程向宿主机init进程发送READY=1的信号，表示开始正常工作</li>
+</ul>
+<h4 id="2-daemon对象的创建与初始化过程">2. Daemon对象的创建与初始化过程</h4>
+<h5 id="21-docker容器的配置信息">2.1 docker容器的配置信息</h5>
+<p>提供用户自由配置的可选功能，使docker运行更贴近用户期望的场景，配置信息包括：</p>
+<ul>
+<li>设置默认的网络最大传输单元</li>
+<li>检测网桥配置信息</li>
+</ul>
+<h5 id="22-检测系统支持及用户权限">2.2 检测系统支持及用户权限</h5>
+<ul>
+<li>操作系统对daemon的支持</li>
+<li>用户权限的级别</li>
+<li>内核版本与处理器的支持</li>
+</ul>
+<h5 id="23-配置daemon工作路径">2.3 配置daemon工作路径</h5>
+<ul>
+<li>主要是创建daemon运行的工作路径，默认是/var/lib/docker</li>
+</ul>
+<h5 id="24-配置docker容器所需的文件环境">2.4 配置docker容器所需的文件环境</h5>
+<p>这一步会在工作目录下创建一些重要的目录和文件</p>
+<ul>
+<li>创建容器配置文件目录
+<ul>
+<li>路径：/var/lib/docker/containers/{container id}</li>
+<li>文件包括：
+<ul>
+<li>config.json</li>
+<li>hostname</li>
+<li>hosts</li>
+<li>resolve</li>
+<li>&hellip;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>配置graphdriver目录，用于完成docker容器镜像管理所需的底层存储驱动</li>
+<li>配置镜像目录：创建image目录，用于存放镜像。/var/lib/docker/images</li>
+<li>创建volume驱动目录：/var/lib/docker/volumes，metadata.db用来存储元数据</li>
+</ul>
+<h5 id="25-创建网络">2.5 创建网络</h5>
+<ul>
+<li>网络部分单独抽离一个模块称为libnetwork</li>
+<li>libnetwork通过插件形式为docker服务</li>
+<li>bridge为默认网络驱动，它无法跨主机通信。overlay网络可以跨主机通信</li>
+</ul>
+<h5 id="26-初始化execdriver">2.6 初始化execdriver</h5>
+<p>execdriver是管理docker容器的驱动，创建execdriver时，需要注意以下信息：</p>
+<ul>
+<li>驱动类别，配置文件中默认为native，对应libcontainer</li>
+<li>用户定义的execdriver选项，即-exec-opt参数值</li>
+<li>-exc-root，即execdriver运行根目录，默认为/var/lib/docker</li>
+<li>系统功能信息，包括内存限制功能，交换器内存限制等</li>
+</ul>
+<h4 id="27-总结daemon进程启动三步">2.7 总结：Daemon进程启动三步</h4>
+<ul>
+<li>启动一个Api Server，工作在用户通过-H指定的socket上</li>
+<li>NewDaemon创建daemon对象来保存信息和处理业务逻辑</li>
+<li>将API Server与daemon对象绑定起来，用于处理客户端请求</li>
+</ul>
+<h3 id="3-daemon如何处理客户端请求">3. daemon如何处理客户端请求</h3>
+<p>从docker run命令分析处理的流程</p>
+<h4 id="31-发起请求">3.1 发起请求</h4>
+<ul>
+<li>docker run运行，用户端docker进入client模式</li>
+<li>经过初始化，创建出一个client</li>
+<li>client通过反射找到CmdRun方法</li>
+<li>client解析用户参数后，发送两个post请求
+<ul>
+<li>/containers/create? + containerValues 创建容器</li>
+<li>/containers + createResponse.Id + start 启动容器</li>
+</ul>
+</li>
+<li>daemon端负责接收create请求的方法为postContainerCreate</li>
+</ul>
+<h4 id="32-创建容器">3.2 创建容器</h4>
+<ul>
+<li>解析用户表单，在daemo中创建container对象</li>
+<li>container信息作为response返回给客户端</li>
+</ul>
+<h4 id="33-启动容器">3.3 启动容器</h4>
+<ul>
+<li>所有请求都通过/api/client/{请求名}.go文件来处理，这里是start.go</li>
+<li>start.go中执行ContainerStart启动容器</li>
+</ul>
+<h4 id="34-最后一步">3.4 最后一步</h4>
+<ul>
+<li>跟操作系统相关的系统调用（namespace， cgroups）交给ExecDriver</li>
+<li>docker中默认为libcontainer，它封装了namespace，cgroups等对操作系统的调用</li>
+<li>daemon调用libcontainer需要提供以下三个参数
+<ul>
+<li>commandv：容器需要的所有配置信息集合</li>
+<li>pipes：用于将容器stdin、stdout、stderror重定向到daemon</li>
+<li>startCallback：回调方法</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-libcontainer">4. libcontainer</h3>
+<ul>
+<li>容器是一个与宿主机系统共享内核但与其他进程资源隔离的执行环境，docker要实现隔离，需要调用linux的系统函数，该工作交给libcontainer来做。</li>
+<li>execdriver：拿到daemon传过来的command信息，生成一份专门的容器配置</li>
+<li>libcontainer：拿到容器配置文件，创建容器</li>
+</ul>
+<h4 id="41-libcontainer的工作方式">4.1 libcontainer的工作方式</h4>
+<ul>
+<li>创建容器运行时需要的进程对象，称为Process</li>
+<li>设置容器的输出管道</li>
+<li>使用工厂类Factory创建逻辑容器Container</li>
+<li>执行Container.strt(Process)创建物理容器</li>
+<li>execdriver执行callback回调</li>
+<li>执行Process.wait，一直等到创建完成</li>
+</ul>
+<p>libcontainer定义了Process、Container来对应linux中进程和容器的关系</p>
+<h4 id="42-libcontainer的实现原理">4.2 libcontainer的实现原理</h4>
+<h5 id="用factory创建逻辑容器container">用Factory创建逻辑容器Container</h5>
+<ul>
+<li>逻辑容器对象包括容器要运行的指令及其参数、namespace、cgroups等信息</li>
+<li>libcontainer底层需要兼容不同的操作系统，所以用工厂方法来创建</li>
+<li>factory创建对象具体做的事：
+<ul>
+<li>验证容器运行的根目录、容器id、容器配置的合法性</li>
+<li>验证容器id与现有的容器不冲突</li>
+<li>创建工作目录</li>
+<li>返回Container对象</li>
+</ul>
+</li>
+</ul>
+<h5 id="启动逻辑容器">启动逻辑容器</h5>
+<ul>
+<li>创建管道pipe，用来与容器内进程通信</li>
+<li>创建容器内进程启动命令对象cmd，并且cmd对象创建第一个进程：init进程</li>
+<li>为cmd对象设置环境变量，指明当前为创建动作（exec执行时是进入操作，不会创建）</li>
+<li>namespace添加到cmd的Cloneflags中</li>
+<li>合并container中容器的配置和Process中entrypoint配置，加入到ParentProcess中</li>
+<li>ParentProcess负责从物理容器外部处理物理容器启动工作</li>
+<li>ParentProcess是接口，实现为initProcess，调用它的start方法就可以创建容器</li>
+</ul>
+<h5 id="逻辑容器创建物理容器">逻辑容器创建物理容器</h5>
+<p>initProcess.start()的具体流程：</p>
+<ul>
+<li>调用exec执行initProcess.cmd，创建新的进程dockerinit并设置namespace</li>
+<li>将dockerinit的pid加入cgroups中管理，容器的隔离环境初步建立完成</li>
+<li>创建容器网络设备，包括veth</li>
+<li>通过管道发送容器配置给容器内的dockerinit</li>
+<li>通过管道等到dockerinit完成初始化工作</li>
+<li>dockerinit只有一个函数，执行reexec.init()reexec.init()，由注册的具体实现决定</li>
+<li>对于libcontainer来说，是StartInitialization方法，具体包括：（以下方法都是在容器内进行）
+<ul>
+<li>创建pip管道的文件描述符</li>
+<li>通过管道获取ParentProcess传来的容器配置</li>
+<li>从配置文件获取变量信息</li>
+<li>如果docker run指定了-pid，-ipc， -uts等参数，dockerinit还要把自己加入namespace</li>
+<li>初始化网络设备：修改名称，分配mac地址，添加ip地址，默认网关等</li>
+<li>设置路由和RLIMIT参数</li>
+<li>创建mount namespace，为挂载文件系统做准备</li>
+<li>挂载各类设备文件，比如/proc</li>
+<li>写入hostname信息，加载profile信息</li>
+<li>比较当前进程父进程id与初始化进程，确保没有出错</li>
+<li>最后使用execv执行用户args参数指定的命令</li>
+</ul>
+</li>
+</ul>
+<h5 id="docker-daemon与容器之间的通讯">docker daemon与容器之间的通讯</h5>
+<ul>
+<li>创建容器的进程为父进程，容器进程为子进程，他们如何通讯？</li>
+<li>父子通讯的四种方式：
+<ul>
+<li>signal：信号。&mdash;包含的信息有限，不适合</li>
+<li>内存轮训：效率低，不适合</li>
+<li>socket通讯：网络栈是隔离的，无法通讯</li>
+<li>管道：基于文件和文件描述符。pipe系统调用参数为两个文件描述符，在一端写入，另一端就可以读取</li>
+</ul>
+</li>
+</ul>
+<h4 id="43-使用runc与libcontainer交互">4.3 使用runC与libcontainer交互</h4>
+<ul>
+<li>linux基金会成立OCI（open container Initiative),旨在指定开放的容器标准，指定容器标准格式（OCF）</li>
+<li>runC库是实现OCF的一个库，直接对libcontainer进行调用，去除docker中复杂的功能</li>
+</ul>
+<h5 id="runc的构建">runC的构建</h5>
+<ul>
+<li>使用runC需要相关容器配置文件以及rootfs</li>
+<li>配置文件可用runc spec生成</li>
+<li>config.json为容器基础配置文件</li>
+<li>runtime.json为容器运行时文件</li>
+</ul>
+<h5 id="runc的运行">runC的运行</h5>
+<ul>
+<li>delete：删除容器运行时资源</li>
+<li>enents：展示运行时cpu，io等资源</li>
+<li>exec：容器中运行新的进程</li>
+<li>list：展示被runc启动的容器</li>
+<li>ps：展示运行的容器</li>
+<li>start：启动容器</li>
+<li>state：展示容器状态</li>
+</ul>
+<h3 id="5-镜像管理">5. 镜像管理</h3>
+<h4 id="51-什么是docker镜像">5.1 什么是docker镜像</h4>
+<ul>
+<li>是一个只读的docker容器模板，含有启动容器所需的文件系统结构和内容</li>
+<li>docker镜像的文件内容以及一些运行docker容器的配置文件组成了docker容器的静态文件系统运行环境&ndash;rootfs</li>
+<li>镜像是容器的静态视角，容器是镜像的运行状态</li>
+</ul>
+<h5 id="511-rootfs">5.1.1 rootfs</h5>
+<ul>
+<li>rootfs是docker容器在启动时内部进程可见的文件系统，即docker容器的根目录</li>
+<li>通常包含一个操作系统运行所需的文件系统，比如/bin /dev /proc /etc等</li>
+</ul>
+<h5 id="512-docker镜像的主要特点">5.1.2 docker镜像的主要特点</h5>
+<ul>
+<li>分层：docker镜像采用分层构建，每个镜像由一系列镜像层构成，docker镜像轻量的重要原因</li>
+<li>写时复制：写时复制在多个容器之间共享镜像，每个容器启动时不需要单独复制一份镜像文件。而是以只读方式将镜像层挂载到挂载点上，再在上面覆盖一个读写层</li>
+<li>内容寻址：计算层内容计算校验和，并生成哈希值，作为镜像层的唯一标识</li>
+<li>联合挂载：一个挂载点同时挂载多个文件系统，这种技术称为联合文件系统</li>
+</ul>
+<h5 id="513-docker镜像的存储组织方式">5.1.3 docker镜像的存储组织方式</h5>
+<p><img src="https://user-gold-cdn.xitu.io/2019/10/1/16d86bfe877f52aa?w=1654&amp;h=740&amp;f=png&amp;s=744139" alt=""></p>
+<h4 id="52-docker镜像关键概念">5.2 docker镜像关键概念</h4>
+<ul>
+<li>registry：保存镜像的仓库，repository的集合</li>
+<li>repository：镜像的集合</li>
+<li>manifest：docker镜像描述文件，pull或load时被转换为config配置文件</li>
+<li>image：存储镜像相关的一组元数据信息</li>
+<li>layer：管理镜像层的中间概念</li>
+<li>dockerfile：docker镜像的定义文件</li>
+</ul>
+<h4 id="53-docker镜像构建操作">5.3 docker镜像构建操作</h4>
+<ul>
+<li>commit镜像：提交镜像变更的部分</li>
+<li>build镜像：完成新镜像的构建，路径支持：本地普通文件，压缩文件，git仓库，url地址</li>
+</ul>
+<h4 id="54-docker镜像的分发方法">5.4 docker镜像的分发方法</h4>
+<ul>
+<li>pull：线上拉取镜像</li>
+<li>push：推送镜像到线上</li>
+<li>export：导出容器</li>
+<li>import：导入容器</li>
+<li>save：离线导出镜像，保存时每层保存为一个文件，所以多个镜像公共层多时，会公用文件夹，整体大小会缩小很多</li>
+<li>load：离线导入镜像</li>
+</ul>
+<h3 id="6-存储管理">6. 存储管理</h3>
+<p>docker镜像存储时，元数据与镜像完全分离</p>
+<h4 id="61-repository元数据">6.1 repository元数据</h4>
+<ul>
+<li>repository在本地的持久化文件存放于/var/lib/docker/image/xxx/repository.json</li>
+<li>存储了所有版本镜像名字，tag和镜像id</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/10/1/16d871986e15315e?w=1594&amp;h=746&amp;f=png&amp;s=225945" alt=""></p>
+<h4 id="62-image元数据">6.2 image元数据</h4>
+<ul>
+<li>image元数据包括：镜像架构、操作系统、默认配置、容器id、创建时间，镜像版本等</li>
+<li>imageStore管理镜像id与元数据的映射关系</li>
+</ul>
+<h4 id="63-layer元数据">6.3 layer元数据</h4>
+<ul>
+<li>docker定义了两种接口：Layer和RWLayer，定义只读层和可读可写层的一些操作</li>
+<li>又定义了roLayer和mountedLayer，分别实现上述接口</li>
+</ul>
+<h4 id="62-存储驱动">6.2 存储驱动</h4>
+<p>为了支持镜像分层和写时复制，docker提供了存储驱动的接口。驱动根据操作系统底层的支持提供了针对某种文件系统的初始化和对镜像的增删改查</p>
+<h5 id="存储驱动的功能和管理">存储驱动的功能和管理</h5>
+<ul>
+<li>docker中管理文件系统的驱动为graphdriver，定义了统一的接口对不同的文件系统进行管理</li>
+</ul>
+<h5 id="常用的存储驱动">常用的存储驱动</h5>
+<ul>
+<li>aufs</li>
+<li>device mapper</li>
+<li>overlay</li>
+</ul>
+<h3 id="7-数据卷">7. 数据卷</h3>
+<h4 id="71-volume概述">7.1 volume概述</h4>
+<p>docker镜像分层管理，下层的只读层和上层读写层。这种管理方式提高了镜像构建、存储、分发效率。但是存在一些问题：</p>
+<ul>
+<li>不方便在宿主机中访问容器文件</li>
+<li>多个容器无法数据共享</li>
+<li>删除容器时，产生的数据将会丢失</li>
+</ul>
+<p>docker引入数据卷解决以上问题，volume是存在一个或多个容器的特定文件或文件夹，以联合文件系统存在，为数据共享和持久化提供便利</p>
+<h4 id="72-volume特点">7.2 volume特点</h4>
+<ul>
+<li>容器创建时就初始化，容器启动后就可以使用</li>
+<li>能在不同的容器之间共享和重用</li>
+<li>对volume的数据操作会马上生效</li>
+<li>对volume的操作不会影响镜像本身</li>
+<li>生命周期独立于容器</li>
+<li>docker提供vloumedriver接口</li>
+</ul>
+<h4 id="73-使用方式">7.3 使用方式</h4>
+<ul>
+<li>命令创建
+<ul>
+<li>docker volume create &ndash;name xxx</li>
+<li>dcoker run -v name:path</li>
+</ul>
+</li>
+<li>dockerfile创建：
+<ul>
+<li>VOLUME path</li>
+</ul>
+</li>
+<li>共享volume：
+<ul>
+<li>&ndash;volumes-from</li>
+</ul>
+</li>
+<li>删除：docker volume rm <!-- raw HTML omitted --></li>
+<li>备份迁移：存档或者&ndash;volumes-from</li>
+</ul>
+<h3 id="8-网络管理">8. 网络管理</h3>
+<h4 id="81-网络架构">8.1 网络架构</h4>
+<p><img src="https://user-gold-cdn.xitu.io/2019/10/1/16d8737fba2f1f86?w=1414&amp;h=740&amp;f=png&amp;s=244520" alt=""></p>
+<ul>
+<li>CNM：容器网络模型，虚拟化网络标准接口</li>
+<li>libnetwork作为一个独立的库，docker调用libcontainer提供的api来创建和管理网络</li>
+<li>CNM主要由沙盒、端点和网络三大组件
+<ul>
+<li>沙盒：包含一个容器网络栈的信息，可以对容器的接口、路由、DNS设置进行管理</li>
+<li>端点：一个端点可以加入一个沙盒或者一个网络</li>
+<li>网络：一组可以直通的端点</li>
+</ul>
+</li>
+<li>内置5种驱动提供不同的网络服务
+<ul>
+<li>brige：默认设置，容器连接到docker网桥上</li>
+<li>host：不会创建独立的网络协议栈，容器公用宿主机网络协议</li>
+<li>overlay：适合大规模场景，使用时需要额外配置存储，daemon启动时需要配置存储地址</li>
+<li>remote：调用用户自己实现的网络插件</li>
+<li>null：不对网络进行任何配置，容器网络没有任何网卡、路由信息</li>
+</ul>
+</li>
+</ul>
+<h4 id="82-brige驱动实现原理">8.2 brige驱动实现原理</h4>
+<h5 id="docker0网桥">docker0网桥</h5>
+<ul>
+<li>docker安装后，会多一块docker0的网卡</li>
+<li>docker0是一个网桥，通过veth pair连接，一端连到eth0，另一端连到容器。容器内的网络通过docker0网桥转发到eth0</li>
+<li>daemon启动参数设置：
+<ul>
+<li>&ndash;bip=172.17.0.0/16，设置ip地址和子网范围</li>
+<li>&ndash;fixed-cir=xxx，设置子网范围</li>
+<li>&ndash;bridge，指定自己的网桥</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li>《Docker容器与容器云》第三章</li>
+</ul>
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">查看更多</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+      </li>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java%E5%8F%8D%E5%B0%84/" class="nav-link">java反射</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java-io%E6%B5%81/" class="nav-link">java基础-io流</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6/" class="nav-link">java基础-集合框架</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/java/jdk/java%E5%A4%9A%E7%BA%BF%E7%A8%8B/" class="nav-link">java多线程</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/" class="nav-link">《kubernetes源码剖析》- 资源创建流程</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/" class="nav-link">client-go源码分析(一) - 四种客户端对象</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" class="nav-link">go第三方库 - Cobra</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent">
+          博客搭建
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>19</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>7</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>4</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>4</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
+          CLIENT-GO
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">All tags</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent" data-position=11>BREAKPAD<span class='button_tally'>11</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=2>CLIENT-GO<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent" data-position=7>GO<span class='button_tally'>7</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent" data-position=6>GO基础入门<span class='button_tally'>6</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=1>GO第三方库<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent" data-position=1>INDEX<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=4>JAVA基础<span class='button_tally'>4</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=4>K8S<span class='button_tally'>4</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=1>MYSQL<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=19>源码分析<span class='button_tally'>19</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script type="text/javascript" src = "https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous"></script>
+  </body>
+</html>
