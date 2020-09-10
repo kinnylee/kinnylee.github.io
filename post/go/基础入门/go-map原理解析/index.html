@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>go第三方库 - Cobra | kinnylee</title>
+  <head>  <title>go-map原理解析 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,16 +12,17 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
+  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="k8s的命令行工具-cobra框架 简介 Cobra 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli">
+<meta name="description" content="map原理 map数据结构 map初始化 插入 删除 扩容 遍历 NAN 结构体 源码位置：src/runtime/map.go 1type hmap struct { 2 // 元素数量 3 count int 4 // 标识">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go第三方库 - Cobra" />
-<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" />
-<meta property = "og:title" content = "go第三方库 - Cobra" />
-<meta property = "og:description" content = "k8s的命令行工具-cobra框架 简介 Cobra 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli" />
-<meta property = "og:image" content = "https://kinnylee.github.io/images/cobra.png" />
+<meta name = "twitter:title" content = "go-map原理解析" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" />
+<meta property = "og:title" content = "go-map原理解析" />
+<meta property = "og:description" content = "map原理 map数据结构 map初始化 插入 删除 扩容 遍历 NAN 结构体 源码位置：src/runtime/map.go 1type hmap struct { 2 // 元素数量 3 count int 4 // 标识" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/go.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
@@ -30,7 +31,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/'>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
 
@@ -141,21 +142,25 @@
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content' id= 'post_content'>
-    <h1 class='post_title'>go第三方库 - Cobra</h1><div class = 'post_meta'>
+    <h1 class='post_title'>go-map原理解析</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Sep 1, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/k8s' class = 'post_tag button button_translucent'>k8s
+    Sep 8, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
   </a>
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1195 字</span>，阅读约<span class="more-meta"> 3 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 573 字</span>，阅读约<span class="more-meta"> 2 分钟</span>
     <div class='post_share'>
   | 复制链接:
-  <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" title="Copy Link" class="link link_yank">
+  <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" title="Copy Link" class="link link_yank">
     <svg class="icon">
       <use xlink:href="#yank"></use>
     </svg>
@@ -167,161 +172,89 @@
     <h2>Overview</h2>
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#简介">简介</a>
-      <ul>
-        <li><a href="#特性">特性</a></li>
-      </ul>
-    </li>
-    <li><a href="#基本概念">基本概念</a></li>
-    <li><a href="#安装">安装</a></li>
-    <li><a href="#快速上手">快速上手</a>
-      <ul>
-        <li><a href="#添加额外的command">添加额外的command</a></li>
-        <li><a href="#flags">Flags</a></li>
-      </ul>
-    </li>
-    <li><a href="#模板脚手架">模板脚手架</a></li>
-    <li><a href="#生命周期">生命周期</a></li>
-    <li><a href="#拼写错误智能提示">拼写错误智能提示</a></li>
+    <li><a href="#结构体">结构体</a></li>
+    <li><a href="#map初始化">map初始化</a></li>
   </ul>
 </nav>
-    <h1 id="k8s的命令行工具-cobra框架">k8s的命令行工具-cobra框架</h1>
-<h2 id="简介">简介</h2>
-<p><a href="https://github.com/spf13/cobra">Cobra</a> 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli。比如：</p>
+    <h1 id="map原理">map原理</h1>
 <ul>
-<li>k8s：kubectl等多个组件都用到</li>
-<li>Istio: istioctl命令</li>
-<li>Docker：docker命令</li>
-<li>Etcd：etcd命令</li>
-<li>Helm</li>
-<li>RClone</li>
+<li>map数据结构</li>
+<li>map初始化</li>
+<li>插入</li>
+<li>删除</li>
+<li>扩容</li>
+<li>遍历</li>
+<li>NAN</li>
 </ul>
-<blockquote>
-<p>spf13这个github项目的大佬开发了好几个知名的项目。比如：
-hugo：世界上最快的构建静态网站的项目（该文档的博客系统就是用hugo搭建的）
-cobra：今天的主角，命令行框架
-viper：配置信息处理框架</p>
-</blockquote>
-<h3 id="特性">特性</h3>
-<ul>
-<li>支持子命令行模式</li>
-<li>命令智能建议</li>
-<li>轻松生成应用程序和命令</li>
-<li>自动生成命令和参数的帮助信息</li>
-<li>自动生成详细的命令行帮助</li>
-<li>自动识别 -h &ndash;help</li>
-<li>bash环境下自动补全</li>
-<li>自动生成帮助手册</li>
-</ul>
-<h2 id="基本概念">基本概念</h2>
-<p>Cobra基于三个基本结构构建应用程序：</p>
-<ul>
-<li>Commands：表示执行动作。是应用程序交互的中心，支持子命令 SubCommand</li>
-<li>Args：执行参数</li>
-<li>Flags：动作的标识符，可以修改command的行为</li>
-</ul>
-<p>展现形式为：
-APPNAME VERB NOUN &ndash;ADJECTIVE. 或者 APPNAME COMMAND ARG &ndash;FLAG</p>
-<h2 id="安装">安装</h2>
-<ol>
-<li>通过<code>go get</code>安装最新版本库</li>
-</ol>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">1</span>go get github.io/spf13/cobra
-</code></pre></div><ol start="2">
-<li>引入包名</li>
-</ol>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kn">import</span> <span class="s">&#34;github.com/spf13/cobra&#34;</span>
-</code></pre></div><h2 id="快速上手">快速上手</h2>
-<p>基本操作包括三步：</p>
-<ul>
-<li>创建command主命令，并定义Run执行函数（只定义，还没有执行），AddCommand可以添加命令或者子命令</li>
-<li>为命令添加命令行参数</li>
-<li>执行Execute命令（会在内部回调Run函数）</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln"> 2</span>  <span class="kd">var</span> <span class="nx">Version</span> <span class="kt">bool</span>
-<span class="ln"> 3</span>
-<span class="ln"> 4</span>  <span class="kd">var</span> <span class="nx">rootCmd</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln"> 5</span>    <span class="nx">Use</span><span class="p">:</span>                        <span class="s">&#34;root [sub]&#34;</span><span class="p">,</span>
-<span class="ln"> 6</span>    <span class="nx">Short</span><span class="p">:</span>                      <span class="s">&#34;root command&#34;</span><span class="p">,</span>
-<span class="ln"> 7</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 8</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd Run with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 9</span>      <span class="k">if</span> <span class="nx">Version</span> <span class="p">{</span>
-<span class="ln">10</span>        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Version: 1.0&#34;</span><span class="p">)</span>
-<span class="ln">11</span>      <span class="p">}</span>
-<span class="ln">12</span>    <span class="p">},</span>
-<span class="ln">13</span>  <span class="p">}</span>
-<span class="ln">14</span>
-<span class="ln">15</span>  <span class="nx">flags</span> <span class="o">:=</span> <span class="nx">rootCmd</span><span class="p">.</span><span class="nf">Flags</span><span class="p">()</span>
-<span class="ln">16</span>  <span class="c1">// 设置flags
-</span><span class="ln">17</span><span class="c1"></span>  <span class="c1">// 参数含义依次是：接收参数的变量，命令行参数名称，名称简写，默认值，参数提示信息
-</span><span class="ln">18</span><span class="c1"></span>  <span class="nx">flags</span><span class="p">.</span><span class="nf">BoolVarP</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Version</span><span class="p">,</span> <span class="s">&#34;version&#34;</span><span class="p">,</span> <span class="s">&#34;v&#34;</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&#34;print version information&#34;</span><span class="p">)</span>
-<span class="ln">19</span>
-<span class="ln">20</span>  <span class="c1">// 开始执行
-</span><span class="ln">21</span><span class="c1"></span>  <span class="nx">_</span> <span class="p">=</span> <span class="nx">rootCmd</span><span class="p">.</span><span class="nf">Execute</span><span class="p">()</span>
-<span class="ln">22</span><span class="p">}</span>
-</code></pre></div><h3 id="添加额外的command">添加额外的command</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">rootCmd</span><span class="p">.</span><span class="nf">AddCommand</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln">2</span>    <span class="nx">Use</span><span class="p">:</span> <span class="s">&#34;hello&#34;</span><span class="p">,</span>
-<span class="ln">3</span>    <span class="nx">Short</span><span class="p">:</span> <span class="s">&#34;hello&#34;</span><span class="p">,</span>
-<span class="ln">4</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">5</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;hello&#34;</span><span class="p">)</span>
-<span class="ln">6</span>    <span class="p">},</span>
-<span class="ln">7</span>  <span class="p">})</span>
-</code></pre></div><h3 id="flags">Flags</h3>
-<p>Flags分为全局flag和局部flag：</p>
-<ul>
-<li>全局flag：对所有的command生效。rootCmd.PersistentFlags()</li>
-<li>局部flag：只对特定的command生效。localCmd.Flags()</li>
-</ul>
-<h2 id="模板脚手架">模板脚手架</h2>
-<p>cobra提供命令行工具，支持快速搭建cli应用程序，代替手工编写繁琐代码</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln"> 1</span><span class="c1"># 引入包依赖</span>
-<span class="ln"> 2</span>go get -u github.com/spf13/cobra/cobra
-<span class="ln"> 3</span><span class="c1"># 使用模板脚手架</span>
-<span class="ln"> 4</span>cobra init --pkg-name cobraDemo
-<span class="ln"> 5</span><span class="nb">cd</span> cobraDemo
-<span class="ln"> 6</span><span class="c1"># 查看目录结构</span>
-<span class="ln"> 7</span>tree .
-<span class="ln"> 8</span>.
-<span class="ln"> 9</span>├── LICENSE
-<span class="ln">10</span>├── cmd
-<span class="ln">11</span>│   └── root.go
-<span class="ln">12</span>└── main.go
-</code></pre></div><h2 id="生命周期">生命周期</h2>
-<p>Command中的Run字段，是执行的核心方法。Cobra支持应用生命周期的配置，运行在执行Run方法的前后定义业务逻辑。具体的执行顺序为：</p>
-<ul>
-<li>PersistentPreRun</li>
-<li>PreRun</li>
-<li>Run</li>
-<li>PostRun</li>
-<li>PersistentPostRun</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">var</span> <span class="nx">rootCmd</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln"> 2</span>    <span class="nx">Use</span><span class="p">:</span>   <span class="s">&#34;root [sub]&#34;</span><span class="p">,</span>
-<span class="ln"> 3</span>    <span class="nx">Short</span><span class="p">:</span> <span class="s">&#34;My root command&#34;</span><span class="p">,</span>
-<span class="ln"> 4</span>    <span class="nx">PersistentPreRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 5</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PersistentPreRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 6</span>    <span class="p">},</span>
-<span class="ln"> 7</span>    <span class="nx">PreRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 8</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PreRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 9</span>    <span class="p">},</span>
-<span class="ln">10</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">11</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd Run with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">12</span>    <span class="p">},</span>
-<span class="ln">13</span>    <span class="nx">PostRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">14</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PostRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">15</span>    <span class="p">},</span>
-<span class="ln">16</span>    <span class="nx">PersistentPostRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">17</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PersistentPostRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">18</span>    <span class="p">},</span>
-<span class="ln">19</span>  <span class="p">}</span>
-</code></pre></div><h2 id="拼写错误智能提示">拼写错误智能提示</h2>
-<p>默认是开启拼写错误智能提示的，如果想关闭，可以如下设置</p>
-<blockquote>
-<p>底层使用了字符串相似度算法（编辑距离算法 Levenshtein Distance），由俄罗斯科学家Vladimir Levenshtein在1965年提出</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="nx">command</span><span class="p">.</span><span class="nx">DisableSuggestions</span> <span class="p">=</span> <span class="kc">true</span>
+<h2 id="结构体">结构体</h2>
+<p>源码位置：src/runtime/map.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">hmap</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 元素数量
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nx">count</span>     <span class="kt">int</span>
+<span class="ln"> 4</span>  <span class="c1">// 标识目前map的状态：写、扩容
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">flags</span>     <span class="kt">uint8</span>
+<span class="ln"> 6</span>  <span class="c1">// log_2 桶数量
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nx">B</span>         <span class="kt">uint8</span>
+<span class="ln"> 8</span>  <span class="c1">// 元素超出该数量认为溢出
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="nx">noverflow</span> <span class="kt">uint16</span>
+<span class="ln">10</span>  <span class="nx">hash0</span>     <span class="kt">uint32</span> <span class="c1">// hash seed
+</span><span class="ln">11</span><span class="c1"></span>  <span class="c1">// 桶数组，指向bmap，长度为 2^B
+</span><span class="ln">12</span><span class="c1"></span>  <span class="nx">buckets</span>    <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span>
+<span class="ln">13</span>  <span class="c1">// 扩容用的桶
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">oldbuckets</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span>
+<span class="ln">15</span>  <span class="c1">// 扩容进度
+</span><span class="ln">16</span><span class="c1"></span>  <span class="nx">nevacuate</span>  <span class="kt">uintptr</span>
+<span class="ln">17</span>  <span class="c1">// 可选字段，额外属性
+</span><span class="ln">18</span><span class="c1"></span>  <span class="nx">extra</span> <span class="o">*</span><span class="nx">mapextra</span> <span class="c1">// optional fields
+</span><span class="ln">19</span><span class="c1"></span><span class="p">}</span>
+<span class="ln">20</span>
+<span class="ln">21</span><span class="c1">// 桶
+</span><span class="ln">22</span><span class="c1"></span><span class="kd">type</span> <span class="nx">bmap</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">23</span>  <span class="c1">// 不仅仅只有这个字段，其他字段是在编译时加进去的，因为map中存放的数据类型不确定
+</span><span class="ln">24</span><span class="c1"></span>  <span class="c1">// 参考 src/cmd/compile/internal/gc/reflect.go的bmap函数
+</span><span class="ln">25</span><span class="c1"></span>
+<span class="ln">26</span>  <span class="c1">// bucketCnt=8，也就是bmap中的桶固定只有8个格子，每个格子内存放一对key-value，
+</span><span class="ln">27</span><span class="c1"></span>  <span class="c1">// 表示key-value的字段并不在这里表示，而是编译时动态添加的
+</span><span class="ln">28</span><span class="c1"></span>  <span class="nx">tophash</span> <span class="p">[</span><span class="nx">bucketCnt</span><span class="p">]</span><span class="kt">uint8</span>
+<span class="ln">29</span>
+<span class="ln">30</span>  <span class="c1">// 其他编译生成的字段包括
+</span><span class="ln">31</span><span class="c1"></span>  <span class="c1">// overflow 用于连接下一个bmap（溢出桶）
+</span><span class="ln">32</span><span class="c1"></span><span class="p">}</span>
+</code></pre></div><h2 id="map初始化">map初始化</h2>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">makemap</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">maptype</span><span class="p">,</span> <span class="nx">hint</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span><span class="nx">hmap</span><span class="p">)</span> <span class="o">*</span><span class="nx">hmap</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">mem</span><span class="p">,</span> <span class="nx">overflow</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">MulUintptr</span><span class="p">(</span><span class="nb">uintptr</span><span class="p">(</span><span class="nx">hint</span><span class="p">),</span> <span class="nx">t</span><span class="p">.</span><span class="nx">bucket</span><span class="p">.</span><span class="nx">size</span><span class="p">)</span>
+<span class="ln"> 3</span>  <span class="k">if</span> <span class="nx">overflow</span> <span class="o">||</span> <span class="nx">mem</span> <span class="p">&gt;</span> <span class="nx">maxAlloc</span> <span class="p">{</span>
+<span class="ln"> 4</span>    <span class="nx">hint</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln"> 5</span>  <span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// initialize Hmap
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 9</span>    <span class="nx">h</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">hmap</span><span class="p">)</span>
+<span class="ln">10</span>  <span class="p">}</span>
+<span class="ln">11</span>  <span class="nx">h</span><span class="p">.</span><span class="nx">hash0</span> <span class="p">=</span> <span class="nf">fastrand</span><span class="p">()</span>
+<span class="ln">12</span>
+<span class="ln">13</span>  <span class="c1">// Find the size parameter B which will hold the requested # of elements.
+</span><span class="ln">14</span><span class="c1"></span>  <span class="c1">// For hint &lt; 0 overLoadFactor returns false since hint &lt; bucketCnt.
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">B</span> <span class="o">:=</span> <span class="nb">uint8</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="ln">16</span>  <span class="k">for</span> <span class="nf">overLoadFactor</span><span class="p">(</span><span class="nx">hint</span><span class="p">,</span> <span class="nx">B</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">17</span>    <span class="nx">B</span><span class="o">++</span>
+<span class="ln">18</span>  <span class="p">}</span>
+<span class="ln">19</span>  <span class="nx">h</span><span class="p">.</span><span class="nx">B</span> <span class="p">=</span> <span class="nx">B</span>
+<span class="ln">20</span>
+<span class="ln">21</span>  <span class="c1">// allocate initial hash table
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">// if B == 0, the buckets field is allocated lazily later (in mapassign)
+</span><span class="ln">23</span><span class="c1"></span>  <span class="c1">// If hint is large zeroing this memory could take a while.
+</span><span class="ln">24</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">h</span><span class="p">.</span><span class="nx">B</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">25</span>    <span class="kd">var</span> <span class="nx">nextOverflow</span> <span class="o">*</span><span class="nx">bmap</span>
+<span class="ln">26</span>    <span class="nx">h</span><span class="p">.</span><span class="nx">buckets</span><span class="p">,</span> <span class="nx">nextOverflow</span> <span class="p">=</span> <span class="nf">makeBucketArray</span><span class="p">(</span><span class="nx">t</span><span class="p">,</span> <span class="nx">h</span><span class="p">.</span><span class="nx">B</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">27</span>    <span class="k">if</span> <span class="nx">nextOverflow</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">28</span>      <span class="nx">h</span><span class="p">.</span><span class="nx">extra</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">mapextra</span><span class="p">)</span>
+<span class="ln">29</span>      <span class="nx">h</span><span class="p">.</span><span class="nx">extra</span><span class="p">.</span><span class="nx">nextOverflow</span> <span class="p">=</span> <span class="nx">nextOverflow</span>
+<span class="ln">30</span>    <span class="p">}</span>
+<span class="ln">31</span>  <span class="p">}</span>
+<span class="ln">32</span>
+<span class="ln">33</span>  <span class="k">return</span> <span class="nx">h</span>
+<span class="ln">34</span><span class="p">}</span>
 </code></pre></div>
   </article>
 <aside class="sidebar">
@@ -366,9 +299,6 @@ APPNAME VERB NOUN &ndash;ADJECTIVE. 或者 APPNAME COMMAND ARG &ndash;FLAG</p>
     <h2 class="mt-4">Recent Posts</h2>
     <ul class="flex-column">
       
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" class="nav-link">go-map原理解析</a>
-      </li>
       <li>
         <a href="https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" class="nav-link">Docker核心原理</a>
       </li>

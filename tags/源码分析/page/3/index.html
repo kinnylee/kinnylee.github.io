@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="" class="page">
-  <head>  <title>go第三方库 - Cobra | kinnylee</title>
+<html lang="en" data-figures="">
+  <head>  <title>源码分析 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -14,14 +14,14 @@
 </script>
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="k8s的命令行工具-cobra框架 简介 Cobra 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli">
+<meta name="description" content="">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go第三方库 - Cobra" />
-<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" />
-<meta property = "og:title" content = "go第三方库 - Cobra" />
-<meta property = "og:description" content = "k8s的命令行工具-cobra框架 简介 Cobra 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli" />
-<meta property = "og:image" content = "https://kinnylee.github.io/images/cobra.png" />
+<meta name = "twitter:title" content = "源码分析" />
+<meta property = "og:url" content = "https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" />
+<meta property = "og:title" content = "源码分析" />
+<meta property = "og:description" content = "" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
@@ -30,7 +30,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/'>
+  <link rel='canonical' href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/'>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
 
@@ -138,192 +138,66 @@
 </header>
 
     <main>
-  
-<div class = 'grid-inverse wrap content'>
-  <article class='post_content' id= 'post_content'>
-    <h1 class='post_title'>go第三方库 - Cobra</h1><div class = 'post_meta'>
+
+<div class='grid-inverse wrap content'>
+  <ul class='posts' id = 'posts'>
+      
+<li class = 'post_item'>
+  <div class = 'excerpt'>
+    <div class = 'excerpt_header'>
+      <h3 class = 'post_link'>
+        <a href='https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/'>client-go源码分析(二) - Informer机制</a>
+      </h3>
+      <div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Sep 1, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/k8s' class = 'post_tag button button_translucent'>k8s
+    Aug 30, 2018</span>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
   </a>
-</div>
-<br/>
-    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1195 字</span>，阅读约<span class="more-meta"> 3 分钟</span>
-    <div class='post_share'>
-  | 复制链接:
-  <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" title="Copy Link" class="link link_yank">
-    <svg class="icon">
-      <use xlink:href="#yank"></use>
-    </svg>
+  <a href = 'https://kinnylee.github.io/tags/client-go' class = 'post_tag button button_translucent'>client-go
   </a>
 </div>
 
-    
-    
-    <h2>Overview</h2>
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#简介">简介</a>
-      <ul>
-        <li><a href="#特性">特性</a></li>
-      </ul>
+    </div>
+      <div class = 'excerpt_footer'>
+        <div>
+          <p class = 'pale'>client-go源码分析(二) - Informer机制 先放一张调用关系图 由于Informer这部分的源码比较复杂，调用链路也很长，后面的源码</p>
+          <a href='https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/' class='excerpt_more button'>阅读原文</a>
+        </div>
+      </div>
+    </div>
+  </li>
+  
+    <li>
+<ul class="pagination">
+  <li class="page-item">
+    <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="page-link" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
+  </li>
+  <li class="page-item">
+    <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/page/2/" class="page-link" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+  </li>
+  <li class="page-item">
+    <a class="page-link" href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">1</a>
+  </li>
+  <li class="page-item">
+    <a class="page-link" href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/page/2/">2</a>
+  </li>
+  <li class="page-item active">
+    <a class="page-link" href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/page/3/">3</a>
+  </li>
+  <li class="page-item disabled">
+    <a  class="page-link" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+  </li>
+  <li class="page-item">
+    <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/page/3/" class="page-link" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
+  </li>
+</ul>
+
+
     </li>
-    <li><a href="#基本概念">基本概念</a></li>
-    <li><a href="#安装">安装</a></li>
-    <li><a href="#快速上手">快速上手</a>
-      <ul>
-        <li><a href="#添加额外的command">添加额外的command</a></li>
-        <li><a href="#flags">Flags</a></li>
-      </ul>
-    </li>
-    <li><a href="#模板脚手架">模板脚手架</a></li>
-    <li><a href="#生命周期">生命周期</a></li>
-    <li><a href="#拼写错误智能提示">拼写错误智能提示</a></li>
   </ul>
-</nav>
-    <h1 id="k8s的命令行工具-cobra框架">k8s的命令行工具-cobra框架</h1>
-<h2 id="简介">简介</h2>
-<p><a href="https://github.com/spf13/cobra">Cobra</a> 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli。比如：</p>
-<ul>
-<li>k8s：kubectl等多个组件都用到</li>
-<li>Istio: istioctl命令</li>
-<li>Docker：docker命令</li>
-<li>Etcd：etcd命令</li>
-<li>Helm</li>
-<li>RClone</li>
-</ul>
-<blockquote>
-<p>spf13这个github项目的大佬开发了好几个知名的项目。比如：
-hugo：世界上最快的构建静态网站的项目（该文档的博客系统就是用hugo搭建的）
-cobra：今天的主角，命令行框架
-viper：配置信息处理框架</p>
-</blockquote>
-<h3 id="特性">特性</h3>
-<ul>
-<li>支持子命令行模式</li>
-<li>命令智能建议</li>
-<li>轻松生成应用程序和命令</li>
-<li>自动生成命令和参数的帮助信息</li>
-<li>自动生成详细的命令行帮助</li>
-<li>自动识别 -h &ndash;help</li>
-<li>bash环境下自动补全</li>
-<li>自动生成帮助手册</li>
-</ul>
-<h2 id="基本概念">基本概念</h2>
-<p>Cobra基于三个基本结构构建应用程序：</p>
-<ul>
-<li>Commands：表示执行动作。是应用程序交互的中心，支持子命令 SubCommand</li>
-<li>Args：执行参数</li>
-<li>Flags：动作的标识符，可以修改command的行为</li>
-</ul>
-<p>展现形式为：
-APPNAME VERB NOUN &ndash;ADJECTIVE. 或者 APPNAME COMMAND ARG &ndash;FLAG</p>
-<h2 id="安装">安装</h2>
-<ol>
-<li>通过<code>go get</code>安装最新版本库</li>
-</ol>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">1</span>go get github.io/spf13/cobra
-</code></pre></div><ol start="2">
-<li>引入包名</li>
-</ol>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kn">import</span> <span class="s">&#34;github.com/spf13/cobra&#34;</span>
-</code></pre></div><h2 id="快速上手">快速上手</h2>
-<p>基本操作包括三步：</p>
-<ul>
-<li>创建command主命令，并定义Run执行函数（只定义，还没有执行），AddCommand可以添加命令或者子命令</li>
-<li>为命令添加命令行参数</li>
-<li>执行Execute命令（会在内部回调Run函数）</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln"> 2</span>  <span class="kd">var</span> <span class="nx">Version</span> <span class="kt">bool</span>
-<span class="ln"> 3</span>
-<span class="ln"> 4</span>  <span class="kd">var</span> <span class="nx">rootCmd</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln"> 5</span>    <span class="nx">Use</span><span class="p">:</span>                        <span class="s">&#34;root [sub]&#34;</span><span class="p">,</span>
-<span class="ln"> 6</span>    <span class="nx">Short</span><span class="p">:</span>                      <span class="s">&#34;root command&#34;</span><span class="p">,</span>
-<span class="ln"> 7</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 8</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd Run with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 9</span>      <span class="k">if</span> <span class="nx">Version</span> <span class="p">{</span>
-<span class="ln">10</span>        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Version: 1.0&#34;</span><span class="p">)</span>
-<span class="ln">11</span>      <span class="p">}</span>
-<span class="ln">12</span>    <span class="p">},</span>
-<span class="ln">13</span>  <span class="p">}</span>
-<span class="ln">14</span>
-<span class="ln">15</span>  <span class="nx">flags</span> <span class="o">:=</span> <span class="nx">rootCmd</span><span class="p">.</span><span class="nf">Flags</span><span class="p">()</span>
-<span class="ln">16</span>  <span class="c1">// 设置flags
-</span><span class="ln">17</span><span class="c1"></span>  <span class="c1">// 参数含义依次是：接收参数的变量，命令行参数名称，名称简写，默认值，参数提示信息
-</span><span class="ln">18</span><span class="c1"></span>  <span class="nx">flags</span><span class="p">.</span><span class="nf">BoolVarP</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Version</span><span class="p">,</span> <span class="s">&#34;version&#34;</span><span class="p">,</span> <span class="s">&#34;v&#34;</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&#34;print version information&#34;</span><span class="p">)</span>
-<span class="ln">19</span>
-<span class="ln">20</span>  <span class="c1">// 开始执行
-</span><span class="ln">21</span><span class="c1"></span>  <span class="nx">_</span> <span class="p">=</span> <span class="nx">rootCmd</span><span class="p">.</span><span class="nf">Execute</span><span class="p">()</span>
-<span class="ln">22</span><span class="p">}</span>
-</code></pre></div><h3 id="添加额外的command">添加额外的command</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">rootCmd</span><span class="p">.</span><span class="nf">AddCommand</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln">2</span>    <span class="nx">Use</span><span class="p">:</span> <span class="s">&#34;hello&#34;</span><span class="p">,</span>
-<span class="ln">3</span>    <span class="nx">Short</span><span class="p">:</span> <span class="s">&#34;hello&#34;</span><span class="p">,</span>
-<span class="ln">4</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">5</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;hello&#34;</span><span class="p">)</span>
-<span class="ln">6</span>    <span class="p">},</span>
-<span class="ln">7</span>  <span class="p">})</span>
-</code></pre></div><h3 id="flags">Flags</h3>
-<p>Flags分为全局flag和局部flag：</p>
-<ul>
-<li>全局flag：对所有的command生效。rootCmd.PersistentFlags()</li>
-<li>局部flag：只对特定的command生效。localCmd.Flags()</li>
-</ul>
-<h2 id="模板脚手架">模板脚手架</h2>
-<p>cobra提供命令行工具，支持快速搭建cli应用程序，代替手工编写繁琐代码</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln"> 1</span><span class="c1"># 引入包依赖</span>
-<span class="ln"> 2</span>go get -u github.com/spf13/cobra/cobra
-<span class="ln"> 3</span><span class="c1"># 使用模板脚手架</span>
-<span class="ln"> 4</span>cobra init --pkg-name cobraDemo
-<span class="ln"> 5</span><span class="nb">cd</span> cobraDemo
-<span class="ln"> 6</span><span class="c1"># 查看目录结构</span>
-<span class="ln"> 7</span>tree .
-<span class="ln"> 8</span>.
-<span class="ln"> 9</span>├── LICENSE
-<span class="ln">10</span>├── cmd
-<span class="ln">11</span>│   └── root.go
-<span class="ln">12</span>└── main.go
-</code></pre></div><h2 id="生命周期">生命周期</h2>
-<p>Command中的Run字段，是执行的核心方法。Cobra支持应用生命周期的配置，运行在执行Run方法的前后定义业务逻辑。具体的执行顺序为：</p>
-<ul>
-<li>PersistentPreRun</li>
-<li>PreRun</li>
-<li>Run</li>
-<li>PostRun</li>
-<li>PersistentPostRun</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">var</span> <span class="nx">rootCmd</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln"> 2</span>    <span class="nx">Use</span><span class="p">:</span>   <span class="s">&#34;root [sub]&#34;</span><span class="p">,</span>
-<span class="ln"> 3</span>    <span class="nx">Short</span><span class="p">:</span> <span class="s">&#34;My root command&#34;</span><span class="p">,</span>
-<span class="ln"> 4</span>    <span class="nx">PersistentPreRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 5</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PersistentPreRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 6</span>    <span class="p">},</span>
-<span class="ln"> 7</span>    <span class="nx">PreRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 8</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PreRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 9</span>    <span class="p">},</span>
-<span class="ln">10</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">11</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd Run with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">12</span>    <span class="p">},</span>
-<span class="ln">13</span>    <span class="nx">PostRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">14</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PostRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">15</span>    <span class="p">},</span>
-<span class="ln">16</span>    <span class="nx">PersistentPostRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">17</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PersistentPostRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">18</span>    <span class="p">},</span>
-<span class="ln">19</span>  <span class="p">}</span>
-</code></pre></div><h2 id="拼写错误智能提示">拼写错误智能提示</h2>
-<p>默认是开启拼写错误智能提示的，如果想关闭，可以如下设置</p>
-<blockquote>
-<p>底层使用了字符串相似度算法（编辑距离算法 Levenshtein Distance），由俄罗斯科学家Vladimir Levenshtein在1965年提出</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="nx">command</span><span class="p">.</span><span class="nx">DisableSuggestions</span> <span class="p">=</span> <span class="kc">true</span>
-</code></pre></div>
-  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -638,6 +512,8 @@ APPNAME VERB NOUN &ndash;ADJECTIVE. 或者 APPNAME COMMAND ARG &ndash;FLAG</p>
 </aside>
 
 </div>
+
+
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>

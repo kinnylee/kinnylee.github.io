@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 08 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/categories/go/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>go-map原理解析</title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/</link>
+      <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/</guid>
+      <description>map原理 map数据结构 map初始化 插入 删除 扩容 遍历 NAN 结构体 源码位置：src/runtime/map.go 1type hmap struct { 2 // 元素数量 3 count int 4 // 标识</description>
+    </item>
     
     <item>
       <title>go触发调度机制</title>

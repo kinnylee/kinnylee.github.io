@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>go第三方库 - Cobra | kinnylee</title>
+  <head>  <title>client-go源码分析(三) - WorkQueue | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,16 +12,17 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
+  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="k8s的命令行工具-cobra框架 简介 Cobra 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli">
+<meta name="description" content="WorkQueue WorkQueue称为工作队列，比普通的FIFO负责，主要功能在于标记和去重，并支持如下特性： 有序 去重 并发性 标记机制：标记是否被处理过 通知">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go第三方库 - Cobra" />
-<meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" />
-<meta property = "og:title" content = "go第三方库 - Cobra" />
-<meta property = "og:description" content = "k8s的命令行工具-cobra框架 简介 Cobra 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli" />
-<meta property = "og:image" content = "https://kinnylee.github.io/images/cobra.png" />
+<meta name = "twitter:title" content = "client-go源码分析(三) - WorkQueue" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/" />
+<meta property = "og:title" content = "client-go源码分析(三) - WorkQueue" />
+<meta property = "og:description" content = "WorkQueue WorkQueue称为工作队列，比普通的FIFO负责，主要功能在于标记和去重，并支持如下特性： 有序 去重 并发性 标记机制：标记是否被处理过 通知" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
@@ -30,7 +31,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/'>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
 
@@ -141,21 +142,23 @@
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content' id= 'post_content'>
-    <h1 class='post_title'>go第三方库 - Cobra</h1><div class = 'post_meta'>
+    <h1 class='post_title'>client-go源码分析(三) - WorkQueue</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Sep 1, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/k8s' class = 'post_tag button button_translucent'>k8s
+    Sep 10, 2018</span>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/client-go' class = 'post_tag button button_translucent'>client-go
   </a>
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1195 字</span>，阅读约<span class="more-meta"> 3 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 1416 字</span>，阅读约<span class="more-meta"> 3 分钟</span>
     <div class='post_share'>
   | 复制链接:
-  <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-cobra/" title="Copy Link" class="link link_yank">
+  <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/" title="Copy Link" class="link link_yank">
     <svg class="icon">
       <use xlink:href="#yank"></use>
     </svg>
@@ -167,161 +170,196 @@
     <h2>Overview</h2>
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#简介">简介</a>
+    <li><a href="#workqueue">WorkQueue</a>
       <ul>
-        <li><a href="#特性">特性</a></li>
+        <li><a href="#fifo队列">FIFO队列</a></li>
+        <li><a href="#延迟队列">延迟队列</a></li>
+        <li><a href="#限速队列">限速队列</a></li>
       </ul>
     </li>
-    <li><a href="#基本概念">基本概念</a></li>
-    <li><a href="#安装">安装</a></li>
-    <li><a href="#快速上手">快速上手</a>
-      <ul>
-        <li><a href="#添加额外的command">添加额外的command</a></li>
-        <li><a href="#flags">Flags</a></li>
-      </ul>
-    </li>
-    <li><a href="#模板脚手架">模板脚手架</a></li>
-    <li><a href="#生命周期">生命周期</a></li>
-    <li><a href="#拼写错误智能提示">拼写错误智能提示</a></li>
+    <li><a href="#事件管理器">事件管理器</a></li>
   </ul>
 </nav>
-    <h1 id="k8s的命令行工具-cobra框架">k8s的命令行工具-cobra框架</h1>
-<h2 id="简介">简介</h2>
-<p><a href="https://github.com/spf13/cobra">Cobra</a> 是一个创建强大的现代化Cli命令行应用程序的go语言库。很多知名的开源软件都使用Cobra实现Cli。比如：</p>
+    <h2 id="workqueue">WorkQueue</h2>
+<p>WorkQueue称为工作队列，比普通的FIFO负责，主要功能在于标记和去重，并支持如下特性：</p>
 <ul>
-<li>k8s：kubectl等多个组件都用到</li>
-<li>Istio: istioctl命令</li>
-<li>Docker：docker命令</li>
-<li>Etcd：etcd命令</li>
-<li>Helm</li>
-<li>RClone</li>
+<li>有序</li>
+<li>去重</li>
+<li>并发性</li>
+<li>标记机制：标记是否被处理过</li>
+<li>通知机制</li>
+<li>延迟</li>
+<li>限速</li>
+<li>Metric：支持监控指标</li>
 </ul>
-<blockquote>
-<p>spf13这个github项目的大佬开发了好几个知名的项目。比如：
-hugo：世界上最快的构建静态网站的项目（该文档的博客系统就是用hugo搭建的）
-cobra：今天的主角，命令行框架
-viper：配置信息处理框架</p>
-</blockquote>
-<h3 id="特性">特性</h3>
+<p>WorkQueue支持三种队列，并提供了3种接口，不同的实现应对不同的场景</p>
 <ul>
-<li>支持子命令行模式</li>
-<li>命令智能建议</li>
-<li>轻松生成应用程序和命令</li>
-<li>自动生成命令和参数的帮助信息</li>
-<li>自动生成详细的命令行帮助</li>
-<li>自动识别 -h &ndash;help</li>
-<li>bash环境下自动补全</li>
-<li>自动生成帮助手册</li>
+<li>Interface：FIFO队列，去重队列</li>
+<li>DelayingInterface：延时队列</li>
+<li>RateLimitingInterface：限速队列</li>
 </ul>
-<h2 id="基本概念">基本概念</h2>
-<p>Cobra基于三个基本结构构建应用程序：</p>
+<h3 id="fifo队列">FIFO队列</h3>
+<p>源码位置：k8s.io/client-go/util/workqueue/quque.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Interface</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 添加元素
+</span><span class="ln"> 3</span><span class="c1"></span>  <span class="nf">Add</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln"> 4</span>  <span class="c1">// 队列长度
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span>
+<span class="ln"> 6</span>  <span class="c1">// 获取队列头部第一个元素
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nf">Get</span><span class="p">()</span> <span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">shutdown</span> <span class="kt">bool</span><span class="p">)</span>
+<span class="ln"> 8</span>  <span class="c1">// 标记队列中该元素已被处理
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="nf">Done</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln">10</span>  <span class="c1">// 关闭队列
+</span><span class="ln">11</span><span class="c1"></span>  <span class="nf">ShutDown</span><span class="p">()</span>
+<span class="ln">12</span>  <span class="c1">// 查询队列是否关闭
+</span><span class="ln">13</span><span class="c1"></span>  <span class="nf">ShuttingDown</span><span class="p">()</span> <span class="kt">bool</span>
+<span class="ln">14</span><span class="p">}</span>
+<span class="ln">15</span>
+<span class="ln">16</span><span class="c1">// FIFO数据结构
+</span><span class="ln">17</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Type</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">18</span>  <span class="c1">// 实际存储数据的地方
+</span><span class="ln">19</span><span class="c1"></span>  <span class="nx">queue</span> <span class="p">[]</span><span class="nx">t</span>
+<span class="ln">20</span>
+<span class="ln">21</span>  <span class="c1">// 保证去重
+</span><span class="ln">22</span><span class="c1"></span>  <span class="nx">dirty</span> <span class="nx">set</span>
+<span class="ln">23</span>  <span class="c1">// 标记元素是否正在被处理
+</span><span class="ln">24</span><span class="c1"></span>  <span class="nx">processing</span> <span class="nx">set</span>
+<span class="ln">25</span>
+<span class="ln">26</span>  <span class="nx">cond</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Cond</span>
+<span class="ln">27</span>
+<span class="ln">28</span>  <span class="nx">shuttingDown</span> <span class="kt">bool</span>
+<span class="ln">29</span>
+<span class="ln">30</span>  <span class="nx">metrics</span> <span class="nx">queueMetrics</span>
+<span class="ln">31</span>
+<span class="ln">32</span>  <span class="nx">unfinishedWorkUpdatePeriod</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="ln">33</span>  <span class="nx">clock</span>                      <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
+<span class="ln">34</span><span class="p">}</span>
+</code></pre></div><h3 id="延迟队列">延迟队列</h3>
+<p>延迟队列基于FIFO队列，增加了AddAfter方法，原理是：延迟一段时间后再将元素插入FIFO。</p>
+<p>AddAfter方法会插入一个参数，并附带一个时间，指定插入元素的延迟时间</p>
+<p>源码位置：k8s.io/client-go/util/workqueue/delaying_queue.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">DelayingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">Interface</span>
+<span class="ln"> 3</span>  <span class="c1">// AddAfter adds an item to the workqueue after the indicated duration has passed
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="nf">AddAfter</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">duration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span>
+<span class="ln"> 5</span><span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="kd">type</span> <span class="nx">delayingType</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 8</span>  <span class="nx">Interface</span>
+<span class="ln"> 9</span>  <span class="nx">clock</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Clock</span>
+<span class="ln">10</span>  <span class="nx">stopCh</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{}</span>
+<span class="ln">11</span>  <span class="nx">stopOnce</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">Once</span>
+<span class="ln">12</span>  <span class="nx">heartbeat</span> <span class="nx">clock</span><span class="p">.</span><span class="nx">Ticker</span>
+<span class="ln">13</span>
+<span class="ln">14</span>  <span class="c1">// 插入的元素数量阈值，超过该值延迟队列会阻塞
+</span><span class="ln">15</span><span class="c1"></span>  <span class="nx">waitingForAddCh</span> <span class="kd">chan</span> <span class="o">*</span><span class="nx">waitFor</span>
+<span class="ln">16</span>  <span class="nx">metrics</span> <span class="nx">retryMetrics</span>
+<span class="ln">17</span><span class="p">}</span>
+</code></pre></div><h3 id="限速队列">限速队列</h3>
+<p>限速队列基于延迟队列和FIFO队列接口封装，新增了以下方法：</p>
 <ul>
-<li>Commands：表示执行动作。是应用程序交互的中心，支持子命令 SubCommand</li>
-<li>Args：执行参数</li>
-<li>Flags：动作的标识符，可以修改command的行为</li>
+<li>AddRateLimited</li>
+<li>Forget</li>
+<li>NumRequeues</li>
 </ul>
-<p>展现形式为：
-APPNAME VERB NOUN &ndash;ADJECTIVE. 或者 APPNAME COMMAND ARG &ndash;FLAG</p>
-<h2 id="安装">安装</h2>
-<ol>
-<li>通过<code>go get</code>安装最新版本库</li>
-</ol>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">1</span>go get github.io/spf13/cobra
-</code></pre></div><ol start="2">
-<li>引入包名</li>
-</ol>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kn">import</span> <span class="s">&#34;github.com/spf13/cobra&#34;</span>
-</code></pre></div><h2 id="快速上手">快速上手</h2>
-<p>基本操作包括三步：</p>
-<ul>
-<li>创建command主命令，并定义Run执行函数（只定义，还没有执行），AddCommand可以添加命令或者子命令</li>
-<li>为命令添加命令行参数</li>
-<li>执行Execute命令（会在内部回调Run函数）</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln"> 2</span>  <span class="kd">var</span> <span class="nx">Version</span> <span class="kt">bool</span>
+<p>源码位置：k8s.io/client-go/util/workqueue/rate_limiting_queue.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">RateLimitingInterface</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">DelayingInterface</span>
 <span class="ln"> 3</span>
-<span class="ln"> 4</span>  <span class="kd">var</span> <span class="nx">rootCmd</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln"> 5</span>    <span class="nx">Use</span><span class="p">:</span>                        <span class="s">&#34;root [sub]&#34;</span><span class="p">,</span>
-<span class="ln"> 6</span>    <span class="nx">Short</span><span class="p">:</span>                      <span class="s">&#34;root command&#34;</span><span class="p">,</span>
-<span class="ln"> 7</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 8</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd Run with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 9</span>      <span class="k">if</span> <span class="nx">Version</span> <span class="p">{</span>
-<span class="ln">10</span>        <span class="nx">fmt</span><span class="p">.</span><span class="nf">Println</span><span class="p">(</span><span class="s">&#34;Version: 1.0&#34;</span><span class="p">)</span>
-<span class="ln">11</span>      <span class="p">}</span>
-<span class="ln">12</span>    <span class="p">},</span>
-<span class="ln">13</span>  <span class="p">}</span>
-<span class="ln">14</span>
-<span class="ln">15</span>  <span class="nx">flags</span> <span class="o">:=</span> <span class="nx">rootCmd</span><span class="p">.</span><span class="nf">Flags</span><span class="p">()</span>
-<span class="ln">16</span>  <span class="c1">// 设置flags
-</span><span class="ln">17</span><span class="c1"></span>  <span class="c1">// 参数含义依次是：接收参数的变量，命令行参数名称，名称简写，默认值，参数提示信息
-</span><span class="ln">18</span><span class="c1"></span>  <span class="nx">flags</span><span class="p">.</span><span class="nf">BoolVarP</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Version</span><span class="p">,</span> <span class="s">&#34;version&#34;</span><span class="p">,</span> <span class="s">&#34;v&#34;</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&#34;print version information&#34;</span><span class="p">)</span>
-<span class="ln">19</span>
-<span class="ln">20</span>  <span class="c1">// 开始执行
-</span><span class="ln">21</span><span class="c1"></span>  <span class="nx">_</span> <span class="p">=</span> <span class="nx">rootCmd</span><span class="p">.</span><span class="nf">Execute</span><span class="p">()</span>
-<span class="ln">22</span><span class="p">}</span>
-</code></pre></div><h3 id="添加额外的command">添加额外的command</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">rootCmd</span><span class="p">.</span><span class="nf">AddCommand</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln">2</span>    <span class="nx">Use</span><span class="p">:</span> <span class="s">&#34;hello&#34;</span><span class="p">,</span>
-<span class="ln">3</span>    <span class="nx">Short</span><span class="p">:</span> <span class="s">&#34;hello&#34;</span><span class="p">,</span>
-<span class="ln">4</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">5</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;hello&#34;</span><span class="p">)</span>
-<span class="ln">6</span>    <span class="p">},</span>
-<span class="ln">7</span>  <span class="p">})</span>
-</code></pre></div><h3 id="flags">Flags</h3>
-<p>Flags分为全局flag和局部flag：</p>
+<span class="ln"> 4</span>  <span class="c1">// AddRateLimited adds an item to the workqueue after the rate limiter says it&#39;s ok
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nf">AddRateLimited</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// Forget indicates that an item is finished being retried.  Doesn&#39;t matter whether it&#39;s for perm failing
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="c1">// or for success, we&#39;ll stop the rate limiter from tracking it.  This only clears the `rateLimiter`, you
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="c1">// still have to call `Done` on the queue.
+</span><span class="ln">10</span><span class="c1"></span>  <span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln">11</span>
+<span class="ln">12</span>  <span class="c1">// NumRequeues returns back how many times the item was requeued
+</span><span class="ln">13</span><span class="c1"></span>  <span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div><p>限速队列提供了4中限速算法接口，利用延迟队列的特性达到限速目的：</p>
 <ul>
-<li>全局flag：对所有的command生效。rootCmd.PersistentFlags()</li>
-<li>局部flag：只对特定的command生效。localCmd.Flags()</li>
+<li>令牌桶算法</li>
+<li>排队指数算法</li>
+<li>计数器算法</li>
+<li>混合模式</li>
 </ul>
-<h2 id="模板脚手架">模板脚手架</h2>
-<p>cobra提供命令行工具，支持快速搭建cli应用程序，代替手工编写繁琐代码</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln"> 1</span><span class="c1"># 引入包依赖</span>
-<span class="ln"> 2</span>go get -u github.com/spf13/cobra/cobra
-<span class="ln"> 3</span><span class="c1"># 使用模板脚手架</span>
-<span class="ln"> 4</span>cobra init --pkg-name cobraDemo
-<span class="ln"> 5</span><span class="nb">cd</span> cobraDemo
-<span class="ln"> 6</span><span class="c1"># 查看目录结构</span>
-<span class="ln"> 7</span>tree .
-<span class="ln"> 8</span>.
-<span class="ln"> 9</span>├── LICENSE
-<span class="ln">10</span>├── cmd
-<span class="ln">11</span>│   └── root.go
-<span class="ln">12</span>└── main.go
-</code></pre></div><h2 id="生命周期">生命周期</h2>
-<p>Command中的Run字段，是执行的核心方法。Cobra支持应用生命周期的配置，运行在执行Run方法的前后定义业务逻辑。具体的执行顺序为：</p>
-<ul>
-<li>PersistentPreRun</li>
-<li>PreRun</li>
-<li>Run</li>
-<li>PostRun</li>
-<li>PersistentPostRun</li>
-</ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">var</span> <span class="nx">rootCmd</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
-<span class="ln"> 2</span>    <span class="nx">Use</span><span class="p">:</span>   <span class="s">&#34;root [sub]&#34;</span><span class="p">,</span>
-<span class="ln"> 3</span>    <span class="nx">Short</span><span class="p">:</span> <span class="s">&#34;My root command&#34;</span><span class="p">,</span>
-<span class="ln"> 4</span>    <span class="nx">PersistentPreRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 5</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PersistentPreRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 6</span>    <span class="p">},</span>
-<span class="ln"> 7</span>    <span class="nx">PreRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 8</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PreRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 9</span>    <span class="p">},</span>
-<span class="ln">10</span>    <span class="nx">Run</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">11</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd Run with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">12</span>    <span class="p">},</span>
-<span class="ln">13</span>    <span class="nx">PostRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">14</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PostRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">15</span>    <span class="p">},</span>
-<span class="ln">16</span>    <span class="nx">PersistentPostRun</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">cobra</span><span class="p">.</span><span class="nx">Command</span><span class="p">,</span> <span class="nx">args</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">17</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;Inside rootCmd PersistentPostRun with args: %v\n&#34;</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span>
-<span class="ln">18</span>    <span class="p">},</span>
-<span class="ln">19</span>  <span class="p">}</span>
-</code></pre></div><h2 id="拼写错误智能提示">拼写错误智能提示</h2>
-<p>默认是开启拼写错误智能提示的，如果想关闭，可以如下设置</p>
-<blockquote>
-<p>底层使用了字符串相似度算法（编辑距离算法 Levenshtein Distance），由俄罗斯科学家Vladimir Levenshtein在1965年提出</p>
-</blockquote>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="nx">command</span><span class="p">.</span><span class="nx">DisableSuggestions</span> <span class="p">=</span> <span class="kc">true</span>
+<p>源码位置：k8s.io/client-go/util/workqueue/default_rate_limiters.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">RateLimiter</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="c1">// 获取指定元素应该等待的时间
+</span><span class="ln">3</span><span class="c1"></span>  <span class="nf">When</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span>
+<span class="ln">4</span>  <span class="c1">// 释放指定元素，清空该元素的排队数
+</span><span class="ln">5</span><span class="c1"></span>  <span class="nf">Forget</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span>
+<span class="ln">6</span>  <span class="c1">// 获取指定元素的排队数
+</span><span class="ln">7</span><span class="c1"></span>  <span class="nf">NumRequeues</span><span class="p">(</span><span class="nx">item</span> <span class="kd">interface</span><span class="p">{})</span> <span class="kt">int</span>
+<span class="ln">8</span><span class="p">}</span>
+</code></pre></div><h2 id="事件管理器">事件管理器</h2>
+<p>事件是一种资源管理器，用于展示集群内发生的情况。各组件会将事件上报给api-serverer。</p>
+<p>源码位置：k8s.io/api/core/v1/types.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Event</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+<span class="ln"> 3</span>  <span class="c1">// Standard object&#39;s metadata.
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="c1">// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">metav1</span><span class="p">.</span><span class="nx">ObjectMeta</span> <span class="s">`json:&#34;metadata&#34; protobuf:&#34;bytes,1,opt,name=metadata&#34;`</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>  <span class="c1">// The object that this event is about.
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">InvolvedObject</span> <span class="nx">ObjectReference</span> <span class="s">`json:&#34;involvedObject&#34; protobuf:&#34;bytes,2,opt,name=involvedObject&#34;`</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>  <span class="c1">// This should be a short, machine understandable string that gives the reason
+</span><span class="ln">11</span><span class="c1"></span>  <span class="c1">// for the transition into the object&#39;s current status.
+</span><span class="ln">12</span><span class="c1"></span>  <span class="c1">// TODO: provide exact specification for format.
+</span><span class="ln">13</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">Reason</span> <span class="kt">string</span> <span class="s">`json:&#34;reason,omitempty&#34; protobuf:&#34;bytes,3,opt,name=reason&#34;`</span>
+<span class="ln">15</span>
+<span class="ln">16</span>  <span class="c1">// A human-readable description of the status of this operation.
+</span><span class="ln">17</span><span class="c1"></span>  <span class="c1">// TODO: decide on maximum length.
+</span><span class="ln">18</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">19</span><span class="c1"></span>  <span class="nx">Message</span> <span class="kt">string</span> <span class="s">`json:&#34;message,omitempty&#34; protobuf:&#34;bytes,4,opt,name=message&#34;`</span>
+<span class="ln">20</span>
+<span class="ln">21</span>  <span class="c1">// The component reporting this event. Should be a short machine understandable string.
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">23</span><span class="c1"></span>  <span class="nx">Source</span> <span class="nx">EventSource</span> <span class="s">`json:&#34;source,omitempty&#34; protobuf:&#34;bytes,5,opt,name=source&#34;`</span>
+<span class="ln">24</span>
+<span class="ln">25</span>  <span class="c1">// The time at which the event was first recorded. (Time of server receipt is in TypeMeta.)
+</span><span class="ln">26</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">27</span><span class="c1"></span>  <span class="nx">FirstTimestamp</span> <span class="nx">metav1</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;firstTimestamp,omitempty&#34; protobuf:&#34;bytes,6,opt,name=firstTimestamp&#34;`</span>
+<span class="ln">28</span>
+<span class="ln">29</span>  <span class="c1">// The time at which the most recent occurrence of this event was recorded.
+</span><span class="ln">30</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">31</span><span class="c1"></span>  <span class="nx">LastTimestamp</span> <span class="nx">metav1</span><span class="p">.</span><span class="nx">Time</span> <span class="s">`json:&#34;lastTimestamp,omitempty&#34; protobuf:&#34;bytes,7,opt,name=lastTimestamp&#34;`</span>
+<span class="ln">32</span>
+<span class="ln">33</span>  <span class="c1">// The number of times this event has occurred.
+</span><span class="ln">34</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">35</span><span class="c1"></span>  <span class="nx">Count</span> <span class="kt">int32</span> <span class="s">`json:&#34;count,omitempty&#34; protobuf:&#34;varint,8,opt,name=count&#34;`</span>
+<span class="ln">36</span>
+<span class="ln">37</span>  <span class="c1">// Type of this event (Normal, Warning), new types could be added in the future
+</span><span class="ln">38</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">39</span><span class="c1"></span>  <span class="nx">Type</span> <span class="kt">string</span> <span class="s">`json:&#34;type,omitempty&#34; protobuf:&#34;bytes,9,opt,name=type&#34;`</span>
+<span class="ln">40</span>
+<span class="ln">41</span>  <span class="c1">// Time when this Event was first observed.
+</span><span class="ln">42</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">43</span><span class="c1"></span>  <span class="nx">EventTime</span> <span class="nx">metav1</span><span class="p">.</span><span class="nx">MicroTime</span> <span class="s">`json:&#34;eventTime,omitempty&#34; protobuf:&#34;bytes,10,opt,name=eventTime&#34;`</span>
+<span class="ln">44</span>
+<span class="ln">45</span>  <span class="c1">// Data about the Event series this event represents or nil if it&#39;s a singleton Event.
+</span><span class="ln">46</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">47</span><span class="c1"></span>  <span class="nx">Series</span> <span class="o">*</span><span class="nx">EventSeries</span> <span class="s">`json:&#34;series,omitempty&#34; protobuf:&#34;bytes,11,opt,name=series&#34;`</span>
+<span class="ln">48</span>
+<span class="ln">49</span>  <span class="c1">// What action was taken/failed regarding to the Regarding object.
+</span><span class="ln">50</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">51</span><span class="c1"></span>  <span class="nx">Action</span> <span class="kt">string</span> <span class="s">`json:&#34;action,omitempty&#34; protobuf:&#34;bytes,12,opt,name=action&#34;`</span>
+<span class="ln">52</span>
+<span class="ln">53</span>  <span class="c1">// Optional secondary object for more complex actions.
+</span><span class="ln">54</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">55</span><span class="c1"></span>  <span class="nx">Related</span> <span class="o">*</span><span class="nx">ObjectReference</span> <span class="s">`json:&#34;related,omitempty&#34; protobuf:&#34;bytes,13,opt,name=related&#34;`</span>
+<span class="ln">56</span>
+<span class="ln">57</span>  <span class="c1">// Name of the controller that emitted this Event, e.g. `kubernetes.io/kubelet`.
+</span><span class="ln">58</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">59</span><span class="c1"></span>  <span class="nx">ReportingController</span> <span class="kt">string</span> <span class="s">`json:&#34;reportingComponent&#34; protobuf:&#34;bytes,14,opt,name=reportingComponent&#34;`</span>
+<span class="ln">60</span>
+<span class="ln">61</span>  <span class="c1">// ID of the controller instance, e.g. `kubelet-xyzf`.
+</span><span class="ln">62</span><span class="c1"></span>  <span class="c1">// +optional
+</span><span class="ln">63</span><span class="c1"></span>  <span class="nx">ReportingInstance</span> <span class="kt">string</span> <span class="s">`json:&#34;reportingInstance&#34; protobuf:&#34;bytes,15,opt,name=reportingInstance&#34;`</span>
+<span class="ln">64</span><span class="p">}</span>
 </code></pre></div>
   </article>
 <aside class="sidebar">
