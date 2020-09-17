@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Tue, 08 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 14 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/tags/go/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>go协程入门</title>
+      <link>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/</link>
+      <pubDate>Mon, 14 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/</guid>
+      <description>Go文件路径操作 windows、linux下的文件路径差异比较大，go语言作为跨平台的语言，底层做了这种差异的封装。跟文件路径操作相关的源码</description>
+    </item>
     
     <item>
       <title>go-map原理解析</title>

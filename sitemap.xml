@@ -4,46 +4,86 @@
   
   <url>
     <loc>https://kinnylee.github.io/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/categories/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/tags/go/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/net-http/</loc>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/categories/go/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <loc>https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/</loc>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <loc>https://kinnylee.github.io/tags/k8s/</loc>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <loc>https://kinnylee.github.io/categories/k8s/</loc>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/</loc>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/post/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/tags/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
+    <lastmod>2020-09-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/go/</loc>
+    <lastmod>2020-09-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/categories/go/</loc>
+    <lastmod>2020-09-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/</loc>
+    <lastmod>2020-09-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/</loc>
+    <lastmod>2020-09-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/</loc>
+    <lastmod>2020-09-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
+    <lastmod>2020-09-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
   
@@ -98,22 +138,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/tags/k8s/</loc>
-    <lastmod>2020-09-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/categories/k8s/</loc>
-    <lastmod>2020-09-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/</loc>
-    <lastmod>2020-09-02T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
     <lastmod>2020-09-02T00:00:00+00:00</lastmod>
   </url>
   
@@ -128,7 +153,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/</loc>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/golang%E7%9A%84restful%E6%A1%86%E6%9E%B6%E9%9B%86%E5%90%88/</loc>
     <lastmod>2020-09-01T00:00:00+00:00</lastmod>
   </url>
   
@@ -189,6 +214,11 @@
   
   <url>
     <loc>https://kinnylee.github.io/categories/mysql/</loc>
+    <lastmod>2020-08-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/mysql/sql%E8%84%9A%E6%9C%AC%E5%A2%9E%E9%87%8F%E5%8D%87%E7%BA%A7%E6%A1%86%E6%9E%B6-flyway/</loc>
     <lastmod>2020-08-27T00:00:00+00:00</lastmod>
   </url>
   
@@ -402,6 +432,10 @@
   
   <url>
     <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/beego/</loc>
   </url>
   
   <url>
