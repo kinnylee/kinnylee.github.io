@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Wed, 16 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 19 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>k8s使用的web框架：go-restful 源码分析</title>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/</link>
+      <pubDate>Sat, 19 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/</guid>
+      <description>Go-Restful 概述 go-restful是一个用go语言开发的快速构建restful风格的web框架。k8s最核心的组件kube-apiserver使用到</description>
+    </item>
     
     <item>
       <title>Golang http请求源码分析</title>
@@ -19,15 +28,6 @@
       
       <guid>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/net-http/</guid>
       <description>Golang http请求源码分析 go提供的标准库net/http，实现一个简单的http server非常容易，只需要短短几行代码。本篇文章将会对go标</description>
-    </item>
-    
-    <item>
-      <title>k8s使用的web框架：go-restful</title>
-      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/</link>
-      <pubDate>Wed, 16 Sep 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/</guid>
-      <description>Go-Restful 概述 go-restful是一个用go语言开发的快速构建restful风格的web框架。k8s最核心的组件kube-apiserver使用到</description>
     </item>
     
     <item>

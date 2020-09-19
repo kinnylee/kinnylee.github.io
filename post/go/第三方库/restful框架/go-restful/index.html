@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>k8s使用的web框架：go-restful | kinnylee</title>
+  <head>  <title>k8s使用的web框架：go-restful 源码分析 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -17,9 +17,9 @@
 <meta name="description" content="Go-Restful 概述 go-restful是一个用go语言开发的快速构建restful风格的web框架。k8s最核心的组件kube-apiserver使用到">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "k8s使用的web框架：go-restful" />
+<meta name = "twitter:title" content = "k8s使用的web框架：go-restful 源码分析" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" />
-<meta property = "og:title" content = "k8s使用的web框架：go-restful" />
+<meta property = "og:title" content = "k8s使用的web框架：go-restful 源码分析" />
 <meta property = "og:description" content = "Go-Restful 概述 go-restful是一个用go语言开发的快速构建restful风格的web框架。k8s最核心的组件kube-apiserver使用到" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/go.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
@@ -141,12 +141,12 @@
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content' id= 'post_content'>
-    <h1 class='post_title'>k8s使用的web框架：go-restful</h1><div class = 'post_meta'>
+    <h1 class='post_title'>k8s使用的web框架：go-restful 源码分析</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Sep 16, 2020</span>
+    Sep 19, 2020</span>
   <a href = 'https://kinnylee.github.io/tags/k8s' class = 'post_tag button button_translucent'>k8s
   </a>
   <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
@@ -154,7 +154,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1818 字</span>，阅读约<span class="more-meta"> 4 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 5950 字</span>，阅读约<span class="more-meta"> 12 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" title="Copy Link" class="link link_yank">
@@ -173,18 +173,20 @@
     <li><a href="#快速上手">快速上手</a></li>
     <li><a href="#源码分析">源码分析</a>
       <ul>
-        <li><a href="#route">Route</a></li>
-        <li><a href="#routebuilder">RouteBuilder</a></li>
-        <li><a href="#webservice">Webservice</a></li>
-        <li><a href="#container">Container</a></li>
-        <li><a href="#路由选择routeselector">路由选择：RouteSelector</a></li>
+        <li><a href="#核心数据结构">核心数据结构</a></li>
+        <li><a href="#核心代码流程梳理">核心代码流程梳理</a></li>
+        <li><a href="#webservice添加到container">WebService添加到Container</a></li>
+        <li><a href="#启动服务">启动服务</a></li>
       </ul>
     </li>
+    <li><a href="#总结">总结</a></li>
   </ul>
 </nav>
     <h1 id="go-restful">Go-Restful</h1>
 <h2 id="概述">概述</h2>
-<p><a href="https://github.com/emicklei/go-restful">go-restful</a>是一个用go语言开发的快速构建restful风格的web框架。k8s最核心的组件kube-apiserver使用到了该框架，该框架的代码比较精简，这里做个简单的功能介绍，然后分析相关源码。go-restful定义了三个重要的数据结构：</p>
+<p><a href="https://github.com/emicklei/go-restful">go-restful</a>是一个用go语言开发的快速构建restful风格的web框架。k8s最核心的组件kube-apiserver使用到了该框架，该框架的代码比较精简，这里做个简单的功能介绍，然后分析相关源码。</p>
+<p>go-restful基于golang官方的net/http实现，在深入学习之前，建议先看一下本人之前整理的关于<a href="https://juejin.im/post/6873499014482886663">官方http源码分析</a>的文章</p>
+<p>go-restful定义了三个重要的数据结构：</p>
 <ul>
 <li>Router：表示一条路由，包含url、回调处理函数</li>
 <li>Webservice：表示一个服务</li>
@@ -196,6 +198,8 @@
 <li>每个container可以包含多个webservice，相当于一组不同服务的分类</li>
 <li>每个webservice包含多个Router（路由），Router根据http请求的URL路由到对应的处理函数（Handler Func）</li>
 </ul>
+<p><a href="https://www.processon.com/view/link/5f634b100791295dccc43322">高清地址</a>
+<img src="http://assets.processon.com/chart_image/5f634b100791295dccc43321.png" alt="go-restful核心数据结构"></p>
 <h2 id="快速上手">快速上手</h2>
 <p>引入包：</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">1</span>go get github.com/emicklei/go-restful/v3
@@ -217,15 +221,23 @@
 <span class="ln">15</span>  <span class="c1">// 将WebService添加到默认生成的Container中
 </span><span class="ln">16</span><span class="c1"></span>  <span class="c1">// 默认生成的container的代码在web_service_container.go的init方法中
 </span><span class="ln">17</span><span class="c1"></span>  <span class="nx">restful</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">ws</span><span class="p">)</span>
-<span class="ln">18</span>  <span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
-<span class="ln">19</span><span class="p">}</span>
-<span class="ln">20</span>
-<span class="ln">21</span><span class="c1">// 路由对应的回调函数
-</span><span class="ln">22</span><span class="c1"></span><span class="kd">func</span> <span class="nf">hello</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">restful</span><span class="p">.</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">resp</span> <span class="o">*</span><span class="nx">restful</span><span class="p">.</span><span class="nx">Response</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">23</span>  <span class="nx">io</span><span class="p">.</span><span class="nf">WriteString</span><span class="p">(</span><span class="nx">resp</span><span class="p">,</span> <span class="s">&#34;world&#34;</span><span class="p">)</span>
-<span class="ln">24</span><span class="p">}</span>
+<span class="ln">18</span>  <span class="c1">// 启动服务
+</span><span class="ln">19</span><span class="c1"></span>  <span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="ln">20</span><span class="p">}</span>
+<span class="ln">21</span>
+<span class="ln">22</span><span class="c1">// 路由对应的回调函数
+</span><span class="ln">23</span><span class="c1"></span><span class="kd">func</span> <span class="nf">hello</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">restful</span><span class="p">.</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">resp</span> <span class="o">*</span><span class="nx">restful</span><span class="p">.</span><span class="nx">Response</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">24</span>  <span class="nx">io</span><span class="p">.</span><span class="nf">WriteString</span><span class="p">(</span><span class="nx">resp</span><span class="p">,</span> <span class="s">&#34;world&#34;</span><span class="p">)</span>
+<span class="ln">25</span><span class="p">}</span>
 </code></pre></div><h2 id="源码分析">源码分析</h2>
-<h3 id="route">Route</h3>
+<p>看到前面的快速上手代码，你有没有这样的疑惑：创建完成WebServie之后，添加到默认的Container，也没有把container传给谁，只是启动了服务监听就能自动识别到container呢？</p>
+<p>想要揭开答案，让我们一起分析下源码吧。在这之前，还是建议先看下本人之前整理的关于<a href="https://juejin.im/post/6873499014482886663">官方http源码分析</a>的文章，因为go-restful会基于官方提供的http包去实现功能</p>
+<p>下图是整理的源码核心逻辑图。</p>
+<p><a href="https://www.processon.com/view/link/5f6348e35653bb28eb449c5c">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f6348e36376894e327639cc.png" alt="go-restful核心源码逻辑"></p>
+<h3 id="核心数据结构">核心数据结构</h3>
+<h4 id="route">Route</h4>
+<p>前面提到过Route是go-restful的三个概念之一是路由，内部的数据结构是Route，先看一下源码。</p>
 <p>源码位置：github.com/emicklei/go-restful/router.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Route</span> <span class="kd">struct</span> <span class="p">{</span>
 <span class="ln"> 2</span>  <span class="nx">Method</span>   <span class="kt">string</span>
@@ -262,34 +274,25 @@
 <span class="ln">33</span>  <span class="c1">//Overrides the container.contentEncodingEnabled
 </span><span class="ln">34</span><span class="c1"></span>  <span class="nx">contentEncodingEnabled</span> <span class="o">*</span><span class="kt">bool</span>
 <span class="ln">35</span><span class="p">}</span>
-</code></pre></div><h3 id="routebuilder">RouteBuilder</h3>
-<p>RouteBuilder用于构造Route信息</p>
+</code></pre></div><h4 id="routebuilder">RouteBuilder</h4>
+<p>RouteBuilder用于构造Route信息，根据名字就知道使用了建造者模式</p>
 <p>源码位置：github.com/emicklei/go-restful/router.go</p>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">RouteBuilder</span> <span class="kd">struct</span> <span class="p">{</span>
-<span class="ln"> 2</span>  <span class="nx">rootPath</span>    <span class="kt">string</span>
-<span class="ln"> 3</span>  <span class="nx">currentPath</span> <span class="kt">string</span>
-<span class="ln"> 4</span>  <span class="nx">produces</span>    <span class="p">[]</span><span class="kt">string</span>
-<span class="ln"> 5</span>  <span class="nx">consumes</span>    <span class="p">[]</span><span class="kt">string</span>
-<span class="ln"> 6</span>  <span class="nx">httpMethod</span>  <span class="kt">string</span>        <span class="c1">// required
-</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nx">function</span>    <span class="nx">RouteFunction</span> <span class="c1">// required
-</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">filters</span>     <span class="p">[]</span><span class="nx">FilterFunction</span>
-<span class="ln"> 9</span>  <span class="nx">conditions</span>  <span class="p">[]</span><span class="nx">RouteSelectionConditionFunction</span>
-<span class="ln">10</span>
-<span class="ln">11</span>  <span class="nx">typeNameHandleFunc</span> <span class="nx">TypeNameHandleFunction</span> <span class="c1">// required
-</span><span class="ln">12</span><span class="c1"></span>
-<span class="ln">13</span>  <span class="c1">// documentation
-</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">doc</span>                     <span class="kt">string</span>
-<span class="ln">15</span>  <span class="nx">notes</span>                   <span class="kt">string</span>
-<span class="ln">16</span>  <span class="nx">operation</span>               <span class="kt">string</span>
-<span class="ln">17</span>  <span class="nx">readSample</span><span class="p">,</span> <span class="nx">writeSample</span> <span class="kd">interface</span><span class="p">{}</span>
-<span class="ln">18</span>  <span class="nx">parameters</span>              <span class="p">[]</span><span class="o">*</span><span class="nx">Parameter</span>
-<span class="ln">19</span>  <span class="nx">errorMap</span>                <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="nx">ResponseError</span>
-<span class="ln">20</span>  <span class="nx">defaultResponse</span>         <span class="o">*</span><span class="nx">ResponseError</span>
-<span class="ln">21</span>  <span class="nx">metadata</span>                <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span>
-<span class="ln">22</span>  <span class="nx">deprecated</span>              <span class="kt">bool</span>
-<span class="ln">23</span>  <span class="nx">contentEncodingEnabled</span>  <span class="o">*</span><span class="kt">bool</span>
-<span class="ln">24</span><span class="p">}</span>
-</code></pre></div><h3 id="webservice">Webservice</h3>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 大部分属性和Route一样
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">RouteBuilder</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="nx">rootPath</span>    <span class="kt">string</span>
+<span class="ln"> 4</span>  <span class="nx">currentPath</span> <span class="kt">string</span>
+<span class="ln"> 5</span>  <span class="nx">produces</span>    <span class="p">[]</span><span class="kt">string</span>
+<span class="ln"> 6</span>  <span class="nx">consumes</span>    <span class="p">[]</span><span class="kt">string</span>
+<span class="ln"> 7</span>  <span class="nx">httpMethod</span>  <span class="kt">string</span>        <span class="c1">// required
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">function</span>    <span class="nx">RouteFunction</span> <span class="c1">// required
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="nx">filters</span>     <span class="p">[]</span><span class="nx">FilterFunction</span>
+<span class="ln">10</span>  <span class="nx">conditions</span>  <span class="p">[]</span><span class="nx">RouteSelectionConditionFunction</span>
+<span class="ln">11</span>
+<span class="ln">12</span>  <span class="nx">typeNameHandleFunc</span> <span class="nx">TypeNameHandleFunction</span> <span class="c1">// required
+</span><span class="ln">13</span><span class="c1"></span>  <span class="o">...</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div><h4 id="webservice">Webservice</h4>
+<p>WebService拥有一组Route，这组Router有公共的rootPath，在逻辑上将具有相同前置的路由请求放到一起</p>
 <p>源码位置：github.com/emicklei/go-restful/web_service.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">WebService</span> <span class="kd">struct</span> <span class="p">{</span>
 <span class="ln"> 2</span>  <span class="c1">// Webservice中的Route共享一个rootPath
@@ -307,10 +310,11 @@
 <span class="ln">14</span>
 <span class="ln">15</span>  <span class="nx">dynamicRoutes</span> <span class="kt">bool</span>
 <span class="ln">16</span>
-<span class="ln">17</span>  <span class="c1">// protects &#39;routes&#39; if dynamic routes are enabled
+<span class="ln">17</span>  <span class="c1">// 保护路由，防止多线程写操作出现并发问题
 </span><span class="ln">18</span><span class="c1"></span>  <span class="nx">routesLock</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
 <span class="ln">19</span><span class="p">}</span>
-</code></pre></div><h3 id="container">Container</h3>
+</code></pre></div><h4 id="container">Container</h4>
+<p>一个Container包含多个Service，不同的Container监听不同的ip地址或端口，他们之间提供的服务的独立的。</p>
 <p>源码位置：github.com/emicklei/go-restful/container.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Container</span> <span class="kd">struct</span> <span class="p">{</span>
 <span class="ln"> 2</span>  <span class="nx">webServicesLock</span>        <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
@@ -325,82 +329,413 @@
 <span class="ln">11</span>  <span class="nx">router</span>                 <span class="nx">RouteSelector</span> <span class="c1">// default is a CurlyRouter (RouterJSR311 is a slower alternative)
 </span><span class="ln">12</span><span class="c1"></span>  <span class="nx">contentEncodingEnabled</span> <span class="kt">bool</span>          <span class="c1">// default is false
 </span><span class="ln">13</span><span class="c1"></span><span class="p">}</span>
-</code></pre></div><h3 id="路由选择routeselector">路由选择：RouteSelector</h3>
-<p>web框架的一个重要功能就是路由的选择和分发，go标准http包实现了一个ServerMux，go-restful在这个基础上封装了多个服务。
-如何由container -&gt; webservice -&gt; handler 实现层级分发，这些都在dispatch中实现</p>
+</code></pre></div><h3 id="核心代码流程梳理">核心代码流程梳理</h3>
+<p>从前面demo中的代码开始入手，分析整个调用流程。</p>
+<p>整体流程包括：</p>
+<ul>
+<li>创建WebService对象</li>
+<li>为WebService对象添加路由地址和处理函数</li>
+<li>将WebService添加到Container中（这里没有声明Containerr，用的默认Container）</li>
+<li>启动服务监听端口，等待服务请求</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">func</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">2</span>  <span class="nx">ws</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">restful</span><span class="p">.</span><span class="nx">WebService</span><span class="p">)</span>
+<span class="ln">3</span>  <span class="nx">ws</span><span class="p">.</span><span class="nf">Route</span><span class="p">(</span><span class="nx">ws</span><span class="p">.</span><span class="nf">GET</span><span class="p">(</span><span class="s">&#34;/hello&#34;</span><span class="p">).</span><span class="nf">To</span><span class="p">(</span><span class="nx">hello</span><span class="p">))</span>
+<span class="ln">4</span>  <span class="nx">restful</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">ws</span><span class="p">)</span>
+<span class="ln">5</span>  <span class="nx">log</span><span class="p">.</span><span class="nf">Fatal</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nf">ListenAndServe</span><span class="p">(</span><span class="s">&#34;:8080&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="ln">6</span><span class="p">}</span>
+</code></pre></div><h4 id="webservice添加路由">WebService添加路由</h4>
+<p>主要分析<code>ws.Route(ws.GET(&quot;/hello&quot;).To(hello))</code></p>
+<h5 id="构造routebuilder对象">构造RouteBuilder对象</h5>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// Get方法内部new了一个RouteBuilder，用于构造Route对象
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">)</span> <span class="nf">GET</span><span class="p">(</span><span class="nx">subPath</span> <span class="kt">string</span><span class="p">)</span> <span class="o">*</span><span class="nx">RouteBuilder</span> <span class="p">{</span>
+<span class="ln"> 3</span>  <span class="c1">// 典型的建造者模式用法
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="k">return</span> <span class="nb">new</span><span class="p">(</span><span class="nx">RouteBuilder</span><span class="p">).</span><span class="nf">typeNameHandler</span><span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">typeNameHandleFunc</span><span class="p">).</span><span class="nf">servicePath</span><span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">rootPath</span><span class="p">).</span><span class="nf">Method</span><span class="p">(</span><span class="s">&#34;GET&#34;</span><span class="p">).</span><span class="nf">Path</span><span class="p">(</span><span class="nx">subPath</span><span class="p">)</span>
+<span class="ln"> 5</span><span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="c1">// 建造者模式：给属性赋值
+</span><span class="ln"> 8</span><span class="c1">// 其他的方法类似，就不再展开
+</span><span class="ln"> 9</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">RouteBuilder</span><span class="p">)</span> <span class="nf">typeNameHandler</span><span class="p">(</span><span class="nx">handler</span> <span class="nx">TypeNameHandleFunction</span><span class="p">)</span> <span class="o">*</span><span class="nx">RouteBuilder</span> <span class="p">{</span>
+<span class="ln">10</span>  <span class="nx">b</span><span class="p">.</span><span class="nx">typeNameHandleFunc</span> <span class="p">=</span> <span class="nx">handler</span>
+<span class="ln">11</span>  <span class="k">return</span> <span class="nx">b</span>
+<span class="ln">12</span><span class="p">}</span>
+<span class="ln">13</span>
+<span class="ln">14</span><span class="c1">// Get方法后，属性并没有完全构造完，handler处理函数是用单独的To方法赋值的
+</span><span class="ln">15</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">RouteBuilder</span><span class="p">)</span> <span class="nf">To</span><span class="p">(</span><span class="nx">function</span> <span class="nx">RouteFunction</span><span class="p">)</span> <span class="o">*</span><span class="nx">RouteBuilder</span> <span class="p">{</span>
+<span class="ln">16</span>  <span class="nx">b</span><span class="p">.</span><span class="nx">function</span> <span class="p">=</span> <span class="nx">function</span>
+<span class="ln">17</span>  <span class="k">return</span> <span class="nx">b</span>
+<span class="ln">18</span><span class="p">}</span>
+</code></pre></div><h5 id="根据routebuilder生成route对象">根据RouteBuilder生成Route对象</h5>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">)</span> <span class="nf">Route</span><span class="p">(</span><span class="nx">builder</span> <span class="o">*</span><span class="nx">RouteBuilder</span><span class="p">)</span> <span class="o">*</span><span class="nx">WebService</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">w</span><span class="p">.</span><span class="nx">routesLock</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+<span class="ln"> 3</span>  <span class="k">defer</span> <span class="nx">w</span><span class="p">.</span><span class="nx">routesLock</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+<span class="ln"> 4</span>  <span class="c1">// 填充默认值
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">builder</span><span class="p">.</span><span class="nf">copyDefaults</span><span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">produces</span><span class="p">,</span> <span class="nx">w</span><span class="p">.</span><span class="nx">consumes</span><span class="p">)</span>
+<span class="ln"> 6</span>  <span class="c1">// 调用RouteBuilder的Build方法，构造Route
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="c1">// 并将Route添加到routes列表中
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">w</span><span class="p">.</span><span class="nx">routes</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">w</span><span class="p">.</span><span class="nx">routes</span><span class="p">,</span> <span class="nx">builder</span><span class="p">.</span><span class="nf">Build</span><span class="p">())</span>
+<span class="ln"> 9</span>  <span class="k">return</span> <span class="nx">w</span>
+<span class="ln">10</span><span class="p">}</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="c1">// Build方法返回Route对象
+</span><span class="ln">13</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">b</span> <span class="o">*</span><span class="nx">RouteBuilder</span><span class="p">)</span> <span class="nf">Build</span><span class="p">()</span> <span class="nx">Route</span> <span class="p">{</span>
+<span class="ln">14</span>  <span class="o">...</span>
+<span class="ln">15</span>  <span class="nx">route</span> <span class="o">:=</span> <span class="nx">Route</span><span class="p">{</span>
+<span class="ln">16</span>    <span class="o">...</span>
+<span class="ln">17</span>  <span class="p">}</span>
+<span class="ln">18</span>  <span class="nx">route</span><span class="p">.</span><span class="nf">postBuild</span><span class="p">()</span>
+<span class="ln">19</span>  <span class="k">return</span> <span class="nx">route</span>
+<span class="ln">20</span><span class="p">}</span>
+</code></pre></div><h3 id="webservice添加到container">WebService添加到Container</h3>
+<p>主要分析<code>restful.Add(ws)</code>。这里要特别注意的是：</p>
+<ul>
+<li>将http的DefaultServeMux传给了DefaultServeMux的ServeMux</li>
+<li>调用Golang官方http包中的ServeMux.HandleFunc函数处理请求</li>
+<li>处理函数统一为c.dispatch，dispatch再在内部做路由分发</li>
+</ul>
+<p>源码位置：github.com/emicklei/go-restful/web_service_container.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 定义全局变量,作为默认的Container
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">var</span> <span class="nx">DefaultContainer</span> <span class="o">*</span><span class="nx">Container</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span><span class="c1">// init函数在别的包import时，自动触发。也就是只要引用了go-restful框架，就会默认有一个Container
+</span><span class="ln"> 5</span><span class="c1"></span><span class="kd">func</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 6</span>  <span class="nx">DefaultContainer</span> <span class="p">=</span> <span class="nf">NewContainer</span><span class="p">()</span>
+<span class="ln"> 7</span>  <span class="c1">// 这里将Golang中标准http包下的默认路由对象DefaultServeMux赋值给Container的ServeMux
+</span><span class="ln"> 8</span><span class="c1"></span>  <span class="c1">// 这里要特别注意，正是因为这个地方的逻辑，就能回答前面我们提出的问题。go-restful和http库，通过这个赋值建立了关联关系。
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="nx">DefaultContainer</span><span class="p">.</span><span class="nx">ServeMux</span> <span class="p">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">DefaultServeMux</span>
+<span class="ln">10</span><span class="p">}</span>
+<span class="ln">11</span>
+<span class="ln">12</span><span class="c1">// 生成默认的container
+</span><span class="ln">13</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewContainer</span><span class="p">()</span> <span class="o">*</span><span class="nx">Container</span> <span class="p">{</span>
+<span class="ln">14</span>  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">Container</span><span class="p">{</span>
+<span class="ln">15</span>    <span class="nx">webServices</span><span class="p">:</span>            <span class="p">[]</span><span class="o">*</span><span class="nx">WebService</span><span class="p">{},</span>
+<span class="ln">16</span>    <span class="nx">ServeMux</span><span class="p">:</span>               <span class="nx">http</span><span class="p">.</span><span class="nf">NewServeMux</span><span class="p">(),</span>
+<span class="ln">17</span>    <span class="nx">isRegisteredOnRoot</span><span class="p">:</span>     <span class="kc">false</span><span class="p">,</span>
+<span class="ln">18</span>    <span class="nx">containerFilters</span><span class="p">:</span>       <span class="p">[]</span><span class="nx">FilterFunction</span><span class="p">{},</span>
+<span class="ln">19</span>    <span class="nx">doNotRecover</span><span class="p">:</span>           <span class="kc">true</span><span class="p">,</span>
+<span class="ln">20</span>    <span class="nx">recoverHandleFunc</span><span class="p">:</span>      <span class="nx">logStackOnRecover</span><span class="p">,</span>
+<span class="ln">21</span>    <span class="nx">serviceErrorHandleFunc</span><span class="p">:</span> <span class="nx">writeServiceError</span><span class="p">,</span>
+<span class="ln">22</span>    <span class="c1">// 默认的路由选择器用的是CurlyRouter
+</span><span class="ln">23</span><span class="c1"></span>    <span class="nx">router</span><span class="p">:</span>                 <span class="nx">CurlyRouter</span><span class="p">{},</span>
+<span class="ln">24</span>    <span class="nx">contentEncodingEnabled</span><span class="p">:</span> <span class="kc">false</span><span class="p">}</span>
+<span class="ln">25</span><span class="p">}</span>
+<span class="ln">26</span>
+<span class="ln">27</span><span class="c1">// 将WebService添加到默认Container中
+</span><span class="ln">28</span><span class="c1"></span><span class="kd">func</span> <span class="nf">Add</span><span class="p">(</span><span class="nx">service</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">29</span>  <span class="nx">DefaultContainer</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nx">service</span><span class="p">)</span>
+<span class="ln">30</span><span class="p">}</span>
+<span class="ln">31</span>
+<span class="ln">32</span><span class="c1">// Add
+</span><span class="ln">33</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Container</span><span class="p">)</span> <span class="nf">Add</span><span class="p">(</span><span class="nx">service</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">)</span> <span class="o">*</span><span class="nx">Container</span> <span class="p">{</span>
+<span class="ln">34</span>  <span class="o">...</span>
+<span class="ln">35</span>  <span class="c1">// if rootPath was not set then lazy initialize it
+</span><span class="ln">36</span><span class="c1"></span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">service</span><span class="p">.</span><span class="nx">rootPath</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">37</span>    <span class="nx">service</span><span class="p">.</span><span class="nf">Path</span><span class="p">(</span><span class="s">&#34;/&#34;</span><span class="p">)</span>
+<span class="ln">38</span>  <span class="p">}</span>
+<span class="ln">39</span>
+<span class="ln">40</span>  <span class="c1">// 判断有没有重复的RootPath，不同的WebService，rootPath不能重复
+</span><span class="ln">41</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">each</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">c</span><span class="p">.</span><span class="nx">webServices</span> <span class="p">{</span>
+<span class="ln">42</span>    <span class="k">if</span> <span class="nx">each</span><span class="p">.</span><span class="nf">RootPath</span><span class="p">()</span> <span class="o">==</span> <span class="nx">service</span><span class="p">.</span><span class="nf">RootPath</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">43</span>      <span class="nx">log</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;WebService with duplicate root path detected:[&#39;%v&#39;]&#34;</span><span class="p">,</span> <span class="nx">each</span><span class="p">)</span>
+<span class="ln">44</span>      <span class="nx">os</span><span class="p">.</span><span class="nf">Exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="ln">45</span>    <span class="p">}</span>
+<span class="ln">46</span>  <span class="p">}</span>
+<span class="ln">47</span>
+<span class="ln">48</span>  <span class="k">if</span> <span class="p">!</span><span class="nx">c</span><span class="p">.</span><span class="nx">isRegisteredOnRoot</span> <span class="p">{</span>
+<span class="ln">49</span>    <span class="c1">// 核心逻辑：为servcie添加handler处理函数
+</span><span class="ln">50</span><span class="c1"></span>    <span class="c1">// 这里将c.ServeMux作为参数传入，这个值是前面提到的http.DefaultServeMux
+</span><span class="ln">51</span><span class="c1"></span>    <span class="nx">c</span><span class="p">.</span><span class="nx">isRegisteredOnRoot</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">addHandler</span><span class="p">(</span><span class="nx">service</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ServeMux</span><span class="p">)</span>
+<span class="ln">52</span>  <span class="p">}</span>
+<span class="ln">53</span>  <span class="c1">// 将webServices添加到container的webservice列表中
+</span><span class="ln">54</span><span class="c1"></span>  <span class="nx">c</span><span class="p">.</span><span class="nx">webServices</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">webServices</span><span class="p">,</span> <span class="nx">service</span><span class="p">)</span>
+<span class="ln">55</span>  <span class="k">return</span> <span class="nx">c</span>
+<span class="ln">56</span><span class="p">}</span>
+<span class="ln">57</span>
+<span class="ln">58</span><span class="c1">// addHandler
+</span><span class="ln">59</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Container</span><span class="p">)</span> <span class="nf">addHandler</span><span class="p">(</span><span class="nx">service</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">,</span> <span class="nx">serveMux</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+<span class="ln">60</span>  <span class="nx">pattern</span> <span class="o">:=</span> <span class="nf">fixedPrefixPath</span><span class="p">(</span><span class="nx">service</span><span class="p">.</span><span class="nf">RootPath</span><span class="p">())</span>
+<span class="ln">61</span>  <span class="o">...</span>
+<span class="ln">62</span>  <span class="c1">// 这里的关键函数：serveMux.HandleFunc，是Golang标准包中实现路由的函数
+</span><span class="ln">63</span><span class="c1"></span>  <span class="c1">// go-restful中将路由处理函数统一交给c.dispatch函数，可以看出整个go-restful框架中，最核心的就是这个函数了
+</span><span class="ln">64</span><span class="c1"></span>  <span class="k">if</span> <span class="p">!</span><span class="nx">alreadyMapped</span> <span class="p">{</span>
+<span class="ln">65</span>    <span class="nx">serveMux</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">)</span>
+<span class="ln">66</span>    <span class="k">if</span> <span class="p">!</span><span class="nx">strings</span><span class="p">.</span><span class="nf">HasSuffix</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="s">&#34;/&#34;</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">67</span>      <span class="nx">serveMux</span><span class="p">.</span><span class="nf">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="o">+</span><span class="s">&#34;/&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">)</span>
+<span class="ln">68</span>    <span class="p">}</span>
+<span class="ln">69</span>  <span class="p">}</span>
+<span class="ln">70</span>  <span class="k">return</span> <span class="kc">false</span>
+<span class="ln">71</span><span class="p">}</span>
+</code></pre></div><h4 id="路由分发函数dispatch">路由分发函数dispatch</h4>
+<p>如何由container -&gt; webservice -&gt; handler 实现层级分发？
+go-restful框架通过<code>serveMux.HandleFunc(pattern, c.dispatch)</code>函数，一边连接了Golang提供的官方http扩展机制，另一边通过一个dispatch实现了路由的分发，这样就不用单独写很多的handler了。</p>
+<p>这个函数的核心是<code>c.router.SelectRoute</code>，根据请求找到合适的webservice和route</p>
 <p>源码位置：github.com/emicklei/go-restful/container.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Container</span><span class="p">)</span> <span class="nf">dispatch</span><span class="p">(</span><span class="nx">httpWriter</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">httpRequest</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
 <span class="ln"> 2</span>  <span class="o">...</span>
-<span class="ln"> 3</span>  <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
-<span class="ln"> 4</span>    <span class="o">...</span>
-<span class="ln"> 5</span>    <span class="c1">// 选择匹配的WebService和Route
-</span><span class="ln"> 6</span><span class="c1"></span>    <span class="nx">webService</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nf">SelectRoute</span><span class="p">(</span>
-<span class="ln"> 7</span>      <span class="nx">c</span><span class="p">.</span><span class="nx">webServices</span><span class="p">,</span>
-<span class="ln"> 8</span>      <span class="nx">httpRequest</span><span class="p">)</span>
-<span class="ln"> 9</span>  <span class="p">}()</span>
-<span class="ln">10</span>
-<span class="ln">11</span>  <span class="c1">// Detect if compression is needed
-</span><span class="ln">12</span><span class="c1"></span>  <span class="c1">// assume without compression, test for override
-</span><span class="ln">13</span><span class="c1"></span>  <span class="nx">contentEncodingEnabled</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">contentEncodingEnabled</span>
-<span class="ln">14</span>  <span class="k">if</span> <span class="nx">route</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">route</span><span class="p">.</span><span class="nx">contentEncodingEnabled</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">15</span>    <span class="nx">contentEncodingEnabled</span> <span class="p">=</span> <span class="o">*</span><span class="nx">route</span><span class="p">.</span><span class="nx">contentEncodingEnabled</span>
-<span class="ln">16</span>  <span class="p">}</span>
-<span class="ln">17</span>  <span class="k">if</span> <span class="nx">contentEncodingEnabled</span> <span class="p">{</span>
-<span class="ln">18</span>    <span class="nx">doCompress</span><span class="p">,</span> <span class="nx">encoding</span> <span class="o">:=</span> <span class="nf">wantsCompressedResponse</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">)</span>
-<span class="ln">19</span>    <span class="k">if</span> <span class="nx">doCompress</span> <span class="p">{</span>
-<span class="ln">20</span>      <span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
-<span class="ln">21</span>      <span class="nx">writer</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nf">NewCompressingResponseWriter</span><span class="p">(</span><span class="nx">httpWriter</span><span class="p">,</span> <span class="nx">encoding</span><span class="p">)</span>
-<span class="ln">22</span>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">23</span>        <span class="nx">log</span><span class="p">.</span><span class="nf">Print</span><span class="p">(</span><span class="s">&#34;unable to install compressor: &#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-<span class="ln">24</span>        <span class="nx">httpWriter</span><span class="p">.</span><span class="nf">WriteHeader</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusInternalServerError</span><span class="p">)</span>
-<span class="ln">25</span>        <span class="k">return</span>
-<span class="ln">26</span>      <span class="p">}</span>
-<span class="ln">27</span>    <span class="p">}</span>
-<span class="ln">28</span>  <span class="p">}</span>
-<span class="ln">29</span>
-<span class="ln">30</span>  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">31</span>    <span class="nx">chain</span> <span class="o">:=</span> <span class="nx">FilterChain</span><span class="p">{</span><span class="nx">Filters</span><span class="p">:</span> <span class="nx">c</span><span class="p">.</span><span class="nx">containerFilters</span><span class="p">,</span> <span class="nx">Target</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">resp</span> <span class="o">*</span><span class="nx">Response</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">32</span>      <span class="k">switch</span> <span class="nx">err</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">33</span>      <span class="k">case</span> <span class="nx">ServiceError</span><span class="p">:</span>
-<span class="ln">34</span>        <span class="nx">ser</span> <span class="o">:=</span> <span class="nx">err</span><span class="p">.(</span><span class="nx">ServiceError</span><span class="p">)</span>
-<span class="ln">35</span>        <span class="nx">c</span><span class="p">.</span><span class="nf">serviceErrorHandleFunc</span><span class="p">(</span><span class="nx">ser</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">resp</span><span class="p">)</span>
-<span class="ln">36</span>      <span class="p">}</span>
-<span class="ln">37</span>      <span class="c1">// TODO
-</span><span class="ln">38</span><span class="c1"></span>    <span class="p">}}</span>
-<span class="ln">39</span>    <span class="nx">chain</span><span class="p">.</span><span class="nf">ProcessFilter</span><span class="p">(</span><span class="nf">NewRequest</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">),</span> <span class="nf">NewResponse</span><span class="p">(</span><span class="nx">writer</span><span class="p">))</span>
-<span class="ln">40</span>    <span class="k">return</span>
-<span class="ln">41</span>  <span class="p">}</span>
-<span class="ln">42</span>  <span class="nx">pathProcessor</span><span class="p">,</span> <span class="nx">routerProcessesPath</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">router</span><span class="p">.(</span><span class="nx">PathProcessor</span><span class="p">)</span>
-<span class="ln">43</span>  <span class="k">if</span> <span class="p">!</span><span class="nx">routerProcessesPath</span> <span class="p">{</span>
-<span class="ln">44</span>    <span class="nx">pathProcessor</span> <span class="p">=</span> <span class="nx">defaultPathProcessor</span><span class="p">{}</span>
-<span class="ln">45</span>  <span class="p">}</span>
-<span class="ln">46</span>  <span class="c1">// 提取参数
-</span><span class="ln">47</span><span class="c1"></span>  <span class="nx">pathParams</span> <span class="o">:=</span> <span class="nx">pathProcessor</span><span class="p">.</span><span class="nf">ExtractParameters</span><span class="p">(</span><span class="nx">route</span><span class="p">,</span> <span class="nx">webService</span><span class="p">,</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
-<span class="ln">48</span>  <span class="nx">wrappedRequest</span><span class="p">,</span> <span class="nx">wrappedResponse</span> <span class="o">:=</span> <span class="nx">route</span><span class="p">.</span><span class="nf">wrapRequestResponse</span><span class="p">(</span><span class="nx">writer</span><span class="p">,</span> <span class="nx">httpRequest</span><span class="p">,</span> <span class="nx">pathParams</span><span class="p">)</span>
-<span class="ln">49</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">containerFilters</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="nx">webService</span><span class="p">.</span><span class="nx">filters</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="nx">route</span><span class="p">.</span><span class="nx">Filters</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-<span class="ln">50</span>    <span class="c1">// 执行过滤链组成的过滤函数
-</span><span class="ln">51</span><span class="c1"></span>    <span class="nx">allFilters</span> <span class="o">:=</span> <span class="p">[]</span><span class="nx">FilterFunction</span><span class="p">{}</span>
-<span class="ln">52</span>    <span class="nx">allFilters</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">allFilters</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">containerFilters</span><span class="o">...</span><span class="p">)</span>
-<span class="ln">53</span>    <span class="nx">allFilters</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">allFilters</span><span class="p">,</span> <span class="nx">webService</span><span class="p">.</span><span class="nx">filters</span><span class="o">...</span><span class="p">)</span>
-<span class="ln">54</span>    <span class="nx">allFilters</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">allFilters</span><span class="p">,</span> <span class="nx">route</span><span class="p">.</span><span class="nx">Filters</span><span class="o">...</span><span class="p">)</span>
-<span class="ln">55</span>    <span class="nx">chain</span> <span class="o">:=</span> <span class="nx">FilterChain</span><span class="p">{</span><span class="nx">Filters</span><span class="p">:</span> <span class="nx">allFilters</span><span class="p">,</span> <span class="nx">Target</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">resp</span> <span class="o">*</span><span class="nx">Response</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">56</span>      <span class="c1">// handle request by route after passing all filters
-</span><span class="ln">57</span><span class="c1"></span>      <span class="nx">route</span><span class="p">.</span><span class="nf">Function</span><span class="p">(</span><span class="nx">wrappedRequest</span><span class="p">,</span> <span class="nx">wrappedResponse</span><span class="p">)</span>
-<span class="ln">58</span>    <span class="p">}}</span>
-<span class="ln">59</span>    <span class="nx">chain</span><span class="p">.</span><span class="nf">ProcessFilter</span><span class="p">(</span><span class="nx">wrappedRequest</span><span class="p">,</span> <span class="nx">wrappedResponse</span><span class="p">)</span>
-<span class="ln">60</span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-<span class="ln">61</span>    <span class="c1">// 没有过滤函数，直接交给handler处理
-</span><span class="ln">62</span><span class="c1"></span>    <span class="nx">route</span><span class="p">.</span><span class="nf">Function</span><span class="p">(</span><span class="nx">wrappedRequest</span><span class="p">,</span> <span class="nx">wrappedResponse</span><span class="p">)</span>
-<span class="ln">63</span>  <span class="p">}</span>
-<span class="ln">64</span><span class="p">}</span>
-</code></pre></div><p>源码位置：github.com/emicklei/go-restful/router.go</p>
+<span class="ln"> 3</span>  <span class="c1">// 根据请求，找到最合适的webService和route
+</span><span class="ln"> 4</span><span class="c1"></span>  <span class="c1">// 这个方法后面单独介绍
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 6</span>    <span class="o">...</span>
+<span class="ln"> 7</span>    <span class="nx">webService</span><span class="p">,</span> <span class="nx">route</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nf">SelectRoute</span><span class="p">(</span>
+<span class="ln"> 8</span>      <span class="nx">c</span><span class="p">.</span><span class="nx">webServices</span><span class="p">,</span>
+<span class="ln"> 9</span>      <span class="nx">httpRequest</span><span class="p">)</span>
+<span class="ln">10</span>  <span class="p">}()</span>
+<span class="ln">11</span>  <span class="o">...</span>
+<span class="ln">12</span>  <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">13</span>    <span class="c1">// 构造过滤器
+</span><span class="ln">14</span><span class="c1"></span>    <span class="nx">chain</span> <span class="o">:=</span> <span class="nx">FilterChain</span><span class="p">{</span><span class="nx">Filters</span><span class="p">:</span> <span class="nx">c</span><span class="p">.</span><span class="nx">containerFilters</span><span class="p">,</span> <span class="nx">Target</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">,</span> <span class="nx">resp</span> <span class="o">*</span><span class="nx">Response</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">15</span>      <span class="k">switch</span> <span class="nx">err</span><span class="p">.(</span><span class="kd">type</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">16</span>      <span class="k">case</span> <span class="nx">ServiceError</span><span class="p">:</span>
+<span class="ln">17</span>        <span class="nx">ser</span> <span class="o">:=</span> <span class="nx">err</span><span class="p">.(</span><span class="nx">ServiceError</span><span class="p">)</span>
+<span class="ln">18</span>        <span class="nx">c</span><span class="p">.</span><span class="nf">serviceErrorHandleFunc</span><span class="p">(</span><span class="nx">ser</span><span class="p">,</span> <span class="nx">req</span><span class="p">,</span> <span class="nx">resp</span><span class="p">)</span>
+<span class="ln">19</span>      <span class="p">}</span>
+<span class="ln">20</span>      <span class="c1">// TODO
+</span><span class="ln">21</span><span class="c1"></span>    <span class="p">}}</span>
+<span class="ln">22</span>    <span class="c1">// 运行Container的过滤器
+</span><span class="ln">23</span><span class="c1"></span>    <span class="nx">chain</span><span class="p">.</span><span class="nf">ProcessFilter</span><span class="p">(</span><span class="nf">NewRequest</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">),</span> <span class="nf">NewResponse</span><span class="p">(</span><span class="nx">writer</span><span class="p">))</span>
+<span class="ln">24</span>    <span class="k">return</span>
+<span class="ln">25</span>  <span class="p">}</span>
+<span class="ln">26</span>
+<span class="ln">27</span>  <span class="c1">// 尝试将router对象转为PathProcessor对象
+</span><span class="ln">28</span><span class="c1"></span>  <span class="c1">// 我们使用的是默认的Container，前面介绍过router默认用的CurlyRouter，
+</span><span class="ln">29</span><span class="c1"></span>  <span class="c1">// SelectRoute的其中一个实现类RouterJSR311，也实现了PathProcessor。所以如果用了RouterJSR311,这里接口转换才能获取到值
+</span><span class="ln">30</span><span class="c1"></span>  <span class="c1">// 而默认的CurlyRouter并没有实现PathProcessor接口，因此这里转换后是空值，会走到下一个if语句
+</span><span class="ln">31</span><span class="c1"></span>  <span class="nx">pathProcessor</span><span class="p">,</span> <span class="nx">routerProcessesPath</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">router</span><span class="p">.(</span><span class="nx">PathProcessor</span><span class="p">)</span>
+<span class="ln">32</span>  <span class="k">if</span> <span class="p">!</span><span class="nx">routerProcessesPath</span> <span class="p">{</span>
+<span class="ln">33</span>    <span class="c1">// 使用默认的路处理器
+</span><span class="ln">34</span><span class="c1"></span>    <span class="nx">pathProcessor</span> <span class="p">=</span> <span class="nx">defaultPathProcessor</span><span class="p">{}</span>
+<span class="ln">35</span>  <span class="p">}</span>
+<span class="ln">36</span>  <span class="c1">// 从request的url请求中抽取参数
+</span><span class="ln">37</span><span class="c1"></span>  <span class="nx">pathParams</span> <span class="o">:=</span> <span class="nx">pathProcessor</span><span class="p">.</span><span class="nf">ExtractParameters</span><span class="p">(</span><span class="nx">route</span><span class="p">,</span> <span class="nx">webService</span><span class="p">,</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+<span class="ln">38</span>  <span class="nx">wrappedRequest</span><span class="p">,</span> <span class="nx">wrappedResponse</span> <span class="o">:=</span> <span class="nx">route</span><span class="p">.</span><span class="nf">wrapRequestResponse</span><span class="p">(</span><span class="nx">writer</span><span class="p">,</span> <span class="nx">httpRequest</span><span class="p">,</span> <span class="nx">pathParams</span><span class="p">)</span>
+<span class="ln">39</span>  <span class="c1">// 如果有filter的话，处理将所有的filter添加到filter链中
+</span><span class="ln">40</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">size</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">containerFilters</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="nx">webService</span><span class="p">.</span><span class="nx">filters</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="nx">route</span><span class="p">.</span><span class="nx">Filters</span><span class="p">);</span> <span class="nx">size</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">41</span>    <span class="c1">// compose filter chain
+</span><span class="ln">42</span><span class="c1"></span>    <span class="nx">allFilters</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="nx">FilterFunction</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">size</span><span class="p">)</span>
+<span class="ln">43</span>    <span class="nx">allFilters</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">allFilters</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">containerFilters</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">44</span>    <span class="nx">allFilters</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">allFilters</span><span class="p">,</span> <span class="nx">webService</span><span class="p">.</span><span class="nx">filters</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">45</span>    <span class="nx">allFilters</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">allFilters</span><span class="p">,</span> <span class="nx">route</span><span class="p">.</span><span class="nx">Filters</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">46</span>    <span class="nx">chain</span> <span class="o">:=</span> <span class="nx">FilterChain</span><span class="p">{</span><span class="nx">Filters</span><span class="p">:</span> <span class="nx">allFilters</span><span class="p">,</span> <span class="nx">Target</span><span class="p">:</span> <span class="nx">route</span><span class="p">.</span><span class="nx">Function</span><span class="p">}</span>
+<span class="ln">47</span>    <span class="nx">chain</span><span class="p">.</span><span class="nf">ProcessFilter</span><span class="p">(</span><span class="nx">wrappedRequest</span><span class="p">,</span> <span class="nx">wrappedResponse</span><span class="p">)</span>
+<span class="ln">48</span>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">49</span>    <span class="c1">// no filters, handle request by route
+</span><span class="ln">50</span><span class="c1"></span>    <span class="c1">// 没有filter，通过route直接处理请求
+</span><span class="ln">51</span><span class="c1"></span>    <span class="nx">route</span><span class="p">.</span><span class="nf">Function</span><span class="p">(</span><span class="nx">wrappedRequest</span><span class="p">,</span> <span class="nx">wrappedResponse</span><span class="p">)</span>
+<span class="ln">52</span>  <span class="p">}</span>
+<span class="ln">53</span><span class="p">}</span>
+</code></pre></div><h4 id="路由选择">路由选择</h4>
+<p>前面的dispatch中提到的<code>c.router.SelectRoute</code>的作用是选择合适的webservice和route，这里专门介绍一下。</p>
+<p>container中的router属性是一个<code>RouteSelector</code>接口</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">RouteSelector</span> <span class="kd">interface</span> <span class="p">{</span>
 <span class="ln">2</span>  <span class="c1">// SelectRoute根据输入的http请求和webservice列表，找到一个路由并返回
 </span><span class="ln">3</span><span class="c1"></span>  <span class="nf">SelectRoute</span><span class="p">(</span>
 <span class="ln">4</span>    <span class="nx">webServices</span> <span class="p">[]</span><span class="o">*</span><span class="nx">WebService</span><span class="p">,</span>
 <span class="ln">5</span>    <span class="nx">httpRequest</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="nx">selectedService</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">,</span> <span class="nx">selected</span> <span class="o">*</span><span class="nx">Route</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span>
 <span class="ln">6</span><span class="p">}</span>
-</code></pre></div>
+</code></pre></div><p>go-restful框架中共有两个实现类：</p>
+<ul>
+<li>CurlyRouter</li>
+<li>RouterJSR311</li>
+</ul>
+<p>前面分析代码知道CurlyRouter是默认实现，所以这里我们主要分析CurlyRouter的SelectRoute函数</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">  1</span><span class="c1">// 选择路由功能
+</span><span class="ln">  2</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">CurlyRouter</span><span class="p">)</span> <span class="nf">SelectRoute</span><span class="p">(</span>
+<span class="ln">  3</span>  <span class="nx">webServices</span> <span class="p">[]</span><span class="o">*</span><span class="nx">WebService</span><span class="p">,</span>
+<span class="ln">  4</span>  <span class="nx">httpRequest</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="nx">selectedService</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">,</span> <span class="nx">selected</span> <span class="o">*</span><span class="nx">Route</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">  5</span>  <span class="c1">// 解析url，根据&#39;/&#39;拆分为token列表
+</span><span class="ln">  6</span><span class="c1"></span>  <span class="nx">requestTokens</span> <span class="o">:=</span> <span class="nf">tokenizePath</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+<span class="ln">  7</span>  <span class="c1">// 根据tokens列表和webservice的路由表做匹配，返回一个最合适的webservice
+</span><span class="ln">  8</span><span class="c1"></span>  <span class="nx">detectedService</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">detectWebService</span><span class="p">(</span><span class="nx">requestTokens</span><span class="p">,</span> <span class="nx">webServices</span><span class="p">)</span>
+<span class="ln">  9</span>  <span class="o">...</span>
+<span class="ln"> 10</span>  <span class="c1">// 返回webservice中匹配的routes集合
+</span><span class="ln"> 11</span><span class="c1"></span>  <span class="nx">candidateRoutes</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">selectRoutes</span><span class="p">(</span><span class="nx">detectedService</span><span class="p">,</span> <span class="nx">requestTokens</span><span class="p">)</span>
+<span class="ln"> 12</span>  <span class="o">...</span>
+<span class="ln"> 13</span>  <span class="c1">// 从前面的list中找到最合适的route
+</span><span class="ln"> 14</span><span class="c1"></span>  <span class="nx">selectedRoute</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">detectRoute</span><span class="p">(</span><span class="nx">candidateRoutes</span><span class="p">,</span> <span class="nx">httpRequest</span><span class="p">)</span>
+<span class="ln"> 15</span>  <span class="k">if</span> <span class="nx">selectedRoute</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 16</span>    <span class="k">return</span> <span class="nx">detectedService</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+<span class="ln"> 17</span>  <span class="p">}</span>
+<span class="ln"> 18</span>  <span class="k">return</span> <span class="nx">detectedService</span><span class="p">,</span> <span class="nx">selectedRoute</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="ln"> 19</span><span class="p">}</span>
+<span class="ln"> 20</span>
+<span class="ln"> 21</span><span class="c1">// 选择webservice
+</span><span class="ln"> 22</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">CurlyRouter</span><span class="p">)</span> <span class="nf">detectWebService</span><span class="p">(</span><span class="nx">requestTokens</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="nx">webServices</span> <span class="p">[]</span><span class="o">*</span><span class="nx">WebService</span><span class="p">)</span> <span class="o">*</span><span class="nx">WebService</span> <span class="p">{</span>
+<span class="ln"> 23</span>  <span class="kd">var</span> <span class="nx">best</span> <span class="o">*</span><span class="nx">WebService</span>
+<span class="ln"> 24</span>  <span class="nx">score</span> <span class="o">:=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="ln"> 25</span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">each</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">webServices</span> <span class="p">{</span>
+<span class="ln"> 26</span>    <span class="c1">// 计算webservice的得分
+</span><span class="ln"> 27</span><span class="c1"></span>    <span class="nx">matches</span><span class="p">,</span> <span class="nx">eachScore</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">computeWebserviceScore</span><span class="p">(</span><span class="nx">requestTokens</span><span class="p">,</span> <span class="nx">each</span><span class="p">.</span><span class="nx">pathExpr</span><span class="p">.</span><span class="nx">tokens</span><span class="p">)</span>
+<span class="ln"> 28</span>    <span class="c1">// 返回得分最高的webservice
+</span><span class="ln"> 29</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">matches</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">eachScore</span> <span class="p">&gt;</span> <span class="nx">score</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 30</span>      <span class="nx">best</span> <span class="p">=</span> <span class="nx">each</span>
+<span class="ln"> 31</span>      <span class="nx">score</span> <span class="p">=</span> <span class="nx">eachScore</span>
+<span class="ln"> 32</span>    <span class="p">}</span>
+<span class="ln"> 33</span>  <span class="p">}</span>
+<span class="ln"> 34</span>  <span class="c1">// 将得分最高的webservice返回
+</span><span class="ln"> 35</span><span class="c1"></span>  <span class="k">return</span> <span class="nx">best</span>
+<span class="ln"> 36</span><span class="p">}</span>
+<span class="ln"> 37</span>
+<span class="ln"> 38</span><span class="c1">// 计算webservice得分
+</span><span class="ln"> 39</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">CurlyRouter</span><span class="p">)</span> <span class="nf">computeWebserviceScore</span><span class="p">(</span><span class="nx">requestTokens</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="nx">tokens</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 40</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">tokens</span><span class="p">)</span> <span class="p">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">requestTokens</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 41</span>    <span class="k">return</span> <span class="kc">false</span><span class="p">,</span> <span class="mi">0</span>
+<span class="ln"> 42</span>  <span class="p">}</span>
+<span class="ln"> 43</span>  <span class="nx">score</span> <span class="o">:=</span> <span class="mi">0</span>
+<span class="ln"> 44</span>  <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln"> 45</span>    <span class="nx">each</span> <span class="o">:=</span> <span class="nx">requestTokens</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+<span class="ln"> 46</span>    <span class="nx">other</span> <span class="o">:=</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+<span class="ln"> 47</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">each</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 48</span>      <span class="nx">score</span><span class="o">++</span>
+<span class="ln"> 49</span>      <span class="k">continue</span>
+<span class="ln"> 50</span>    <span class="p">}</span>
+<span class="ln"> 51</span>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">other</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">HasPrefix</span><span class="p">(</span><span class="nx">other</span><span class="p">,</span> <span class="s">&#34;{&#34;</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 52</span>      <span class="c1">// no empty match
+</span><span class="ln"> 53</span><span class="c1"></span>      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">each</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 54</span>        <span class="k">return</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">score</span>
+<span class="ln"> 55</span>      <span class="p">}</span>
+<span class="ln"> 56</span>      <span class="nx">score</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="ln"> 57</span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 58</span>      <span class="c1">// not a parameter
+</span><span class="ln"> 59</span><span class="c1"></span>      <span class="k">if</span> <span class="nx">each</span> <span class="o">!=</span> <span class="nx">other</span> <span class="p">{</span>
+<span class="ln"> 60</span>        <span class="k">return</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">score</span>
+<span class="ln"> 61</span>      <span class="p">}</span>
+<span class="ln"> 62</span>      <span class="nx">score</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nx">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="nx">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span> <span class="c1">//fuzzy
+</span><span class="ln"> 63</span><span class="c1"></span>    <span class="p">}</span>
+<span class="ln"> 64</span>  <span class="p">}</span>
+<span class="ln"> 65</span>  <span class="k">return</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">score</span>
+<span class="ln"> 66</span><span class="p">}</span>
+<span class="ln"> 67</span>
+<span class="ln"> 68</span><span class="c1">// 初选：匹配path，返回一批Route作为备选
+</span><span class="ln"> 69</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">CurlyRouter</span><span class="p">)</span> <span class="nf">selectRoutes</span><span class="p">(</span><span class="nx">ws</span> <span class="o">*</span><span class="nx">WebService</span><span class="p">,</span> <span class="nx">requestTokens</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="nx">sortableCurlyRoutes</span> <span class="p">{</span>
+<span class="ln"> 70</span>  <span class="c1">// 选中的Route存放到sortableCurlyRoutes中
+</span><span class="ln"> 71</span><span class="c1"></span>  <span class="nx">candidates</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="nx">sortableCurlyRoutes</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="ln"> 72</span>  <span class="c1">// 遍历webservice下所有的route
+</span><span class="ln"> 73</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">each</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">ws</span><span class="p">.</span><span class="nx">routes</span> <span class="p">{</span>
+<span class="ln"> 74</span>    <span class="c1">// paramCount：正则命中
+</span><span class="ln"> 75</span><span class="c1"></span>    <span class="c1">// staticCount：完全匹配命中
+</span><span class="ln"> 76</span><span class="c1"></span>    <span class="nx">matches</span><span class="p">,</span> <span class="nx">paramCount</span><span class="p">,</span> <span class="nx">staticCount</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">matchesRouteByPathTokens</span><span class="p">(</span><span class="nx">each</span><span class="p">.</span><span class="nx">pathParts</span><span class="p">,</span> <span class="nx">requestTokens</span><span class="p">,</span> <span class="nx">each</span><span class="p">.</span><span class="nx">hasCustomVerb</span><span class="p">)</span>
+<span class="ln"> 77</span>    <span class="c1">// 如果匹配，加入到备选列表中
+</span><span class="ln"> 78</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">matches</span> <span class="p">{</span>
+<span class="ln"> 79</span>      <span class="nx">candidates</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="nx">curlyRoute</span><span class="p">{</span><span class="nx">each</span><span class="p">,</span> <span class="nx">paramCount</span><span class="p">,</span> <span class="nx">staticCount</span><span class="p">})</span> <span class="c1">// TODO make sure Routes() return pointers?
+</span><span class="ln"> 80</span><span class="c1"></span>    <span class="p">}</span>
+<span class="ln"> 81</span>  <span class="p">}</span>
+<span class="ln"> 82</span>  <span class="c1">// 排序备选的route
+</span><span class="ln"> 83</span><span class="c1"></span>  <span class="nx">sort</span><span class="p">.</span><span class="nf">Sort</span><span class="p">(</span><span class="nx">candidates</span><span class="p">)</span>
+<span class="ln"> 84</span>  <span class="k">return</span> <span class="nx">candidates</span>
+<span class="ln"> 85</span><span class="p">}</span>
+<span class="ln"> 86</span>
+<span class="ln"> 87</span><span class="c1">// 二次筛选：匹配属性等信息。返回最合适的Route
+</span><span class="ln"> 88</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">CurlyRouter</span><span class="p">)</span> <span class="nf">detectRoute</span><span class="p">(</span><span class="nx">candidateRoutes</span> <span class="nx">sortableCurlyRoutes</span><span class="p">,</span> <span class="nx">httpRequest</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">Route</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 89</span>  <span class="c1">// tracing is done inside detectRoute
+</span><span class="ln"> 90</span><span class="c1"></span>  <span class="k">return</span> <span class="nx">jsr311Router</span><span class="p">.</span><span class="nf">detectRoute</span><span class="p">(</span><span class="nx">candidateRoutes</span><span class="p">.</span><span class="nf">routes</span><span class="p">(),</span> <span class="nx">httpRequest</span><span class="p">)</span>
+<span class="ln"> 91</span><span class="p">}</span>
+<span class="ln"> 92</span>
+<span class="ln"> 93</span><span class="c1">// 匹配多个属性是否匹配：method、content-type、accept
+</span><span class="ln"> 94</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="nx">RouterJSR311</span><span class="p">)</span> <span class="nf">detectRoute</span><span class="p">(</span><span class="nx">routes</span> <span class="p">[]</span><span class="nx">Route</span><span class="p">,</span> <span class="nx">httpRequest</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">Route</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 95</span>  <span class="nx">candidates</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="nx">Route</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="ln"> 96</span>  <span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">each</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">routes</span> <span class="p">{</span>
+<span class="ln"> 97</span>    <span class="nx">ok</span> <span class="o">:=</span> <span class="kc">true</span>
+<span class="ln"> 98</span>    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">fn</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">each</span><span class="p">.</span><span class="nx">If</span> <span class="p">{</span>
+<span class="ln"> 99</span>      <span class="k">if</span> <span class="p">!</span><span class="nf">fn</span><span class="p">(</span><span class="nx">httpRequest</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">100</span>        <span class="nx">ok</span> <span class="p">=</span> <span class="kc">false</span>
+<span class="ln">101</span>        <span class="k">break</span>
+<span class="ln">102</span>      <span class="p">}</span>
+<span class="ln">103</span>    <span class="p">}</span>
+<span class="ln">104</span>    <span class="k">if</span> <span class="nx">ok</span> <span class="p">{</span>
+<span class="ln">105</span>      <span class="nx">candidates</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">candidates</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">routes</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+<span class="ln">106</span>    <span class="p">}</span>
+<span class="ln">107</span>  <span class="p">}</span>
+<span class="ln">108</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">candidates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">109</span>    <span class="k">if</span> <span class="nx">trace</span> <span class="p">{</span>
+<span class="ln">110</span>      <span class="nx">traceLogger</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;no Route found (from %d) that passes conditional checks&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">routes</span><span class="p">))</span>
+<span class="ln">111</span>    <span class="p">}</span>
+<span class="ln">112</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nf">NewError</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusNotFound</span><span class="p">,</span> <span class="s">&#34;404: Not Found&#34;</span><span class="p">)</span>
+<span class="ln">113</span>  <span class="p">}</span>
+<span class="ln">114</span>
+<span class="ln">115</span>  <span class="c1">// 判断 http method 是否匹配
+</span><span class="ln">116</span><span class="c1"></span>  <span class="nx">previous</span> <span class="o">:=</span> <span class="nx">candidates</span>
+<span class="ln">117</span>  <span class="nx">candidates</span> <span class="p">=</span> <span class="nx">candidates</span><span class="p">[:</span><span class="mi">0</span><span class="p">]</span>
+<span class="ln">118</span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">each</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">previous</span> <span class="p">{</span>
+<span class="ln">119</span>    <span class="k">if</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="nx">each</span><span class="p">.</span><span class="nx">Method</span> <span class="p">{</span>
+<span class="ln">120</span>      <span class="nx">candidates</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">candidates</span><span class="p">,</span> <span class="nx">each</span><span class="p">)</span>
+<span class="ln">121</span>    <span class="p">}</span>
+<span class="ln">122</span>  <span class="p">}</span>
+<span class="ln">123</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">candidates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">124</span>    <span class="k">if</span> <span class="nx">trace</span> <span class="p">{</span>
+<span class="ln">125</span>      <span class="nx">traceLogger</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;no Route found (in %d routes) that matches HTTP method %s\n&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">previous</span><span class="p">),</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">Method</span><span class="p">)</span>
+<span class="ln">126</span>    <span class="p">}</span>
+<span class="ln">127</span>    <span class="nx">allowed</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{}</span>
+<span class="ln">128</span>  <span class="nx">allowedLoop</span><span class="p">:</span>
+<span class="ln">129</span>    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">candidate</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">previous</span> <span class="p">{</span>
+<span class="ln">130</span>      <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">method</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">allowed</span> <span class="p">{</span>
+<span class="ln">131</span>        <span class="k">if</span> <span class="nx">method</span> <span class="o">==</span> <span class="nx">candidate</span><span class="p">.</span><span class="nx">Method</span> <span class="p">{</span>
+<span class="ln">132</span>          <span class="k">continue</span> <span class="nx">allowedLoop</span>
+<span class="ln">133</span>        <span class="p">}</span>
+<span class="ln">134</span>      <span class="p">}</span>
+<span class="ln">135</span>      <span class="nx">allowed</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">allowed</span><span class="p">,</span> <span class="nx">candidate</span><span class="p">.</span><span class="nx">Method</span><span class="p">)</span>
+<span class="ln">136</span>    <span class="p">}</span>
+<span class="ln">137</span>    <span class="nx">header</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Header</span><span class="p">{</span><span class="s">&#34;Allow&#34;</span><span class="p">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="nx">strings</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">allowed</span><span class="p">,</span> <span class="s">&#34;, &#34;</span><span class="p">)}}</span>
+<span class="ln">138</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nf">NewErrorWithHeader</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusMethodNotAllowed</span><span class="p">,</span> <span class="s">&#34;405: Method Not Allowed&#34;</span><span class="p">,</span> <span class="nx">header</span><span class="p">)</span>
+<span class="ln">139</span>  <span class="p">}</span>
+<span class="ln">140</span>
+<span class="ln">141</span>  <span class="c1">// 判断 Content-Type 是否匹配
+</span><span class="ln">142</span><span class="c1"></span>  <span class="nx">contentType</span> <span class="o">:=</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="nx">HEADER_ContentType</span><span class="p">)</span>
+<span class="ln">143</span>  <span class="nx">previous</span> <span class="p">=</span> <span class="nx">candidates</span>
+<span class="ln">144</span>  <span class="nx">candidates</span> <span class="p">=</span> <span class="nx">candidates</span><span class="p">[:</span><span class="mi">0</span><span class="p">]</span>
+<span class="ln">145</span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">each</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">previous</span> <span class="p">{</span>
+<span class="ln">146</span>    <span class="k">if</span> <span class="nx">each</span><span class="p">.</span><span class="nf">matchesContentType</span><span class="p">(</span><span class="nx">contentType</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">147</span>      <span class="nx">candidates</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">candidates</span><span class="p">,</span> <span class="nx">each</span><span class="p">)</span>
+<span class="ln">148</span>    <span class="p">}</span>
+<span class="ln">149</span>  <span class="p">}</span>
+<span class="ln">150</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">candidates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">151</span>    <span class="k">if</span> <span class="nx">trace</span> <span class="p">{</span>
+<span class="ln">152</span>      <span class="nx">traceLogger</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;no Route found (from %d) that matches HTTP Content-Type: %s\n&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">previous</span><span class="p">),</span> <span class="nx">contentType</span><span class="p">)</span>
+<span class="ln">153</span>    <span class="p">}</span>
+<span class="ln">154</span>    <span class="k">if</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">ContentLength</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">155</span>      <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nf">NewError</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusUnsupportedMediaType</span><span class="p">,</span> <span class="s">&#34;415: Unsupported Media Type&#34;</span><span class="p">)</span>
+<span class="ln">156</span>    <span class="p">}</span>
+<span class="ln">157</span>  <span class="p">}</span>
+<span class="ln">158</span>
+<span class="ln">159</span>  <span class="c1">// 判断 accept 是否匹配
+</span><span class="ln">160</span><span class="c1"></span>  <span class="nx">previous</span> <span class="p">=</span> <span class="nx">candidates</span>
+<span class="ln">161</span>  <span class="nx">candidates</span> <span class="p">=</span> <span class="nx">candidates</span><span class="p">[:</span><span class="mi">0</span><span class="p">]</span>
+<span class="ln">162</span>  <span class="nx">accept</span> <span class="o">:=</span> <span class="nx">httpRequest</span><span class="p">.</span><span class="nx">Header</span><span class="p">.</span><span class="nf">Get</span><span class="p">(</span><span class="nx">HEADER_Accept</span><span class="p">)</span>
+<span class="ln">163</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">accept</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">164</span>    <span class="nx">accept</span> <span class="p">=</span> <span class="s">&#34;*/*&#34;</span>
+<span class="ln">165</span>  <span class="p">}</span>
+<span class="ln">166</span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">each</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">previous</span> <span class="p">{</span>
+<span class="ln">167</span>    <span class="k">if</span> <span class="nx">each</span><span class="p">.</span><span class="nf">matchesAccept</span><span class="p">(</span><span class="nx">accept</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">168</span>      <span class="nx">candidates</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">candidates</span><span class="p">,</span> <span class="nx">each</span><span class="p">)</span>
+<span class="ln">169</span>    <span class="p">}</span>
+<span class="ln">170</span>  <span class="p">}</span>
+<span class="ln">171</span>  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">candidates</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">172</span>    <span class="k">if</span> <span class="nx">trace</span> <span class="p">{</span>
+<span class="ln">173</span>      <span class="nx">traceLogger</span><span class="p">.</span><span class="nf">Printf</span><span class="p">(</span><span class="s">&#34;no Route found (from %d) that matches HTTP Accept: %s\n&#34;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">previous</span><span class="p">),</span> <span class="nx">accept</span><span class="p">)</span>
+<span class="ln">174</span>    <span class="p">}</span>
+<span class="ln">175</span>    <span class="nx">available</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{}</span>
+<span class="ln">176</span>    <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">candidate</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">previous</span> <span class="p">{</span>
+<span class="ln">177</span>      <span class="nx">available</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">available</span><span class="p">,</span> <span class="nx">candidate</span><span class="p">.</span><span class="nx">Produces</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">178</span>    <span class="p">}</span>
+<span class="ln">179</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nf">NewError</span><span class="p">(</span>
+<span class="ln">180</span>      <span class="nx">http</span><span class="p">.</span><span class="nx">StatusNotAcceptable</span><span class="p">,</span>
+<span class="ln">181</span>      <span class="nx">fmt</span><span class="p">.</span><span class="nf">Sprintf</span><span class="p">(</span><span class="s">&#34;406: Not Acceptable\n\nAvailable representations: %s&#34;</span><span class="p">,</span> <span class="nx">strings</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="nx">available</span><span class="p">,</span> <span class="s">&#34;, &#34;</span><span class="p">)),</span>
+<span class="ln">182</span>    <span class="p">)</span>
+<span class="ln">183</span>  <span class="p">}</span>
+<span class="ln">184</span>  <span class="c1">// 如果有多个匹配，返回第一个
+</span><span class="ln">185</span><span class="c1"></span>  <span class="k">return</span> <span class="nx">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">nil</span>
+<span class="ln">186</span><span class="p">}</span>
+</code></pre></div><h3 id="启动服务">启动服务</h3>
+<p>前面介绍过，go-restful直接操作的golang标准库http的路由对象http.DefaultServeMux，所以服务启动这一步只需要调用http标准的服务启动即可，不需要做额外的处理。即<code>http.ListenAndServe(&quot;:8080&quot;, nil)</code></p>
+<h2 id="总结">总结</h2>
+<p>go-restful并不是一个热度很高的golang web框架，但是k8s中用到了它，本篇文章通过源码分析对go-restful的内部实现做了简单的分析。从分析的过程来看，确实是一个精悍小巧的框架。内部更深入的功能我们没有继续研究了，只要达到能看懂k8s kube-apiserver组件源码的目的就行。</p>
+<p>内部核心实现只要是：</p>
+<ul>
+<li>通过http包默认的路由对象DefaultServeMux添加处理函数dispatch</li>
+<li>路由分发功能全部转给dispatch</li>
+<li>dispatch内部调用RouteSelector的默认实现类CurlyRouter的SelectRoute方法选择合适的Route</li>
+<li>调用Route中注册的handler方法，处理请求</li>
+</ul>
+
   </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
