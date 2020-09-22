@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>go-channel源码分析 | kinnylee</title>
+  <head>  <title>图解Golang channel源码 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.74.3" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -15,13 +15,13 @@
   
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="go-channel源码分析 channel简介 channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的">
+<meta name="description" content="图解Golang channel源码 前言 先上一张channel布局图，channel的底层实际上并不复杂，没有用到很高深的知识，主要是围绕着一">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "go-channel源码分析" />
+<meta name = "twitter:title" content = "图解Golang channel源码" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" />
-<meta property = "og:title" content = "go-channel源码分析" />
-<meta property = "og:description" content = "go-channel源码分析 channel简介 channel是一个类型管道，通过它可以在groutine之间发送和接收消息 go语言层面提供的" />
+<meta property = "og:title" content = "图解Golang channel源码" />
+<meta property = "og:description" content = "图解Golang channel源码 前言 先上一张channel布局图，channel的底层实际上并不复杂，没有用到很高深的知识，主要是围绕着一" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/go.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -142,12 +142,12 @@
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content' id= 'post_content'>
-    <h1 class='post_title'>go-channel源码分析</h1><div class = 'post_meta'>
+    <h1 class='post_title'>图解Golang channel源码</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Aug 26, 2020</span>
+    Sep 22, 2020</span>
   <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
   </a>
   <a href = 'https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8' class = 'post_tag button button_translucent'>go基础入门
@@ -157,7 +157,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 3670 字</span>，阅读约<span class="more-meta"> 8 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 5006 字</span>，阅读约<span class="more-meta"> 10 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="Copy Link" class="link link_yank">
@@ -172,6 +172,7 @@
     <h2>Overview</h2>
     <nav id="TableOfContents">
   <ul>
+    <li><a href="#前言">前言</a></li>
     <li><a href="#channel简介">channel简介</a>
       <ul>
         <li><a href="#channel使用">channel使用</a></li>
@@ -181,21 +182,27 @@
     <li><a href="#源码分析">源码分析</a>
       <ul>
         <li><a href="#chan数据结构">chan数据结构</a></li>
-        <li><a href="#创建chan">创建chan</a></li>
-        <li><a href="#发送数据">发送数据</a></li>
+        <li><a href="#创建channel">创建channel</a></li>
+        <li><a href="#发送数据到channel">发送数据到channel</a></li>
         <li><a href="#读取数据">读取数据</a></li>
         <li><a href="#关闭channel">关闭channel</a></li>
       </ul>
     </li>
+    <li><a href="#总结">总结</a></li>
     <li><a href="#参考">参考</a></li>
   </ul>
 </nav>
-    <h1 id="go-channel源码分析">go-channel源码分析</h1>
+    <h1 id="图解golang-channel源码">图解Golang channel源码</h1>
+<h2 id="前言">前言</h2>
+<p>先上一张channel布局图，channel的底层实际上并不复杂，没有用到很高深的知识，主要是围绕着一个环形队列和两个链表展开。相信你看完本篇文章一定能掌握channel的实现。</p>
+<p><a href="https://www.processon.com/view/link/5f6941057d9c087da1bae259">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f694105637689248621dcf0.png" alt="hchan结构"></p>
 <h2 id="channel简介">channel简介</h2>
 <ul>
 <li>channel是一个类型管道，通过它可以在groutine之间发送和接收消息</li>
 <li>go语言层面提供的groutine之间的通讯方式</li>
 </ul>
+<p>在日常开发中，对于channel的使用应该不陌生了，但是了解了基本的使用后，你是否对它的底层实现很好奇呢，为什么它就能实现并发的groutine之间通信呢？带着这个好奇，让我们研究一下channel底层的源码实现吧！</p>
 <h3 id="channel使用">channel使用</h3>
 <p>下面是channel的最简单的用法：</p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kn">package</span> <span class="nx">main</span>
@@ -250,8 +257,6 @@
 <li>chan中的两个重要组件是<code>buf</code>和<code>waitq</code>，所有的行为和实现都是围绕着两个组件进行的</li>
 </ul>
 <p>github上Go夜读提供的这个图片比较形象，直接引用过来。</p>
-<p><a href="https://docs.google.com/presentation/d/18_9LcMc8u93aITZ6DqeUfRvOcHQYj2gwxhskf0XPX2U/edit#slide=id.g5f22a15af9_0_24">原地址</a></p>
-<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bebc995dd05747609488159028a0fe6b~tplv-k3u1fbpfcp-zoom-1.image" alt="hchan结构"></p>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">hchan</span> <span class="kd">struct</span> <span class="p">{</span>
 <span class="ln"> 2</span>  <span class="c1">// 当前队列中总元素个数
 </span><span class="ln"> 3</span><span class="c1"></span>  <span class="nx">qcount</span>   <span class="kt">uint</span>           <span class="c1">// total data in the queue
@@ -282,7 +287,17 @@
 <span class="ln">28</span>  <span class="nx">first</span> <span class="o">*</span><span class="nx">sudog</span>
 <span class="ln">29</span>  <span class="nx">last</span>  <span class="o">*</span><span class="nx">sudog</span>
 <span class="ln">30</span><span class="p">}</span>
-</code></pre></div><h3 id="创建chan">创建chan</h3>
+</code></pre></div><h3 id="创建channel">创建channel</h3>
+<p>概述：</p>
+<p>创建channel时，可以往channel中放入不同类型的数据，不同类型数据占用的空间大小也是不一样的，这决定了hchan和hchan中的buf字段需要开辟多大的存储空间。在go的源码中对不同的情况做不同的处理。包括三种情况：</p>
+<blockquote>
+<p>总体的原则是：总内存大小 = hchan需要的内存大小 + 元素需要的内存大小</p>
+</blockquote>
+<ul>
+<li>队列为空或元素大小为0：只需要开辟的内存空间为hchan本身的大小</li>
+<li>元素不是指针类型：需要开辟的内存空间=hchan本身大小+每个元素的大小*申请的队列长度</li>
+<li>元素是指针类型：这种情况下buf需要单独开辟空间，buf占用内存大小为每个元素的大小*申请的队列长度</li>
+</ul>
 <p>输入：</p>
 <ul>
 <li>chantype：channel的类型</li>
@@ -298,47 +313,50 @@
 <li>数据赋值</li>
 <li>创建缓冲区存储空间（区分元素为空、元素有指针、元素无指针三种情况）</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">makechan</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">chantype</span><span class="p">,</span> <span class="nx">size</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">hchan</span> <span class="p">{</span>
-<span class="ln"> 2</span>  <span class="nx">elem</span> <span class="o">:=</span> <span class="nx">t</span><span class="p">.</span><span class="nx">elem</span>
-<span class="ln"> 3</span>
-<span class="ln"> 4</span>  <span class="c1">// 总共需要的buff大小 = channel中创建的这种元素类型的大小（elem.size）* 元素个数
-</span><span class="ln"> 5</span><span class="c1"></span>  <span class="nx">mem</span><span class="p">,</span> <span class="nx">overflow</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">MulUintptr</span><span class="p">(</span><span class="nx">elem</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">size</span><span class="p">))</span>
-<span class="ln"> 6</span>
-<span class="ln"> 7</span>  <span class="kd">var</span> <span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span>
-<span class="ln"> 8</span>  <span class="c1">// 下面是为buf创建并分配存储空间
-</span><span class="ln"> 9</span><span class="c1"></span>  <span class="k">switch</span> <span class="p">{</span>
-<span class="ln">10</span>  <span class="k">case</span> <span class="nx">mem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<span class="ln">11</span>    <span class="c1">// Queue or element size is zero.
-</span><span class="ln">12</span><span class="c1"></span>
-<span class="ln">13</span>    <span class="c1">// channel的元素个数为0，或者每个元素占用的大小为0
+<p><a href="https://www.processon.com/view/link/5f69ec4be0b34d2c46b8038c">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f69ec4b07912949af466a6d.png" alt="channel创建"></p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="c1">// 对应的源码为 c := make(chan int, size)
+</span><span class="ln"> 2</span><span class="c1">// c := make(chan int) 这种情况下，size = 0
+</span><span class="ln"> 3</span><span class="c1"></span><span class="kd">func</span> <span class="nf">makechan</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">chantype</span><span class="p">,</span> <span class="nx">size</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">hchan</span> <span class="p">{</span>
+<span class="ln"> 4</span>  <span class="nx">elem</span> <span class="o">:=</span> <span class="nx">t</span><span class="p">.</span><span class="nx">elem</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span>  <span class="c1">// 总共需要的buff大小 = channel中创建的这种元素类型的大小（elem.size）* size
+</span><span class="ln"> 7</span><span class="c1"></span>  <span class="nx">mem</span><span class="p">,</span> <span class="nx">overflow</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">MulUintptr</span><span class="p">(</span><span class="nx">elem</span><span class="p">.</span><span class="nx">size</span><span class="p">,</span> <span class="nb">uintptr</span><span class="p">(</span><span class="nx">size</span><span class="p">))</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="kd">var</span> <span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span>
+<span class="ln">10</span>  <span class="c1">// 下面是为buf创建并分配存储空间
+</span><span class="ln">11</span><span class="c1"></span>  <span class="k">switch</span> <span class="p">{</span>
+<span class="ln">12</span>  <span class="k">case</span> <span class="nx">mem</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="ln">13</span>    <span class="c1">// size为0，或者每个元素占用的大小为0
 </span><span class="ln">14</span><span class="c1"></span>    <span class="c1">// 这时为buf分配大小时，只需要分配hchan结构体本身占用的大小即可
 </span><span class="ln">15</span><span class="c1"></span>    <span class="c1">// hchanSize是一个常量，表示空的hchan需要占用的字节大小
-</span><span class="ln">16</span><span class="c1"></span>    <span class="nx">c</span> <span class="p">=</span> <span class="p">(</span><span class="o">*</span><span class="nx">hchan</span><span class="p">)(</span><span class="nf">mallocgc</span><span class="p">(</span><span class="nx">hchanSize</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">true</span><span class="p">))</span>
-<span class="ln">17</span>    <span class="c1">// Race detector uses this location for synchronization.
-</span><span class="ln">18</span><span class="c1"></span>    <span class="nx">c</span><span class="p">.</span><span class="nx">buf</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">raceaddr</span><span class="p">()</span>
-<span class="ln">19</span>  <span class="k">case</span> <span class="nx">elem</span><span class="p">.</span><span class="nx">ptrdata</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<span class="ln">20</span>    <span class="c1">// Elements do not contain pointers.
-</span><span class="ln">21</span><span class="c1"></span>    <span class="c1">// Allocate hchan and buf in one call.
-</span><span class="ln">22</span><span class="c1"></span>    <span class="c1">// 如果队列中不存在指针，那么每个元素都需要被存储并占用空间，占用大小为前面乘法算出来的mem
-</span><span class="ln">23</span><span class="c1"></span>    <span class="c1">// 同时还要加上hchan本身占用的空间大小，加起来就是整个hchan占用的空间大小
-</span><span class="ln">24</span><span class="c1"></span>    <span class="nx">c</span> <span class="p">=</span> <span class="p">(</span><span class="o">*</span><span class="nx">hchan</span><span class="p">)(</span><span class="nf">mallocgc</span><span class="p">(</span><span class="nx">hchanSize</span><span class="o">+</span><span class="nx">mem</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">true</span><span class="p">))</span>
-<span class="ln">25</span>    <span class="c1">// 把buf指针指向空的hchan长度的末尾
-</span><span class="ln">26</span><span class="c1"></span>    <span class="nx">c</span><span class="p">.</span><span class="nx">buf</span> <span class="p">=</span> <span class="nf">add</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">c</span><span class="p">),</span> <span class="nx">hchanSize</span><span class="p">)</span>
-<span class="ln">27</span>  <span class="k">default</span><span class="p">:</span>
-<span class="ln">28</span>    <span class="c1">// Elements contain pointers.
-</span><span class="ln">29</span><span class="c1"></span>    <span class="c1">// 如果chan中的元素是指针类型的数据，为buf单独开辟mem大小的空间，用来保存所有的数据
-</span><span class="ln">30</span><span class="c1"></span>    <span class="nx">c</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">hchan</span><span class="p">)</span>
-<span class="ln">31</span>    <span class="nx">c</span><span class="p">.</span><span class="nx">buf</span> <span class="p">=</span> <span class="nf">mallocgc</span><span class="p">(</span><span class="nx">mem</span><span class="p">,</span> <span class="nx">elem</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
-<span class="ln">32</span>  <span class="p">}</span>
-<span class="ln">33</span>  <span class="c1">// 设置chan的总大小
-</span><span class="ln">34</span><span class="c1"></span>  <span class="nx">c</span><span class="p">.</span><span class="nx">elemsize</span> <span class="p">=</span> <span class="nb">uint16</span><span class="p">(</span><span class="nx">elem</span><span class="p">.</span><span class="nx">size</span><span class="p">)</span>
-<span class="ln">35</span>  <span class="c1">// 元素类型
-</span><span class="ln">36</span><span class="c1"></span>  <span class="nx">c</span><span class="p">.</span><span class="nx">elemtype</span> <span class="p">=</span> <span class="nx">elem</span>
-<span class="ln">37</span>  <span class="c1">// 环形队列的大小，即用户创建时设置的大小
-</span><span class="ln">38</span><span class="c1"></span>  <span class="nx">c</span><span class="p">.</span><span class="nx">dataqsiz</span> <span class="p">=</span> <span class="nb">uint</span><span class="p">(</span><span class="nx">size</span><span class="p">)</span>
-<span class="ln">39</span>  <span class="k">return</span> <span class="nx">c</span>
-<span class="ln">40</span><span class="p">}</span>
-</code></pre></div><h3 id="发送数据">发送数据</h3>
+</span><span class="ln">16</span><span class="c1"></span>    <span class="c1">// hchanSize = unsafe.Sizeof(hchan{}) + uintptr(-int(unsafe.Sizeof(hchan{}))&amp;(maxAlign-1))
+</span><span class="ln">17</span><span class="c1"></span>    <span class="nx">c</span> <span class="p">=</span> <span class="p">(</span><span class="o">*</span><span class="nx">hchan</span><span class="p">)(</span><span class="nf">mallocgc</span><span class="p">(</span><span class="nx">hchanSize</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">true</span><span class="p">))</span>
+<span class="ln">18</span>    <span class="c1">// raceaddr内部实现为：return unsafe.Pointer(&amp;c.buf)
+</span><span class="ln">19</span><span class="c1"></span>    <span class="nx">c</span><span class="p">.</span><span class="nx">buf</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">raceaddr</span><span class="p">()</span>
+<span class="ln">20</span>  <span class="k">case</span> <span class="nx">elem</span><span class="p">.</span><span class="nx">ptrdata</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="ln">21</span>    <span class="c1">// 如果队列中不存在指针，那么每个元素都需要被存储并占用空间，占用大小为前面乘法算出来的mem
+</span><span class="ln">22</span><span class="c1"></span>    <span class="c1">// 同时还要加上hchan本身占用的空间大小，加起来就是整个hchan占用的空间大小
+</span><span class="ln">23</span><span class="c1"></span>    <span class="nx">c</span> <span class="p">=</span> <span class="p">(</span><span class="o">*</span><span class="nx">hchan</span><span class="p">)(</span><span class="nf">mallocgc</span><span class="p">(</span><span class="nx">hchanSize</span><span class="o">+</span><span class="nx">mem</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">true</span><span class="p">))</span>
+<span class="ln">24</span>    <span class="c1">// 把buf指针指向空的hchan占用空间大小的末尾
+</span><span class="ln">25</span><span class="c1"></span>    <span class="nx">c</span><span class="p">.</span><span class="nx">buf</span> <span class="p">=</span> <span class="nf">add</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">c</span><span class="p">),</span> <span class="nx">hchanSize</span><span class="p">)</span>
+<span class="ln">26</span>  <span class="k">default</span><span class="p">:</span>
+<span class="ln">27</span>    <span class="c1">// Elements contain pointers.
+</span><span class="ln">28</span><span class="c1"></span>    <span class="c1">// 如果chan中的元素是指针类型的数据，为buf单独开辟mem大小的空间，用来保存所有的数据
+</span><span class="ln">29</span><span class="c1"></span>    <span class="nx">c</span> <span class="p">=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">hchan</span><span class="p">)</span>
+<span class="ln">30</span>    <span class="nx">c</span><span class="p">.</span><span class="nx">buf</span> <span class="p">=</span> <span class="nf">mallocgc</span><span class="p">(</span><span class="nx">mem</span><span class="p">,</span> <span class="nx">elem</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+<span class="ln">31</span>  <span class="p">}</span>
+<span class="ln">32</span>  <span class="c1">// 设置chan的总大小
+</span><span class="ln">33</span><span class="c1"></span>  <span class="nx">c</span><span class="p">.</span><span class="nx">elemsize</span> <span class="p">=</span> <span class="nb">uint16</span><span class="p">(</span><span class="nx">elem</span><span class="p">.</span><span class="nx">size</span><span class="p">)</span>
+<span class="ln">34</span>  <span class="c1">// 元素类型
+</span><span class="ln">35</span><span class="c1"></span>  <span class="nx">c</span><span class="p">.</span><span class="nx">elemtype</span> <span class="p">=</span> <span class="nx">elem</span>
+<span class="ln">36</span>  <span class="c1">// 环形队列的大小，即用户创建时设置的大小
+</span><span class="ln">37</span><span class="c1"></span>  <span class="nx">c</span><span class="p">.</span><span class="nx">dataqsiz</span> <span class="p">=</span> <span class="nb">uint</span><span class="p">(</span><span class="nx">size</span><span class="p">)</span>
+<span class="ln">38</span>  <span class="k">return</span> <span class="nx">c</span>
+<span class="ln">39</span><span class="p">}</span>
+</code></pre></div><h3 id="发送数据到channel">发送数据到channel</h3>
+<p>概述：</p>
+<p>发送数据到channel时，直观的理解是将数据放到chan的环形队列中，不过go做了一些优化：先判断是否有等待接收数据的groutine，如果有，直接将数据发给Groutine，唤醒groutine，就不放入队列中了。当然还有另外一种情况就是：队列如果满了，那就只能放到队列中等待，直到有数据被取走才能发送。</p>
 <p>输入：</p>
 <ul>
 <li>chan对象</li>
@@ -348,11 +366,21 @@
 </ul>
 <p>输出：无</p>
 <p>核心逻辑：</p>
-<ul>
+<ol>
 <li>如果recvq不为空，从recvq中取出一个等待接收数据的Groutine，将数据发送给该Groutine</li>
-<li>如果recvq为空，则将数据放入buf中</li>
+<li>如果recvq为空，才将数据放入buf中</li>
 <li>如果buf已满，则将要发送的数据和当前的Groutine打包成Sudog对象放入sendq，并将groutine置为等待状态</li>
-</ul>
+</ol>
+<h4 id="有等待接收数据的groutine">有等待接收数据的groutine</h4>
+<p><a href="https://www.processon.com/view/link/5f69fba607912949af468b0a">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f69fba6e401fd61b050061e.png" alt="channel发送-有receive"></p>
+<h4 id="无等待接收数据的groutine环形队列未满">无等待接收数据的groutine，环形队列未满</h4>
+<p><a href="https://www.processon.com/view/link/5f69ff4a7d9c087da1bd5231">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f69ff4a1e0853769821c1d4.png" alt="channel发送-无等待groutine-队列未满"></p>
+<h4 id="无等待接收数据的groutine环形队列已满">无等待接收数据的groutine，环形队列已满</h4>
+<p><a href="https://www.processon.com/view/link/5f6a055be0b34d2c46b836dc">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f6a055ae401fd61b05017c7.png" alt="channel发送-无等待groutine-队列已满"></p>
+<h4 id="发送数据源码">发送数据源码</h4>
 <div class="highlight"><pre class="chroma"><code class="language-GO" data-lang="GO"><span class="ln">  1</span><span class="c1">// ep指向要发送数据的首地址
 </span><span class="ln">  2</span><span class="c1"></span><span class="kd">func</span> <span class="nf">chansend</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span><span class="p">,</span> <span class="nx">ep</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">,</span> <span class="nx">block</span> <span class="kt">bool</span><span class="p">,</span> <span class="nx">callerpc</span> <span class="kt">uintptr</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
 <span class="ln">  3</span>
@@ -475,12 +503,37 @@
 </span><span class="ln">16</span><span class="c1"></span>  <span class="nf">goready</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="nx">skip</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 <span class="ln">17</span><span class="p">}</span>
 </code></pre></div><h3 id="读取数据">读取数据</h3>
-<p>读取数据的流程和发送的类似</p>
+<p>概述：</p>
+<p>从channel读取数据的流程和发送的类似，基本是发送操作的逆操作。</p>
+<p>从channel读取数据时，不是直接去环形队列中去数据，而是先判断是否有等待发送数据的groutine，如果有，直接将groutine出队列，取出数据返回，并唤醒groutine。如果没有等待发送数据的groutine，再从环形队列中取数据。</p>
+<p>输入：</p>
+<ul>
+<li>chan对象</li>
+<li>接收数据的指针</li>
+<li>是否阻塞</li>
+</ul>
+<p>输出：是否接收成功</p>
+<p>核心逻辑：</p>
+<ol>
+<li>如果有等待发送数据的groutine，从sendq中取出一个等待发送数据的Groutine，取出数据</li>
+<li>如果没有等待的groutine，且环形队列中有数据，从队列中取出数据</li>
+<li>如果没有等待的groutine，且环形队列中也没有数据，则阻塞该Groutine，并将groutine打包为sudogo加入到recevq等待队列中</li>
+</ol>
+<h4 id="sendq中有等待的groutine">sendq中有等待的groutine</h4>
+<p><a href="https://www.processon.com/view/link/5f6a0a4fe401fd61b0501f90">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f6a0a4f07912949af46a4f3.png" alt="发送数据-有等待的groutine"></p>
+<h4 id="sendq中无等待的groutine队列不为空">sendq中无等待的groutine，队列不为空</h4>
+<p><a href="https://www.processon.com/view/link/5f6a0b90637689248624570b">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f6a0b901e0853769821d519.png" alt="发送数据-无等待的groutine-队列不为空"></p>
+<h4 id="sendq中无等待的groutine队列为空">sendq中无等待的groutine，队列为空</h4>
+<p><a href="https://www.processon.com/view/link/5f6a0c9d07912949af46a832">高清地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/5f6a0c9d1e0853769821d70f.png" alt="发送数据-无等待的groutine-队列为空"></p>
+<h4 id="读取数据源码">读取数据源码</h4>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">chanrecv</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">hchan</span><span class="p">,</span> <span class="nx">ep</span> <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">,</span> <span class="nx">block</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">(</span><span class="nx">selected</span><span class="p">,</span> <span class="nx">received</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
 <span class="ln"> 2</span>
 <span class="ln"> 3</span>  <span class="c1">// 上锁
 </span><span class="ln"> 4</span><span class="c1"></span>  <span class="nf">lock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
-<span class="ln"> 5</span>  <span class="c1">// 从发送队列中取出数据，如果有等待发送数据的groutine,直接从发送数据的携程中接收数据
+<span class="ln"> 5</span>  <span class="c1">// 优先从发送队列中取数据，如果有等待发送数据的groutine,直接从发送数据的协程中取出数据
 </span><span class="ln"> 6</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">sg</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">sendq</span><span class="p">.</span><span class="nf">dequeue</span><span class="p">();</span> <span class="nx">sg</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
 <span class="ln"> 7</span>    <span class="nf">recv</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">sg</span><span class="p">,</span> <span class="nx">ep</span><span class="p">,</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span> <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span> <span class="p">},</span> <span class="mi">3</span><span class="p">)</span>
 <span class="ln"> 8</span>    <span class="k">return</span> <span class="kc">true</span><span class="p">,</span> <span class="kc">true</span>
@@ -512,14 +565,14 @@
 <span class="ln">34</span>    <span class="k">return</span> <span class="kc">true</span><span class="p">,</span> <span class="kc">true</span>
 <span class="ln">35</span>  <span class="p">}</span>
 <span class="ln">36</span>
-<span class="ln">37</span>  <span class="c1">// 同步非阻塞
+<span class="ln">37</span>  <span class="c1">// 同步非阻塞，协程直接返回
 </span><span class="ln">38</span><span class="c1"></span>  <span class="k">if</span> <span class="p">!</span><span class="nx">block</span> <span class="p">{</span>
 <span class="ln">39</span>    <span class="nf">unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">.</span><span class="nx">lock</span><span class="p">)</span>
 <span class="ln">40</span>    <span class="k">return</span> <span class="kc">false</span><span class="p">,</span> <span class="kc">false</span>
 <span class="ln">41</span>  <span class="p">}</span>
 <span class="ln">42</span>
 <span class="ln">43</span>  <span class="c1">// 同步阻塞
-</span><span class="ln">44</span><span class="c1"></span>  <span class="c1">// 如果没有发送数据的协程，阻塞住，并加入channel的接收队列中
+</span><span class="ln">44</span><span class="c1"></span>  <span class="c1">// 如果代码走到这，说明没有任何数据可以获取到，阻塞住协程，并加入channel的接收队列中
 </span><span class="ln">45</span><span class="c1"></span>  <span class="nx">gp</span> <span class="o">:=</span> <span class="nf">getg</span><span class="p">()</span>
 <span class="ln">46</span>  <span class="nx">mysg</span> <span class="o">:=</span> <span class="nf">acquireSudog</span><span class="p">()</span>
 <span class="ln">47</span>  <span class="nx">mysg</span><span class="p">.</span><span class="nx">releasetime</span> <span class="p">=</span> <span class="mi">0</span>
@@ -639,10 +692,13 @@
 </span><span class="ln">70</span><span class="c1"></span>    <span class="nf">goready</span><span class="p">(</span><span class="nx">gp</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="ln">71</span>  <span class="p">}</span>
 <span class="ln">72</span><span class="p">}</span>
-</code></pre></div><h2 id="参考">参考</h2>
+</code></pre></div><h2 id="总结">总结</h2>
+<p>初次使用channel时，感觉很复杂也很神奇，带着这份好奇去研究底层的源码实现，看完之后才发现，它其实没有那么复杂，底层实现逻辑很清晰。本文通过图文并茂的方式整理了底层的逻辑，包括创建channel，发送数据，接收数据等。当然，里面还涉及到调度等知识，后面专门再整理一篇文章加以分析。</p>
+<h2 id="参考">参考</h2>
 <ul>
 <li><a href="https://www.cyhone.com/articles/analysis-of-golang-channel/">https://www.cyhone.com/articles/analysis-of-golang-channel/</a></li>
 <li><a href="https://github.com/talkgo/night/issues/450">https://github.com/talkgo/night/issues/450</a></li>
+<li><a href="https://talkgo.org/t/topic/75">https://talkgo.org/t/topic/75</a></li>
 </ul>
 
   </article>
@@ -656,6 +712,7 @@
     <h2 class="mt-4">Featured Posts</h2>
     <ul>
     
+    
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
       </li>
@@ -663,7 +720,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
       </li>
-    
     
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
@@ -686,6 +742,9 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/" class="nav-link">k8s组件kube-apiserver源码分析</a>
       </li>
       <li>
@@ -703,12 +762,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" class="nav-link">Docker核心原理</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/java/jdk/java%E5%8F%8D%E5%B0%84/" class="nav-link">java反射</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/java/jdk/java-io%E6%B5%81/" class="nav-link">java基础-io流</a>
-      </li>
     </ul> 
     
     <div>
@@ -716,7 +769,7 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
           K8S
-          <span class='button_tally'>11</span>
+          <span class='button_tally'>12</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
@@ -729,13 +782,13 @@
           <span class='button_tally'>5</span>
         </a>
         
-        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
-          GO第三方库
-          <span class='button_tally'>4</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
           <span class='button_tally'>4</span>
         </a>
         
@@ -806,13 +859,13 @@
           <span class='button_tally'>9</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
-          GO基础入门
-          <span class='button_tally'>8</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
           K8S
+          <span class='button_tally'>9</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
           <span class='button_tally'>8</span>
         </a>
         
@@ -911,7 +964,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=8>K8S<span class='button_tally'>8</span>
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=9>K8S<span class='button_tally'>9</span>
             </a>
             
             

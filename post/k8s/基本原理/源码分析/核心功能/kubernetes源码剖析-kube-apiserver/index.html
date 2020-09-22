@@ -152,7 +152,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 9950 字</span>，阅读约<span class="more-meta"> 20 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 9995 字</span>，阅读约<span class="more-meta"> 20 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/" title="Copy Link" class="link link_yank">
@@ -1089,40 +1089,84 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
 <span class="ln"> 3</span>  <span class="o">...</span>
 <span class="ln"> 4</span><span class="p">}</span>
 <span class="ln"> 5</span>
-<span class="ln"> 6</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">completedConfig</span><span class="p">)</span> <span class="nf">New</span><span class="p">(</span><span class="nx">delegationTarget</span> <span class="nx">genericapiserver</span><span class="p">.</span><span class="nx">DelegationTarget</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">Master</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln"> 7</span>  <span class="c1">// 初始化kube-apiserver
-</span><span class="ln"> 8</span><span class="c1"></span>  <span class="nx">s</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">GenericConfig</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;kube-apiserver&#34;</span><span class="p">,</span> <span class="nx">delegationTarget</span><span class="p">)</span>
-<span class="ln"> 9</span>  <span class="c1">// 初始化Master，k8s的核心服务通过Master对象进行管理
-</span><span class="ln">10</span><span class="c1"></span>  <span class="c1">// 实例化后的对象才能注册KubeAPIServer下的资源
-</span><span class="ln">11</span><span class="c1"></span>  <span class="nx">m</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Master</span><span class="p">{</span>
-<span class="ln">12</span>    <span class="nx">GenericAPIServer</span><span class="p">:</span>          <span class="nx">s</span><span class="p">,</span>
-<span class="ln">13</span>    <span class="nx">ClusterAuthenticationInfo</span><span class="p">:</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">ClusterAuthenticationInfo</span><span class="p">,</span>
-<span class="ln">14</span>  <span class="p">}</span>
+<span class="ln"> 6</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Config</span><span class="p">)</span> <span class="nf">Complete</span><span class="p">()</span> <span class="nx">CompletedConfig</span> <span class="p">{</span>
+<span class="ln"> 7</span>  <span class="o">...</span>
+<span class="ln"> 8</span>  <span class="c1">// 内部调用createEndpointReconciler
+</span><span class="ln"> 9</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">EndpointReconcilerConfig</span><span class="p">.</span><span class="nx">Reconciler</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">10</span>    <span class="nx">cfg</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">EndpointReconcilerConfig</span><span class="p">.</span><span class="nx">Reconciler</span> <span class="p">=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">createEndpointReconciler</span><span class="p">()</span>
+<span class="ln">11</span>  <span class="p">}</span>
+<span class="ln">12</span>
+<span class="ln">13</span>  <span class="k">return</span> <span class="nx">CompletedConfig</span><span class="p">{</span><span class="o">&amp;</span><span class="nx">cfg</span><span class="p">}</span>
+<span class="ln">14</span><span class="p">}</span>
 <span class="ln">15</span>
-<span class="ln">16</span>  <span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">APIResourceConfigSource</span><span class="p">.</span><span class="nf">VersionEnabled</span><span class="p">(</span><span class="nx">apiv1</span><span class="p">.</span><span class="nx">SchemeGroupVersion</span><span class="p">)</span> <span class="p">{</span>
-<span class="ln">17</span>    <span class="c1">// 注册没有组名的资源组，路径前缀为&#34;/api&#34;
-</span><span class="ln">18</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">m</span><span class="p">.</span><span class="nf">InstallLegacyAPI</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">GenericConfig</span><span class="p">.</span><span class="nx">RESTOptionsGetter</span><span class="p">,</span> <span class="nx">legacyRESTStorageProvider</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">19</span>      <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
-<span class="ln">20</span>    <span class="p">}</span>
-<span class="ln">21</span>  <span class="p">}</span>
-<span class="ln">22</span>
-<span class="ln">23</span> <span class="c1">// 注册有组名的资源组，路径前缀为&#34;/apis&#34;
-</span><span class="ln">24</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">m</span><span class="p">.</span><span class="nf">InstallAPIs</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">APIResourceConfigSource</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">GenericConfig</span><span class="p">.</span><span class="nx">RESTOptionsGetter</span><span class="p">,</span> <span class="nx">restStorageProviders</span><span class="o">...</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">25</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
-<span class="ln">26</span>  <span class="p">}</span>
-<span class="ln">27</span>
-<span class="ln">28</span>  <span class="nx">m</span><span class="p">.</span><span class="nx">GenericAPIServer</span><span class="p">.</span><span class="nf">AddPostStartHookOrDie</span><span class="p">(</span><span class="s">&#34;start-cluster-authentication-info-controller&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">hookContext</span> <span class="nx">genericapiserver</span><span class="p">.</span><span class="nx">PostStartHookContext</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
-<span class="ln">29</span>    <span class="nx">kubeClient</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">kubernetes</span><span class="p">.</span><span class="nf">NewForConfig</span><span class="p">(</span><span class="nx">hookContext</span><span class="p">.</span><span class="nx">LoopbackClientConfig</span><span class="p">)</span>
-<span class="ln">30</span>    <span class="c1">// 创建认证controller
-</span><span class="ln">31</span><span class="c1"></span>    <span class="nx">controller</span> <span class="o">:=</span> <span class="nx">clusterauthenticationtrust</span><span class="p">.</span><span class="nf">NewClusterAuthenticationTrustController</span><span class="p">(</span><span class="nx">m</span><span class="p">.</span><span class="nx">ClusterAuthenticationInfo</span><span class="p">,</span> <span class="nx">kubeClient</span><span class="p">)</span>
-<span class="ln">32</span>    <span class="o">...</span>
-<span class="ln">33</span>    <span class="c1">// 启动controller
-</span><span class="ln">34</span><span class="c1"></span>    <span class="k">go</span> <span class="nx">controller</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">hookContext</span><span class="p">.</span><span class="nx">StopCh</span><span class="p">)</span>
-<span class="ln">35</span>    <span class="k">return</span> <span class="kc">nil</span>
-<span class="ln">36</span>  <span class="p">})</span>
-<span class="ln">37</span>
-<span class="ln">38</span>  <span class="k">return</span> <span class="nx">m</span><span class="p">,</span> <span class="kc">nil</span>
-<span class="ln">39</span><span class="p">}</span>
+<span class="ln">16</span><span class="c1">// createEndpointReconciler
+</span><span class="ln">17</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Config</span><span class="p">)</span> <span class="nf">createEndpointReconciler</span><span class="p">()</span> <span class="nx">reconcilers</span><span class="p">.</span><span class="nx">EndpointReconciler</span> <span class="p">{</span>
+<span class="ln">18</span>  <span class="k">switch</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">EndpointReconcilerType</span> <span class="p">{</span>
+<span class="ln">19</span>  <span class="c1">// there are numerous test dependencies that depend on a default controller
+</span><span class="ln">20</span><span class="c1"></span>  <span class="k">case</span> <span class="s">&#34;&#34;</span><span class="p">,</span> <span class="nx">reconcilers</span><span class="p">.</span><span class="nx">MasterCountReconcilerType</span><span class="p">:</span>
+<span class="ln">21</span>    <span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nf">createMasterCountReconciler</span><span class="p">()</span>
+<span class="ln">22</span>  <span class="k">case</span> <span class="nx">reconcilers</span><span class="p">.</span><span class="nx">LeaseEndpointReconcilerType</span><span class="p">:</span>
+<span class="ln">23</span>    <span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nf">createLeaseReconciler</span><span class="p">()</span>
+<span class="ln">24</span>  <span class="k">case</span> <span class="nx">reconcilers</span><span class="p">.</span><span class="nx">NoneEndpointReconcilerType</span><span class="p">:</span>
+<span class="ln">25</span>    <span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nf">createNoneReconciler</span><span class="p">()</span>
+<span class="ln">26</span>  <span class="k">default</span><span class="p">:</span>
+<span class="ln">27</span>    <span class="nx">klog</span><span class="p">.</span><span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;Reconciler not implemented: %v&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">EndpointReconcilerType</span><span class="p">)</span>
+<span class="ln">28</span>  <span class="p">}</span>
+<span class="ln">29</span>  <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">30</span><span class="p">}</span>
+<span class="ln">31</span>
+<span class="ln">32</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">Config</span><span class="p">)</span> <span class="nf">createLeaseReconciler</span><span class="p">()</span> <span class="nx">reconcilers</span><span class="p">.</span><span class="nx">EndpointReconciler</span> <span class="p">{</span>
+<span class="ln">33</span>  <span class="o">...</span>
+<span class="ln">34</span>  <span class="c1">// 初始化Storage
+</span><span class="ln">35</span><span class="c1"></span>  <span class="nx">leaseStorage</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">storagefactory</span><span class="p">.</span><span class="nf">Create</span><span class="p">(</span><span class="o">*</span><span class="nx">config</span><span class="p">)</span>
+<span class="ln">36</span>  <span class="o">...</span>
+<span class="ln">37</span>  <span class="k">return</span> <span class="nx">reconcilers</span><span class="p">.</span><span class="nf">NewLeaseEndpointReconciler</span><span class="p">(</span><span class="nx">endpointsAdapter</span><span class="p">,</span> <span class="nx">masterLeases</span><span class="p">)</span>
+<span class="ln">38</span><span class="p">}</span>
+<span class="ln">39</span>
+<span class="ln">40</span><span class="kd">func</span> <span class="nf">Create</span><span class="p">(</span><span class="nx">c</span> <span class="nx">storagebackend</span><span class="p">.</span><span class="nx">Config</span><span class="p">)</span> <span class="p">(</span><span class="nx">storage</span><span class="p">.</span><span class="nx">Interface</span><span class="p">,</span> <span class="nx">DestroyFunc</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">41</span>  <span class="k">switch</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Type</span> <span class="p">{</span>
+<span class="ln">42</span>  <span class="o">...</span>
+<span class="ln">43</span>  <span class="k">case</span> <span class="nx">storagebackend</span><span class="p">.</span><span class="nx">StorageTypeUnset</span><span class="p">,</span> <span class="nx">storagebackend</span><span class="p">.</span><span class="nx">StorageTypeETCD3</span><span class="p">:</span>
+<span class="ln">44</span>    <span class="c1">// 初始化Storage
+</span><span class="ln">45</span><span class="c1"></span>    <span class="k">return</span> <span class="nf">newETCD3Storage</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+<span class="ln">46</span>  <span class="o">...</span>
+<span class="ln">47</span>  <span class="p">}</span>
+<span class="ln">48</span><span class="p">}</span>
+<span class="ln">49</span>
+<span class="ln">50</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="nx">completedConfig</span><span class="p">)</span> <span class="nf">New</span><span class="p">(</span><span class="nx">delegationTarget</span> <span class="nx">genericapiserver</span><span class="p">.</span><span class="nx">DelegationTarget</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">Master</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">51</span>  <span class="c1">// 初始化kube-apiserver
+</span><span class="ln">52</span><span class="c1"></span>  <span class="nx">s</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nx">GenericConfig</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="s">&#34;kube-apiserver&#34;</span><span class="p">,</span> <span class="nx">delegationTarget</span><span class="p">)</span>
+<span class="ln">53</span>  <span class="c1">// 初始化Master，k8s的核心服务通过Master对象进行管理
+</span><span class="ln">54</span><span class="c1"></span>  <span class="c1">// 实例化后的对象才能注册KubeAPIServer下的资源
+</span><span class="ln">55</span><span class="c1"></span>  <span class="nx">m</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Master</span><span class="p">{</span>
+<span class="ln">56</span>    <span class="nx">GenericAPIServer</span><span class="p">:</span>          <span class="nx">s</span><span class="p">,</span>
+<span class="ln">57</span>    <span class="nx">ClusterAuthenticationInfo</span><span class="p">:</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">ClusterAuthenticationInfo</span><span class="p">,</span>
+<span class="ln">58</span>  <span class="p">}</span>
+<span class="ln">59</span>
+<span class="ln">60</span>  <span class="k">if</span> <span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">APIResourceConfigSource</span><span class="p">.</span><span class="nf">VersionEnabled</span><span class="p">(</span><span class="nx">apiv1</span><span class="p">.</span><span class="nx">SchemeGroupVersion</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">61</span>    <span class="c1">// 注册没有组名的资源组，路径前缀为&#34;/api&#34;
+</span><span class="ln">62</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">m</span><span class="p">.</span><span class="nf">InstallLegacyAPI</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">c</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">GenericConfig</span><span class="p">.</span><span class="nx">RESTOptionsGetter</span><span class="p">,</span> <span class="nx">legacyRESTStorageProvider</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">63</span>      <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+<span class="ln">64</span>    <span class="p">}</span>
+<span class="ln">65</span>  <span class="p">}</span>
+<span class="ln">66</span>
+<span class="ln">67</span> <span class="c1">// 注册有组名的资源组，路径前缀为&#34;/apis&#34;
+</span><span class="ln">68</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">m</span><span class="p">.</span><span class="nf">InstallAPIs</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">ExtraConfig</span><span class="p">.</span><span class="nx">APIResourceConfigSource</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">GenericConfig</span><span class="p">.</span><span class="nx">RESTOptionsGetter</span><span class="p">,</span> <span class="nx">restStorageProviders</span><span class="o">...</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">69</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+<span class="ln">70</span>  <span class="p">}</span>
+<span class="ln">71</span>
+<span class="ln">72</span>  <span class="nx">m</span><span class="p">.</span><span class="nx">GenericAPIServer</span><span class="p">.</span><span class="nf">AddPostStartHookOrDie</span><span class="p">(</span><span class="s">&#34;start-cluster-authentication-info-controller&#34;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">hookContext</span> <span class="nx">genericapiserver</span><span class="p">.</span><span class="nx">PostStartHookContext</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">73</span>    <span class="nx">kubeClient</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">kubernetes</span><span class="p">.</span><span class="nf">NewForConfig</span><span class="p">(</span><span class="nx">hookContext</span><span class="p">.</span><span class="nx">LoopbackClientConfig</span><span class="p">)</span>
+<span class="ln">74</span>    <span class="c1">// 创建认证controller
+</span><span class="ln">75</span><span class="c1"></span>    <span class="nx">controller</span> <span class="o">:=</span> <span class="nx">clusterauthenticationtrust</span><span class="p">.</span><span class="nf">NewClusterAuthenticationTrustController</span><span class="p">(</span><span class="nx">m</span><span class="p">.</span><span class="nx">ClusterAuthenticationInfo</span><span class="p">,</span> <span class="nx">kubeClient</span><span class="p">)</span>
+<span class="ln">76</span>    <span class="o">...</span>
+<span class="ln">77</span>    <span class="c1">// 启动controller
+</span><span class="ln">78</span><span class="c1"></span>    <span class="k">go</span> <span class="nx">controller</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">hookContext</span><span class="p">.</span><span class="nx">StopCh</span><span class="p">)</span>
+<span class="ln">79</span>    <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">80</span>  <span class="p">})</span>
+<span class="ln">81</span>
+<span class="ln">82</span>  <span class="k">return</span> <span class="nx">m</span><span class="p">,</span> <span class="kc">nil</span>
+<span class="ln">83</span><span class="p">}</span>
 </code></pre></div><h5 id="341-installlegacyapi">3.4.1 InstallLegacyAPI</h5>
 <div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">Master</span><span class="p">)</span> <span class="nf">InstallLegacyAPI</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">completedConfig</span><span class="p">,</span> <span class="nx">restOptionsGetter</span> <span class="nx">generic</span><span class="p">.</span><span class="nx">RESTOptionsGetter</span><span class="p">,</span> <span class="nx">legacyRESTStorageProvider</span> <span class="nx">corerest</span><span class="p">.</span><span class="nx">LegacyRESTStorageProvider</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
 <span class="ln"> 2</span>  <span class="c1">// 实例化APIGroupInfo
@@ -1345,14 +1389,7 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
 <span class="ln">29</span>
 <span class="ln">30</span>  <span class="k">return</span> <span class="nx">stoppedCh</span><span class="p">,</span> <span class="kc">nil</span>
 <span class="ln">31</span><span class="p">}</span>
-</code></pre></div><h4 id="authentication认证配置">Authentication认证配置</h4>
-<p>kube-apiserver作为集群的请求入口，每个请求都要经过认证、授权、准入控制三个阶段，才能真正操作资源</p>
-<p>k8s提供了9种认证机制</p>
-<h4 id="authorization授权配置">Authorization授权配置</h4>
-<p>k8s提供了6种授权机制</p>
-<h4 id="admission准控制器配置">Admission准控制器配置</h4>
-<p>k8s提供了31种准入控制</p>
-<h2 id="参考">参考</h2>
+</code></pre></div><h2 id="参考">参考</h2>
 <ul>
 <li>《kubernetes源码剖析》</li>
 </ul>
@@ -1369,15 +1406,15 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
     <ul>
     
       <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">图解Golang channel源码</a>
+      </li>
+    
+      <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
       </li>
     
       <li>
         <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
-      </li>
-    
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go-channel源码分析</a>
       </li>
     
       <li>
@@ -1401,6 +1438,12 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">图解Golang channel源码</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
       </li>
       <li>
@@ -1415,12 +1458,6 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
       <li>
         <a href="https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" class="nav-link">Docker核心原理</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/java/jdk/java%E5%8F%8D%E5%B0%84/" class="nav-link">java反射</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/java/jdk/java-io%E6%B5%81/" class="nav-link">java基础-io流</a>
-      </li>
     </ul> 
     
     <div>
@@ -1428,7 +1465,7 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
           K8S
-          <span class='button_tally'>11</span>
+          <span class='button_tally'>12</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
@@ -1441,13 +1478,13 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
           <span class='button_tally'>5</span>
         </a>
         
-        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
-          GO第三方库
-          <span class='button_tally'>4</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
           <span class='button_tally'>4</span>
         </a>
         
@@ -1518,13 +1555,13 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
           <span class='button_tally'>9</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
-          GO基础入门
-          <span class='button_tally'>8</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
           K8S
+          <span class='button_tally'>9</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
           <span class='button_tally'>8</span>
         </a>
         
@@ -1623,7 +1660,7 @@ AggregatorServer | API聚合服务，提供了聚合服务 | APIAggregator | agg
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=8>K8S<span class='button_tally'>8</span>
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=9>K8S<span class='button_tally'>9</span>
             </a>
             
             
