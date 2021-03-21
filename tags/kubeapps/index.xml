@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubeapps on kinnylee</title>
+    <link>https://kinnylee.github.io/tags/kubeapps/</link>
+    <description>Recent content in kubeapps on kinnylee</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
+    <lastBuildDate>Mon, 15 Mar 2021 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://kinnylee.github.io/tags/kubeapps/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Mon, 15 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>kubeapps源码分析-基本介绍 概述 kubeapps是一个基于web ui部署和管理k8s应用的平台 架构 包括以下组件： assetsvc asset-syncer apprepository-controller kubeops pinniped-proxy prostgresql apprepository-controller 负责监听</description>
+    </item>
+    
+  </channel>
+</rss>
