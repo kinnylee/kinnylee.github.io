@@ -7,13 +7,112 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Mon, 15 Mar 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 21 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title></title>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/</link>
+      <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/</guid>
+      <description>helm源码分析-downloader downloader模块主要负责 目录结构 源码位置：pkg/downloader 1➜ helm git:(041ce5a2) ✗ tree pkg/downloader 2pkg/downloader 3├──</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/</guid>
+      <description>helm源码分析-install命令 helm install命令的代码入口：cmd/helm/install.go 使用介绍 第一个参数为部署后的应用名</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/</guid>
+      <description>helm源码分析-list命令 helm list 主要用于查看已经安装的release列表 源码位置：cmd/helm/list.go 实现逻辑 helm list 的代码比较简</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/</guid>
+      <description>helm repo源码分析 helm repo 主要处理仓库相关信息，包括的所有命令和代码对应关系如下： helm repo 命令源码位置：cmd/helm/repo.go helm repo list 命令源</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</link>
+      <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</guid>
+      <description>helm源码分析-storage storage模块主要用于管理和操作发布的release信息，当我们通过helm list等命令查询relea</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Sat, 20 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>helm源码分析-基本介绍 概述 官网介绍 Helm是k8s包管理器，是查找、分享和使用软件构建k8s的最优方式 Helm 帮助您管理 Kubernetes 应用——Helm 图表</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
+      <pubDate>Sat, 20 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
+      <description>helm源码分析-核心数据结构 概述 包（Chart）：表示一个k8s资源包，包括：元信息、默认配置、可选参数、依赖包 实例（Release）：表</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/</link>
+      <pubDate>Fri, 19 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/</guid>
+      <description>kubeapps源码分析-kubeops 概述 这个组件主要是调用helm sdk执行相关release操作，相当于将helm的install、u</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-assetsvc/</link>
+      <pubDate>Thu, 18 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-assetsvc/</guid>
+      <description>kubeapps源码分析-assetsvc 概述 这个组件主要是通过查询postgresq数据库的数据，并提供接口展示给前端。在asset-sy</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-asset-syncer/</link>
+      <pubDate>Wed, 17 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-asset-syncer/</guid>
+      <description>kubeapps源码分析-asset-syncer 概述 asset-syncer模块负责同步chart仓库的资源，并保存到数据库。 提供了三个命</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-apprepository-controller/</link>
+      <pubDate>Tue, 16 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-apprepository-controller/</guid>
+      <description>kubeppas源码分析-apprepository-controller 概述 apprepository-controller是一个标准的k</description>
+    </item>
+    
+    <item>
+      <title>kubeapps源码分析-基本介绍</title>
       <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
       <pubDate>Mon, 15 Mar 2021 00:00:00 +0000</pubDate>
       
@@ -671,110 +770,11 @@
     
     <item>
       <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/</guid>
-      <description>helm源码分析-downloader downloader模块主要负责 目录结构 源码位置：pkg/downloader 1➜ helm git:(041ce5a2) ✗ tree pkg/downloader 2pkg/downloader 3├──</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/</guid>
-      <description>helm源码分析-install命令 helm install命令的代码入口：cmd/helm/install.go 使用介绍 第一个参数为部署后的应用名</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/</guid>
-      <description>helm源码分析-list命令 helm list 主要用于查看已经安装的release列表 源码位置：cmd/helm/list.go 实现逻辑 helm list 的代码比较简</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/</guid>
-      <description>helm repo源码分析 helm repo 主要处理仓库相关信息，包括的所有命令和代码对应关系如下： helm repo 命令源码位置：cmd/helm/repo.go helm repo list 命令源</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</guid>
-      <description>helm源码分析-storage storage模块主要用于管理和操作发布的release信息，当我们通过helm list等命令查询relea</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
-      <description>helm源码分析-基本介绍 概述 官网介绍 Helm是k8s包管理器，是查找、分享和使用软件构建k8s的最优方式 Helm 帮助您管理 Kubernetes 应用——Helm 图表</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
-      <description>helm源码分析-核心数据结构 概述 包（Chart）：表示一个k8s资源包，包括：元信息、默认配置、可选参数、依赖包 实例（Release）：表</description>
-    </item>
-    
-    <item>
-      <title></title>
       <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/scheme/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/scheme/</guid>
       <description>Scheme原理分析 Scheme Scheme的作用： 定义了资源序列化和反序列化方法 资源类型和版本的对应关系 源码位置：k8s.io/apimachine</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-apprepository-controller/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-apprepository-controller/</guid>
-      <description>kubeppas源码分析-apprepository-controller 概述 apprepository-controller是一个标准的k</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-asset-syncer/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-asset-syncer/</guid>
-      <description>kubeapps源码分析-asset-syncer 概述 asset-syncer模块负责同步chart仓库的资源，并保存到数据库。 提供了三个命</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-assetsvc/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-assetsvc/</guid>
-      <description>kubeapps源码分析-assetsvc 概述 这个组件主要是通过查询postgresq数据库的数据，并提供接口展示给前端。在asset-sy</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/</guid>
-      <description>kubeapps源码分析-kubeops 概述 这个组件主要是调用helm sdk执行相关release操作，相当于将helm的install、u</description>
     </item>
     
     <item>

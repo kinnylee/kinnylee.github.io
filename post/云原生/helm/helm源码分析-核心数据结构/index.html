@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-figures="" class="page">
-  <head>  <title>kinnylee</title>
+  <head>  <title>kubeapps源码分析-基本介绍 | kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.75.0-DEV" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,16 +12,17 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
+  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
 <meta name="description" content="helm源码分析-核心数据结构 概述 包（Chart）：表示一个k8s资源包，包括：元信息、默认配置、可选参数、依赖包 实例（Release）：表">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "" />
+<meta name = "twitter:title" content = "kubeapps源码分析-基本介绍" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" />
-<meta property = "og:title" content = "" />
+<meta property = "og:title" content = "kubeapps源码分析-基本介绍" />
 <meta property = "og:description" content = "helm源码分析-核心数据结构 概述 包（Chart）：表示一个k8s资源包，包括：元信息、默认配置、可选参数、依赖包 实例（Release）：表" />
-<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/helm.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
 <link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
@@ -141,12 +142,16 @@
   
 <div class = 'grid-inverse wrap content'>
   <article class='post_content' id= 'post_content'>
-    <h1 class='post_title'></h1><div class = 'post_meta'>
+    <h1 class='post_title'>kubeapps源码分析-基本介绍</h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Jan 1, 0001</span>
+    Mar 20, 2021</span>
+  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+  </a>
+  <a href = 'https://kinnylee.github.io/tags/kubeapps' class = 'post_tag button button_translucent'>kubeapps
+  </a>
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
@@ -161,6 +166,37 @@
 </div>
 
     
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#概述">概述</a></li>
+    <li><a href="#chart">Chart</a>
+      <ul>
+        <li><a href="#file">File</a></li>
+        <li><a href="#metadata">Metadata</a></li>
+        <li><a href="#lock">Lock</a></li>
+      </ul>
+    </li>
+    <li><a href="#release">Release</a>
+      <ul>
+        <li><a href="#info">Info</a></li>
+        <li><a href="#status">Status</a></li>
+        <li><a href="#hook">Hook</a></li>
+      </ul>
+    </li>
+    <li><a href="#file-1">File</a>
+      <ul>
+        <li><a href="#entry">Entry</a></li>
+      </ul>
+    </li>
+    <li><a href="#index">Index</a>
+      <ul>
+        <li><a href="#chartversion">ChartVersion</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
     <h1 id="helm源码分析-核心数据结构">helm源码分析-核心数据结构</h1>
 <h2 id="概述">概述</h2>
 <ul>
@@ -444,27 +480,6 @@
     <h2 class="mt-4">Recent Posts</h2>
     <ul class="flex-column">
       
-      <li>
-        <a href="https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/" class="nav-link">java基础-集合框架</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/" class="nav-link">k8s源码分析- kube-apiserver</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/" class="nav-link">k8s源码分析： kube-scheduler</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/net-http/" class="nav-link">Golang http请求源码分析</a>
-      </li>
     </ul> 
     
     <div>
@@ -473,6 +488,11 @@
         <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
           K8S
           <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent">
+          云原生
+          <span class='button_tally'>12</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
@@ -527,11 +547,6 @@
         
         <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
           REDIS
-          <span class='button_tally'>1</span>
-        </a>
-        
-        <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent">
-          云原生
           <span class='button_tally'>1</span>
         </a>
         
@@ -590,7 +605,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent" data-position=1>云原生<span class='button_tally'>1</span>
+            <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent" data-position=12>云原生<span class='button_tally'>12</span>
             </a>
             
             
@@ -621,7 +636,12 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>23</span>
+          <span class='button_tally'>34</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/kubeapps/' class=" post_tag button button_translucent">
+          KUBEAPPS
+          <span class='button_tally'>12</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
@@ -684,11 +704,6 @@
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
-          JVM
-          <span class='button_tally'>1</span>
-        </a>
-        
         
         <br>
         <div class="post_tags_toggle button">All tags</div>
@@ -743,7 +758,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/kubeapps/' class=" post_tag button button_translucent" data-position=1>KUBEAPPS<span class='button_tally'>1</span>
+            <a href='https://kinnylee.github.io/tags/kubeapps/' class=" post_tag button button_translucent" data-position=12>KUBEAPPS<span class='button_tally'>12</span>
             </a>
             
             
@@ -767,7 +782,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=23>源码分析<span class='button_tally'>23</span>
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=34>源码分析<span class='button_tally'>34</span>
             </a>
             
             
