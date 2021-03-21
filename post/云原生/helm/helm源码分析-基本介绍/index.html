@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.75.0-DEV" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="helm源码分析-基本介绍 概述 官网介绍 Helm是k8s包管理器，是查找、分享和使用软件构建k8s的最优方式 Helm 帮助您管理 Kubernetes 应用——Helm 图表">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" />
+<meta property = "og:title" content = "" />
+<meta property = "og:description" content = "helm源码分析-基本介绍 概述 官网介绍 Helm是k8s包管理器，是查找、分享和使用软件构建k8s的最优方式 Helm 帮助您管理 Kubernetes 应用——Helm 图表" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/'>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity = "sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" as="script" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous">
+
+    
+    <link rel="stylesheet" type="text/css" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity="sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" crossorigin="anonymous">
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <div>
+          <svg class="icon">
+            <use xlink:href="#open-menu"></use>
+          </svg>
+          <svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg>
+        </div>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>Mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>Redis</a>
+          <a href = 'https://kinnylee.github.io/categories/rocketmq' class = 'nav_child nav_item'>RocketMQ</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/categories/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/docker' class = 'nav_child nav_item'>Docker</a>
+          <a href = 'https://kinnylee.github.io/categories/linux' class = 'nav_child nav_item'>Linux内核</a>
+          <a href = 'https://kinnylee.github.io/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0' class = 'nav_child nav_item'>机器学习</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'></h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Jan 1, 0001</span>
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 2831 字</span>，阅读约<span class="more-meta"> 6 分钟</span>
+    <div class='post_share'>
+  | 复制链接:
+  <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    <h1 id="helm源码分析-基本介绍">helm源码分析-基本介绍</h1>
+<h2 id="概述">概述</h2>
+<p><a href="https://helm.sh/zh/">官网介绍</a></p>
+<ul>
+<li>
+<p>Helm是k8s包管理器，是查找、分享和使用软件构建k8s的最优方式</p>
+</li>
+<li>
+<p>Helm 帮助您管理 Kubernetes 应用——Helm 图表，即使是最复杂的 Kubernetes 应用程序，都可以帮助您定义，安装和升级。</p>
+</li>
+<li>
+<p>Helm是CNCF第10个毕业的项目</p>
+</li>
+</ul>
+<h2 id="特性">特性</h2>
+<ul>
+<li>复杂性管理</li>
+<li>易于升级</li>
+<li>分发简单</li>
+<li>回滚</li>
+</ul>
+<h2 id="架构">架构</h2>
+<h3 id="helm的目标">helm的目标</h3>
+<p>helm管理名为chart的k8s包的工具，可以做以下事情：</p>
+<ul>
+<li>从头开始创建新的chart</li>
+<li>将chart包打包成归档（tgz）文件</li>
+<li>与存储chart的仓库进行交互</li>
+<li>在k8s集群中安装和卸载chart</li>
+<li>管理与helm一起安装的chart的发布周期</li>
+</ul>
+<h3 id="重要概念">重要概念</h3>
+<h4 id="chart">Chart</h4>
+<p>创建k8s应用程序所必需的一组信息</p>
+<h4 id="config">Config</h4>
+<p>包含可以合并到打包的chart中的配置信息，用于创建一个可以发布的对象</p>
+<h4 id="release">Release</h4>
+<p>是一个与特定配置相结合的chart的运行实例</p>
+<h2 id="源码分析环境准备">源码分析环境准备</h2>
+<h3 id="版本说明">版本说明</h3>
+<ul>
+<li>基于helm v3.5.3分支</li>
+<li>go1.15.6 darwin/amd64</li>
+</ul>
+<h3 id="前期准备">前期准备</h3>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">1</span>// 创建目录
+<span class="ln">2</span><span class="nb">cd</span> <span class="nv">$GOPATH</span>/src <span class="o">&amp;&amp;</span> mkdir -p github.com/helm.sh
+<span class="ln">3</span>// 下载代码
+<span class="ln">4</span>git clone https://github.com/helm/helm
+<span class="ln">5</span><span class="nb">cd</span> helm
+<span class="ln">6</span>// 切换分支
+<span class="ln">7</span>git checkout v3.5.3
+<span class="ln">8</span>// 下载git依赖
+<span class="ln">9</span>go get -v all
+</code></pre></div><h3 id="目录结构">目录结构</h3>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln"> 1</span>➜  helm git:<span class="o">(</span>041ce5a2<span class="o">)</span> ✗ tree -L <span class="m">1</span> 
+<span class="ln"> 2</span>.
+<span class="ln"> 3</span>├── ADOPTERS.md
+<span class="ln"> 4</span>├── CONTRIBUTING.md
+<span class="ln"> 5</span>├── KEYS
+<span class="ln"> 6</span>├── LICENSE
+<span class="ln"> 7</span>├── Makefile // make编译文件
+<span class="ln"> 8</span>├── OWNERS
+<span class="ln"> 9</span>├── README.md
+<span class="ln">10</span>├── SECURITY.md
+<span class="ln">11</span>├── cmd  // 使用helm命令所有的入口文件
+<span class="ln">12</span>├── code-of-conduct.md
+<span class="ln">13</span>├── go.mod
+<span class="ln">14</span>├── go.sum
+<span class="ln">15</span>├── internal // 内部实现逻辑包
+<span class="ln">16</span>├── pkg // sdk包
+<span class="ln">17</span>├── scripts // 存放脚本的目录
+<span class="ln">18</span>└── testdata // 测试数据
+</code></pre></div><p>主要关注 cmd、pkg、internal三个目录的代码</p>
+<h4 id="cmd目录结构">cmd目录结构</h4>
+<ul>
+<li>cmd目录下存放了执行helm命令时所有的相关代码，比如helm install、helm uninstall、helm upgrade等。</li>
+<li>cmd中有些命令是实验性阶段的命令，需要配置<code>HELM_EXPERIMENTAL_OCI=1</code>属性才能使用</li>
+<li>cmd中代码使用cobra命令行框架（该框架非常流行，比如k8s、istio等重大项目都是使用该命令行框架）</li>
+<li>main函数入口在helm.go文件中</li>
+<li>所有的命令注册在root.go文件中，root.go还包括加载插件、校验kubeconfig权限、校验超时的repo仓库</li>
+<li>调用的先后关系：helm.go -&gt; root.go -&gt; xxx.go</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln">  1</span>➜  helm git:<span class="o">(</span>041ce5a2<span class="o">)</span> ✗ tree -L <span class="m">2</span> cmd
+<span class="ln">  2</span>cmd
+<span class="ln">  3</span>└── helm
+<span class="ln">  4</span>    ├── chart.go // helm chart 命令的代码，子命令有：pull、push、tag、list、remove
+<span class="ln">  5</span>    ├── chart_export.go
+<span class="ln">  6</span>    ├── chart_list.go // helm chart list 命令代码
+<span class="ln">  7</span>    ├── chart_pull.go // helm chart pull 命令代码
+<span class="ln">  8</span>    ├── chart_push.go // helm chart push 命令代码
+<span class="ln">  9</span>    ├── chart_remove.go // helm chart remove 命令代码
+<span class="ln"> 10</span>    ├── chart_save.go // helm chart save 命令代码
+<span class="ln"> 11</span>    ├── completion.go // helm completion, 子命令有：bash、fish、zsh
+<span class="ln"> 12</span>    ├── completion_test.go
+<span class="ln"> 13</span>    ├── create.go // helm create 命令代码
+<span class="ln"> 14</span>    ├── create_test.go
+<span class="ln"> 15</span>    ├── dependency.go // helm dependency，helm dependency list 命令代码，子命令有：build、list、update
+<span class="ln"> 16</span>    ├── dependency_build.go // helm dependency build 命令代码
+<span class="ln"> 17</span>    ├── dependency_build_test.go
+<span class="ln"> 18</span>    ├── dependency_test.go
+<span class="ln"> 19</span>    ├── dependency_update.go // helm dependency update 命令代码
+<span class="ln"> 20</span>    ├── dependency_update_test.go
+<span class="ln"> 21</span>    ├── docs.go // helm docs 命令代码，执行后会在当前目录下生成每个命令的markdown说明文件
+<span class="ln"> 22</span>    ├── docs_test.go
+<span class="ln"> 23</span>    ├── env.go // helm env 命令代码
+<span class="ln"> 24</span>    ├── env_test.go
+<span class="ln"> 25</span>    ├── flags.go // 解析命令行flag的代码
+<span class="ln"> 26</span>    ├── flags_test.go
+<span class="ln"> 27</span>    ├── get.go // helm get 命令代码，获取release相关信息。子命令有：all、hooks、manifest、notes、values
+<span class="ln"> 28</span>    ├── get_all.go // helm get all 命令代码
+<span class="ln"> 29</span>    ├── get_all_test.go
+<span class="ln"> 30</span>    ├── get_hooks.go // helm get hook 命令代码
+<span class="ln"> 31</span>    ├── get_hooks_test.go
+<span class="ln"> 32</span>    ├── get_manifest.go // helm get manifest 命令代码
+<span class="ln"> 33</span>    ├── get_manifest_test.go
+<span class="ln"> 34</span>    ├── get_notes.go // helm get notes 命令代码
+<span class="ln"> 35</span>    ├── get_notes_test.go
+<span class="ln"> 36</span>    ├── get_test.go
+<span class="ln"> 37</span>    ├── get_values.go // helm get values 命令代码
+<span class="ln"> 38</span>    ├── get_values_test.go
+<span class="ln"> 39</span>    ├── helm.go // main函数入口文件
+<span class="ln"> 40</span>    ├── helm_test.go
+<span class="ln"> 41</span>    ├── history.go // helm <span class="nb">history</span> 命令代码，获取某个release发布的历史情况，历史发布情况通过driver模块存储，底层实现可以是多种：secret、configmap、memory，sql（仅仅支持postgresql），比如secret这种驱动就通过查询label（LabelSelector）实现历史查询（name+owner），因为发布的历史数据存放在一个owner属于helm的secret中
+<span class="ln"> 42</span>    ├── history_test.go
+<span class="ln"> 43</span>    ├── install.go // helm install 命令代码
+<span class="ln"> 44</span>    ├── install_test.go
+<span class="ln"> 45</span>    ├── lint.go // helm lint 命令代码
+<span class="ln"> 46</span>    ├── lint_test.go
+<span class="ln"> 47</span>    ├── list.go // helm list 命令代码
+<span class="ln"> 48</span>    ├── list_test.go
+<span class="ln"> 49</span>    ├── load_plugins.go // 处理插件相关代码，读取插件文件，将相关元信息中的命令注册到helm命令行中
+<span class="ln"> 50</span>    ├── package.go // helm package 命令代码，将目录打包成待版本管理的tgz
+<span class="ln"> 51</span>    ├── package_test.go
+<span class="ln"> 52</span>    ├── plugin.go // helm plugin 命令代码，子命令有：install、list、uninstall、update
+<span class="ln"> 53</span>    ├── plugin_install.go // helm plugin install 命令代码
+<span class="ln"> 54</span>    ├── plugin_list.go // helm plugin list 命令代码
+<span class="ln"> 55</span>    ├── plugin_test.go
+<span class="ln"> 56</span>    ├── plugin_uninstall.go // helm plugin uninstall 命令代码 <span class="o">(</span>也可以用rm、remove<span class="o">)</span>
+<span class="ln"> 57</span>    ├── plugin_update.go // helm plugin update 命令代码
+<span class="ln"> 58</span>    ├── printer.go
+<span class="ln"> 59</span>    ├── pull.go // helm pull 命令代码
+<span class="ln"> 60</span>    ├── pull_test.go
+<span class="ln"> 61</span>    ├── registry.go // helm registry 命令代码，子命令有：login、logout
+<span class="ln"> 62</span>    ├── registry_login.go // helm registry login 命令代码
+<span class="ln"> 63</span>    ├── registry_logout.go // helm registry <span class="nb">logout</span> 命令代码
+<span class="ln"> 64</span>    ├── release_testing.go
+<span class="ln"> 65</span>    ├── release_testing_test.go
+<span class="ln"> 66</span>    ├── repo.go // helm repo 命令代码，子命令有：add、list、remove、index、update
+<span class="ln"> 67</span>    ├── repo_add.go // helm repo add 命令代码
+<span class="ln"> 68</span>    ├── repo_add_test.go
+<span class="ln"> 69</span>    ├── repo_index.go // helm repo index 为目录下所有的chart包创建索引
+<span class="ln"> 70</span>    ├── repo_index_test.go
+<span class="ln"> 71</span>    ├── repo_list.go // helm repo list 命令代码
+<span class="ln"> 72</span>    ├── repo_list_test.go
+<span class="ln"> 73</span>    ├── repo_remove.go // helm repo remove 命令代码
+<span class="ln"> 74</span>    ├── repo_remove_test.go
+<span class="ln"> 75</span>    ├── repo_test.go
+<span class="ln"> 76</span>    ├── repo_update.go // helm repo update 命令代码
+<span class="ln"> 77</span>    ├── repo_update_test.go
+<span class="ln"> 78</span>    ├── rollback.go // helm rollback 命令代码，将release回滚到之前的版本
+<span class="ln"> 79</span>    ├── rollback_test.go
+<span class="ln"> 80</span>    ├── root.go // 所有命令的注册入口
+<span class="ln"> 81</span>    ├── root_test.go
+<span class="ln"> 82</span>    ├── root_unix.go // unix下的校验，目前只校验kubeconfig文件是否存在以及全新
+<span class="ln"> 83</span>    ├── root_unix_test.go
+<span class="ln"> 84</span>    ├── root_windows.go // windows下暂未实现
+<span class="ln"> 85</span>    ├── search.go // helm search 命令代码
+<span class="ln"> 86</span>    ├── search_hub.go // helm search hub 命令代码
+<span class="ln"> 87</span>    ├── search_hub_test.go
+<span class="ln"> 88</span>    ├── search_repo.go // helm search repo 命令代码
+<span class="ln"> 89</span>    ├── search_repo_test.go
+<span class="ln"> 90</span>    ├── search_test.go
+<span class="ln"> 91</span>    ├── show.go // helm show 或者 helm inspect
+<span class="ln"> 92</span>    ├── show_test.go
+<span class="ln"> 93</span>    ├── status.go // helm status
+<span class="ln"> 94</span>    ├── status_test.go
+<span class="ln"> 95</span>    ├── template.go // helm template
+<span class="ln"> 96</span>    ├── template_test.go
+<span class="ln"> 97</span>    ├── uninstall.go // helm uninstall 命令代码，也可以是helm un、helm del、helm delete
+<span class="ln"> 98</span>    ├── uninstall_test.go
+<span class="ln"> 99</span>    ├── upgrade.go // helm upgrade
+<span class="ln">100</span>    ├── upgrade_test.go
+<span class="ln">101</span>    ├── verify.go // helm vertify
+<span class="ln">102</span>    ├── verify_test.go
+<span class="ln">103</span>    ├── version.go // helm version
+<span class="ln">104</span>    └── version_test.go
+</code></pre></div><h4 id="pkg目录结构">pkg目录结构</h4>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln"> 1</span>➜  helm git:<span class="o">(</span>041ce5a2<span class="o">)</span> ✗ tree -L <span class="m">1</span> pkg     
+<span class="ln"> 2</span>pkg
+<span class="ln"> 3</span>├── action // 存放所有cmd中helm执行命令行需要的底层操作
+<span class="ln"> 4</span>├── chart // chart对象和相关操作的包（比如加载文件为Chart对象）
+<span class="ln"> 5</span>├── chartutil
+<span class="ln"> 6</span>├── cli
+<span class="ln"> 7</span>├── downloader
+<span class="ln"> 8</span>├── engine // 模板渲染相关代码，将给定的配置和模板渲染成最终的资源文件
+<span class="ln"> 9</span>├── gates
+<span class="ln">10</span>├── getter
+<span class="ln">11</span>├── helmpath
+<span class="ln">12</span>├── kube
+<span class="ln">13</span>├── lint
+<span class="ln">14</span>├── plugin
+<span class="ln">15</span>├── postrender
+<span class="ln">16</span>├── provenance
+<span class="ln">17</span>├── release // release等数据结构和操作的包
+<span class="ln">18</span>├── releaseutil
+<span class="ln">19</span>├── repo // helm repo相关操作的实现代码
+<span class="ln">20</span>├── storage // 存储相关操作，release发布后的信息，需要存储起来，便于查询、回滚等操作。storage提供了插件式存储接口，底层有多种存储实现：secret（默认）、configmap、sql（目前只支持postgresql）、memory
+<span class="ln">21</span>├── strvals
+<span class="ln">22</span>└── <span class="nb">time</span>
+</code></pre></div><h4 id="internal目录结构">internal目录结构</h4>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="ln"> 1</span>➜  helm git:<span class="o">(</span>041ce5a2<span class="o">)</span> ✗ tree -L <span class="m">1</span> internal 
+<span class="ln"> 2</span>internal
+<span class="ln"> 3</span>├── experimental
+<span class="ln"> 4</span>├── fileutil
+<span class="ln"> 5</span>├── ignore
+<span class="ln"> 6</span>├── monocular
+<span class="ln"> 7</span>├── resolver
+<span class="ln"> 8</span>├── sympath
+<span class="ln"> 9</span>├── <span class="nb">test</span>
+<span class="ln">10</span>├── third_party
+<span class="ln">11</span>├── tlsutil
+<span class="ln">12</span>├── urlutil
+<span class="ln">13</span>└── version
+</code></pre></div>
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">查看更多</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go协程原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+      </li>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/" class="nav-link">java基础-集合框架</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/" class="nav-link">k8s源码分析- kube-apiserver</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/" class="nav-link">k8s源码分析： kube-scheduler</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/net-http/" class="nav-link">Golang http请求源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/" class="nav-link">go协程入门</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>4</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent">
+          博客搭建
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>22</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>9</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
+          CLIENT-GO
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">All tags</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent" data-position=11>BREAKPAD<span class='button_tally'>11</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=3>CLIENT-GO<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent" data-position=9>GO<span class='button_tally'>9</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent" data-position=8>GO基础入门<span class='button_tally'>8</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=1>GO第三方库<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent" data-position=1>INDEX<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=5>JAVA基础<span class='button_tally'>5</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=10>K8S<span class='button_tally'>10</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=2>MYSQL<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=22>源码分析<span class='button_tally'>22</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script type="text/javascript" src = "https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous"></script>
+  </body>
+</html>

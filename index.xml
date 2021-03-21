@@ -7,36 +7,54 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Tue, 22 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 03 Oct 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>java基础-集合框架</title>
+      <link>https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/</link>
+      <pubDate>Sat, 03 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/</guid>
+      <description>接口新增default实现 Collection新增Spliterator，需要实现Predicate接口，重写test方法 Iterator新</description>
+    </item>
+    
+    <item>
       <title>图解Golang channel源码</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/</link>
       <pubDate>Tue, 22 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/</guid>
       <description>图解Golang channel源码 前言 先上一张channel布局图，channel的底层实际上并不复杂，没有用到很高深的知识，主要是围绕着一</description>
     </item>
     
     <item>
       <title>k8s存储组件Etcd核心源码分析</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/</link>
       <pubDate>Sun, 20 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/</guid>
       <description>概述 Etcd是一个分布式键值对存储数据库 etcd以一致和容错的方式存储元数据 通过分布式锁、leader选举、写屏障来实现可靠的分布式协作 为什</description>
     </item>
     
     <item>
-      <title>k8s组件kube-apiserver源码分析</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/</link>
+      <title>k8s源码分析- kube-apiserver</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/</link>
       <pubDate>Sun, 20 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/</guid>
-      <description>《kubernetes源码剖析》- kube-apiserver 前言 最近加入云原生社区组织的k8s源码研习社，开始学习k8s底层源码，并整理成笔记。欢迎感兴趣的同学一起</description>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/</guid>
+      <description>前言 最近加入云原生社区组织的k8s源码研习社，开始学习k8s底层源码，并整理成笔记。欢迎感兴趣的同学一起加入，共同学习进步。群里和社区里有各</description>
+    </item>
+    
+    <item>
+      <title>k8s源码分析： kube-scheduler</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/</link>
+      <pubDate>Sun, 20 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/</guid>
+      <description>前言 最近加入云原生社区组织的k8s源码研习社，开始学习k8s底层源码，并整理成笔记。欢迎感兴趣的同学一起加入，共同学习进步。群里和社区里有各</description>
     </item>
     
     <item>
@@ -122,19 +140,19 @@
     
     <item>
       <title>《kubernetes源码剖析》- 资源创建流程</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/</link>
       <pubDate>Wed, 02 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/</guid>
       <description>简介 k8s中的资源创建方法有很多中，本文以kubectl create命令创建Deployment资源对象的过程进行分析。大体流程包括： 实例化</description>
     </item>
     
     <item>
       <title>client-go源码分析(一) - 四种客户端对象</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</link>
       <pubDate>Tue, 01 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</guid>
       <description>client-go源码分析(一) - 四种客户端对象 概述 k8s使用client-go作为go语言的官方客户端编程工具，提供对api-server</description>
     </item>
     
@@ -167,10 +185,10 @@
     
     <item>
       <title>《kubernetes源码剖析》- k8s核心数据结构</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
       <pubDate>Sat, 29 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
       <description>《kubernetes源码剖析》- k8s核心数据结构 概述 k8s是一个完全以资源为中心的系统，本质是一个资源控制系统。包括：注册、管理、调度资</description>
     </item>
     
@@ -230,10 +248,10 @@
     
     <item>
       <title>go协程原理</title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</link>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
       <pubDate>Tue, 25 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</guid>
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
       <description>协程原理 并发编程模型 从内存的角度看，并行计算只有两种：共享内存、消息通讯。 目的是解决多线程的数据一致性 CSP模型 go语言的并发特性是由197</description>
     </item>
     
@@ -333,7 +351,7 @@
       <pubDate>Sat, 15 Aug 2020 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/</guid>
-      <description></description>
+      <description>工程师应该怎么学习 1. 阅读书籍 2. 信息源 github trending follow优秀工程师 关注优秀社区 参加技术会议和公开课 3. 多做总结 建立自己的博客 建立自己的代码库 建立自</description>
     </item>
     
     <item>
@@ -401,10 +419,10 @@
     
     <item>
       <title>K8s基本入门</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/</link>
       <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/</guid>
       <description>分享的内容包括 k8s demo部署示例 k8s基本架构和原理 k8s资源对象 k8s网络模型 总结 k8s就像图中的货船，管理各种集装箱（容器） 一. k8s dem</description>
     </item>
     
@@ -437,28 +455,100 @@
     
     <item>
       <title>client-go源码分析(三) - WorkQueue</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/</link>
       <pubDate>Mon, 10 Sep 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/</guid>
       <description>WorkQueue WorkQueue称为工作队列，比普通的FIFO负责，主要功能在于标记和去重，并支持如下特性： 有序 去重 并发性 标记机制：标记是否被处理过 通知</description>
     </item>
     
     <item>
       <title>client-go源码分析(二) - Informer机制</title>
-      <link>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</link>
       <pubDate>Thu, 30 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</guid>
       <description>client-go源码分析(二) - Informer机制 最近加入云原生社区组织的k8s源码研习社，开始学习k8s底层源码，并整理成笔记。欢迎感</description>
     </item>
     
     <item>
       <title></title>
-      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</link>
+      <link>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E8%93%9D%E9%B2%B8paas%E5%B9%B3%E5%8F%B0/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</guid>
+      <guid>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E8%93%9D%E9%B2%B8paas%E5%B9%B3%E5%8F%B0/</guid>
+      <description>快速启动 1docker pull ccr.ccs.tencentyun.com/bk.io/paas-standalone:latest 2docker run -d --name=&amp;#34;bk-paas&amp;#34; -p 8000-8003:8000-8003 ccr.ccs.tencentyun.com/bk.io/paas-standalone:latest 3</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E8%93%9D%E9%B2%B8%E5%B9%B3%E5%8F%B0%E5%88%86%E6%9E%90/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E8%93%9D%E9%B2%B8%E5%B9%B3%E5%8F%B0%E5%88%86%E6%9E%90/</guid>
+      <description>蓝鲸全家桶介绍 项目名称 项目代号 对标产品 简介 特性 开发语言 持续集成平台 Bk-ci jenkins 是一个免费并开源的 CI 服务，可助你自动化构建-测试-发布工作流，持续、快</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86cmdb%E5%B9%B3%E5%8F%B0/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86cmdb%E5%B9%B3%E5%8F%B0/</guid>
+      <description>快速安装 1docker run -d -p 8081:8090 ccr.ccs.tencentyun.com/bk.io/cmdb-standalone:latest helm安装 1# 修改helm中的value.yaml文件 2# 镜像名称：bk-cmdb -&amp;gt; docker.io/hoffermei/bk-cmdb 3# mongo不需要持久化：mongo</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/devops/%E9%83%A8%E7%BD%B2%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90%E5%92%8C%E5%B8%B8%E7%94%A8%E9%83%A8%E7%BD%B2%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/devops/%E9%83%A8%E7%BD%B2%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90%E5%92%8C%E5%B8%B8%E7%94%A8%E9%83%A8%E7%BD%B2%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94/</guid>
+      <description>一、业务场景和现状分析 1. 目前房角石所处的角色 图片链接地址 2. 完整的部署流程 目前真正到客户现场实施私有化的产品有： bimface：在没有房角石之</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid>
+      <description>环境准备 mac vscode 环境配置 下载代码 1git clone https://github.com/envoyproxy/envoy.git 安装bazel等环境 1cd ci 2./mac_ci_setup.sh 3 编译代码 1bazel build //source/exe:envoy-static 2bazel build -c opt //source/exe:envoy-static vscode调试配置 1touch .vscode/launch.json 文本内容 1{ 2 // Use IntelliSense to learn about possible attributes. 3</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/gc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/gc/</guid>
+      <description>https://github.com/qcrao/Go-Questions/blob/master/GC/GC.md</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-context/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-context/</guid>
+      <description>https://github.com/cch123/golang-notes/blob/master/context.md</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/</guid>
+      <description>什么是协程 软件运行时，计算机真正干活的是CPU 单进程时代 程序串行进行，只有当一个程序运行完才能运行下一个进程 缺点： 进程阻塞 cpu利用率低 多进</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/context/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/context/</guid>
       <description></description>
     </item>
     
@@ -473,11 +563,47 @@
     
     <item>
       <title></title>
+      <link>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/string/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/string/</guid>
+      <description>Boyer-Moore 算法 https://www.cnblogs.com/lanxuezaipiao/p/3452579.html http://www.ruanyifeng.com/blog/2013/05/boyer-moore_string_search_algorithm.html</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/</guid>
       <description>互斥锁 sync.Mutex 同步锁 sync.RWMutex</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/template/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/template/</guid>
+      <description>基本使用 源码分析 1type Template struct { 2 name string // template的名称 3 *parse.Tree // 解析树 4 *common 5 leftDelim string // 左边分隔符，默认为{{}} 6 rightDelim string // 左边分隔符，默认为{{}} 7}</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E7%9F%A5%E5%90%8Dgo%E5%8D%9A%E4%B8%BB/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%9F%A5%E5%90%8Dgo%E5%8D%9A%E4%B8%BB/</guid>
+      <description>https://github.com/qcrao/Go-Questions</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/orm/xorm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/orm/xorm/</guid>
+      <description>概述 官网 xorm是一个简单而强大的Go语言ORM库. 通过它可以使数据库操作非常简便。 基本使用</description>
     </item>
     
     <item>
@@ -491,11 +617,263 @@
     
     <item>
       <title></title>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/waypoint/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/waypoint/</guid>
+      <description>A tool to build, deploy, and release any application on any platform.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/go%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/go%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94/</guid>
+      <description>框架名称 star数 follow数 最近更新 公司 istio 25k 4.8k 25min前 go-kit 18.5k 1.9k 2d前 grpc-go 12.5k 2.7k 2h前 go-kratos 10.7k 2.3k 14d前 go-micro 8.8k 768 9h前 go-chi 8.4k 574 1月前 go-zero 3k 379 2d前 晓黑</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/go/%E7%BF%BB%E8%AF%91/%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9B%AE%E5%89%8Dgolang%E8%BF%98%E4%B8%8D%E5%85%B7%E5%A4%87%E4%BC%81%E4%B8%9A%E7%BA%A7%E5%BC%80%E5%8F%91%E8%83%BD%E5%8A%9B/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%BF%BB%E8%AF%91/%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9B%AE%E5%89%8Dgolang%E8%BF%98%E4%B8%8D%E5%85%B7%E5%A4%87%E4%BC%81%E4%B8%9A%E7%BA%A7%E5%BC%80%E5%8F%91%E8%83%BD%E5%8A%9B/</guid>
+      <description>简介 企业级应用是长期存在的、可靠的、持久化存储很多年数据的系统。目前golang还没有具备构建世界上的企业级系统的能力。 马丁福乐的企业级应用</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/redis/redis-cluster/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/redis/redis-cluster/</guid>
+      <description>基于gossip算法</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/redis/redis-sentinel/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/redis/redis-sentinel/</guid>
+      <description>基于raft算法</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%B9%A6%E5%8D%95/2020%E4%B9%A6%E5%8D%95/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%B9%A6%E5%8D%95/2020%E4%B9%A6%E5%8D%95/</guid>
+      <description>2020书单 《数据密集型应用系统设计》 豆瓣评分：9.7 go夜读 《SRE：Google运维解密》 豆瓣评分：8.9 go夜读读书会第二期 《Linu</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/gitops/flux/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/gitops/flux/</guid>
+      <description>1sudo &amp;#34;GITHUB_TOKEN=$GITHUB_TOKEN&amp;#34; flux bootstrap github \ 2 --owner=kinnylee \ 3 --repository=fleet-infra \ 4 --branch=main \ 5 --path=./clusters/my-cluster \ 6 --personal 配置镜像自动升级功能 1sudo &amp;#34;GITHUB_TOKEN=$GITHUB_TOKEN&amp;#34; flux bootstrap github \ 2 --components-extra=image-reflector-controller,image-automation-controller \ 3 --owner=$GITHUB_USER \ 4 --repository=fleet-infra \ 5 --branch=main \ 6 --path=clusters/image-update-cluster \ 7 --token-auth \ 8 --personal</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/</guid>
+      <description>helm源码分析-downloader downloader模块主要负责 目录结构 源码位置：pkg/downloader 1➜ helm git:(041ce5a2) ✗ tree pkg/downloader 2pkg/downloader 3├──</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/</guid>
+      <description>helm源码分析-install命令 helm install命令的代码入口：cmd/helm/install.go 使用介绍 第一个参数为部署后的应用名</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/</guid>
+      <description>helm源码分析-list命令 helm list 主要用于查看已经安装的release列表 源码位置：cmd/helm/list.go 实现逻辑 helm list 的代码比较简</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/</guid>
+      <description>helm repo源码分析 helm repo 主要处理仓库相关信息，包括的所有命令和代码对应关系如下： helm repo 命令源码位置：cmd/helm/repo.go helm repo list 命令源</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</guid>
+      <description>helm源码分析-storage storage模块主要用于管理和操作发布的release信息，当我们通过helm list等命令查询relea</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>helm源码分析-基本介绍 概述 官网介绍 Helm是k8s包管理器，是查找、分享和使用软件构建k8s的最优方式 Helm 帮助您管理 Kubernetes 应用——Helm 图表</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
+      <description>helm源码分析-核心数据结构 概述 包（Chart）：表示一个k8s资源包，包括：元信息、默认配置、可选参数、依赖包 实例（Release）：表</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/scheme/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/scheme/</guid>
+      <description>Scheme原理分析 Scheme Scheme的作用： 定义了资源序列化和反序列化方法 资源类型和版本的对应关系 源码位置：k8s.io/apimachine</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-apprepository-controller/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-apprepository-controller/</guid>
+      <description>kubeppas源码分析-apprepository-controller 概述 apprepository-controller是一个标准的k</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-asset-syncer/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-asset-syncer/</guid>
+      <description>kubeapps源码分析-asset-syncer 概述 asset-syncer模块负责同步chart仓库的资源，并保存到数据库。 提供了三个命</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-assetsvc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-assetsvc/</guid>
+      <description>kubeapps源码分析-assetsvc 概述 这个组件主要是通过查询postgresq数据库的数据，并提供接口展示给前端。在asset-sy</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/</guid>
+      <description>kubeapps源码分析-kubeops 概述 这个组件主要是调用helm sdk执行相关release操作，相当于将helm的install、u</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>kubeapps源码分析-基本介绍 概述 kubeapps是一个基于web ui部署和管理k8s应用的平台 架构 包括以下组件： assetsvc asset-syncer apprepository-controller kubeops pinniped-proxy prostgresql apprepository-controller 负责监听</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubevela/%E5%9F%BA%E4%BA%8Ekubevela&#43;argocd&#43;teckton%E5%AE%9E%E7%8E%B0%E5%BA%94%E7%94%A8gitops/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubevela/%E5%9F%BA%E4%BA%8Ekubevela&#43;argocd&#43;teckton%E5%AE%9E%E7%8E%B0%E5%BA%94%E7%94%A8gitops/</guid>
+      <description>安装 Kubevela安装 Tekton安装 1. 环境要求 k8s &amp;gt;= 1.16 2. 开始安装 1# 执行以下命令安装 2[root@middleware-1810-01 ~]# kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml 3 4namespace/tekton-pipelines created 5podsecuritypolicy.policy/tekton-pipelines created 6clusterrole.rbac.authorization.k8s.io/tekton-pipelines-controller-cluster-access created 7clusterrole.rbac.authorization.k8s.io/tekton-pipelines-controller-tenant-access created 8clusterrole.rbac.authorization.k8s.io/tekton-pipelines-webhook-cluster-access created 9role.rbac.authorization.k8s.io/tekton-pipelines-controller created 10role.rbac.authorization.k8s.io/tekton-pipelines-webhook created 11role.rbac.authorization.k8s.io/tekton-pipelines-leader-election created 12serviceaccount/tekton-pipelines-controller created 13serviceaccount/tekton-pipelines-webhook created 14Warning:</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
+      <description>简介 Argo Workflows 是一个开源的容器原生的工作流引擎，可在 Kubernetes 上编排并行作业。Argo Workflows 实现为 Kubernetes CRD。 快速入门 1kubectl create ns argo 2kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo/stable/manifests/install.yaml</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</guid>
+      <description>概述 jenkins在ci、cd领域如此火热，独霸一方，得益于丰富的插件生态。而作为开发者你的，是否好奇jenkins的插件机制是如何实现的 开</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://kinnylee.github.io/posts/_about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/posts/_about/</guid>
       <description>项目经验 时间 产品名称 产品介绍 技术栈 个人职责 2019-04 ~ 至今 房角石系统 公司后台服务产品私有化部署 java、python、vue 1. 负责部署引擎的开发 2017-10 ~</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/aecore%E5%AF%B9%E6%8E%A5%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/aecore%E5%AF%B9%E6%8E%A5%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</guid>
+      <description>对接AECore方案设计 [TOC] 一、实体对应关系 AECore的SP对应房角石的应用 AECore的一个部署包对应房角石的一个应用（或者一个Actio</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/</guid>
+      <description>前言 房角石系统实现部署的前提是：应用在房角石上架。经过几个版本的演进，上架流程支持各种形式：包括完整上架、模板上架、自动上架。虽然形式不同，</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E6%96%BD%E5%B7%A5%E5%AF%B9%E6%8E%A5%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E6%96%BD%E5%B7%A5%E5%AF%B9%E6%8E%A5%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</guid>
+      <description>一、接口说明 1. 创建项目接口 input name：项目名称，必填 description：项目描述，非必填 output uuid：项目唯一标识，32位 project表</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E7%89%88%E6%9C%AC%E5%B1%9E%E6%80%A7%E8%AE%BE%E8%AE%A1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E7%89%88%E6%9C%AC%E5%B1%9E%E6%80%A7%E8%AE%BE%E8%AE%A1/</guid>
+      <description>目的 简化配置，让用户尽量少的配置，拖拽完实例后即可快速部署，降低用户的使用门槛 属性规范 key：部署引擎识别的唯一标识 label：界面上展示的</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E5%92%8Cproject.json%E6%96%87%E4%BB%B6/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E5%92%8Cproject.json%E6%96%87%E4%BB%B6/</guid>
+      <description>脚本目录结构 1└── cornerstone-ansible-playbook 2 ├── app 3 │ └── cornerstone 4 │ ├── Kubernetes 5 │ └── MySQL 6 │ └── bin-5.7.21 7 │ ├── group_vars 8 │ ├── hosts.yaml 9 │ ├── inventory 10 │ ├── playbook.yaml 11 │ ├── properties.yaml</description>
     </item>
     
   </channel>

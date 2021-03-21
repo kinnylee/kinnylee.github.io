@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>K8s基本入门 | kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.75.0-DEV" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+  
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="分享的内容包括 k8s demo部署示例 k8s基本架构和原理 k8s资源对象 k8s网络模型 总结 k8s就像图中的货船，管理各种集装箱（容器） 一. k8s dem">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "K8s基本入门" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" />
+<meta property = "og:title" content = "K8s基本入门" />
+<meta property = "og:description" content = "分享的内容包括 k8s demo部署示例 k8s基本架构和原理 k8s资源对象 k8s网络模型 总结 k8s就像图中的货船，管理各种集装箱（容器） 一. k8s dem" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/'>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity = "sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" as="script" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous">
+
+    
+    <link rel="stylesheet" type="text/css" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity="sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" crossorigin="anonymous">
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <div>
+          <svg class="icon">
+            <use xlink:href="#open-menu"></use>
+          </svg>
+          <svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg>
+        </div>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>Mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>Redis</a>
+          <a href = 'https://kinnylee.github.io/categories/rocketmq' class = 'nav_child nav_item'>RocketMQ</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/categories/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/docker' class = 'nav_child nav_item'>Docker</a>
+          <a href = 'https://kinnylee.github.io/categories/linux' class = 'nav_child nav_item'>Linux内核</a>
+          <a href = 'https://kinnylee.github.io/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0' class = 'nav_child nav_item'>机器学习</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'>K8s基本入门</h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Jun 28, 2020</span>
+  <a href = 'https://kinnylee.github.io/tags/k8s' class = 'post_tag button button_translucent'>k8s
+  </a>
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 4021 字</span>，阅读约<span class="more-meta"> 9 分钟</span>
+    <div class='post_share'>
+  | 复制链接:
+  <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    
+    <h2>Overview</h2>
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#分享的内容包括">分享的内容包括</a></li>
+    <li><a href="#一-k8s-demo部署示例">一. k8s demo部署示例</a>
+      <ul>
+        <li><a href="#说明">说明</a></li>
+        <li><a href="#1-宿主机上如何运行">1. 宿主机上如何运行</a></li>
+        <li><a href="#2-docker容器上如何运行">2. Docker容器上如何运行</a></li>
+        <li><a href="#3-在k8s中如何运行">3. 在k8s中如何运行</a></li>
+        <li><a href="#4-总结三种部署方式">4. 总结三种部署方式</a></li>
+        <li><a href="#5-流程越来越复杂为什么不直接部署在宿主机">5. 流程越来越复杂，为什么不直接部署在宿主机？</a></li>
+      </ul>
+    </li>
+    <li><a href="#二-基本架构和原理">二. 基本架构和原理</a>
+      <ul>
+        <li><a href="#1-master节点的组件">1. Master节点的组件</a></li>
+        <li><a href="#2-node节点的组件">2. Node节点的组件</a></li>
+      </ul>
+    </li>
+    <li><a href="#三-资源对象">三. 资源对象</a>
+      <ul>
+        <li><a href="#概述">概述</a></li>
+        <li><a href="#1-pod">1. Pod</a></li>
+        <li><a href="#2-deployment">2. Deployment</a></li>
+        <li><a href="#3-service">3. Service</a></li>
+        <li><a href="#4-ingress">4. Ingress</a></li>
+      </ul>
+    </li>
+    <li><a href="#四-k8s网络模型">四. k8s网络模型</a>
+      <ul>
+        <li><a href="#1-docker网络模型">1. Docker网络模型</a></li>
+        <li><a href="#2-docker网络的局限性">2. Docker网络的局限性</a></li>
+        <li><a href="#3-k8s网络模型概述">3. k8s网络模型概述</a></li>
+        <li><a href="#4-k8s网络模型详解">4. k8s网络模型详解</a></li>
+        <li><a href="#4-开源网络组件flannel">4. 开源网络组件Flannel</a></li>
+      </ul>
+    </li>
+    <li><a href="#五-总结">五. 总结</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+    <h2 id="分享的内容包括">分享的内容包括</h2>
+<ul>
+<li>k8s demo部署示例</li>
+<li>k8s基本架构和原理</li>
+<li>k8s资源对象</li>
+<li>k8s网络模型</li>
+<li>总结</li>
+</ul>
+<blockquote>
+<p>k8s就像图中的货船，管理各种集装箱（容器）</p>
+</blockquote>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/30/16c429dc4a1d3a19?w=800&amp;h=483&amp;f=jpeg&amp;s=110337" alt="装满集装箱的船"></p>
+<h2 id="一-k8s-demo部署示例">一. k8s demo部署示例</h2>
+<h3 id="说明">说明</h3>
+<ul>
+<li>先通过一个hello world程序直观感受一下k8s</li>
+<li>程序部署在宿主机，容器和k8s三种环境，对比他们的差异</li>
+<li>代码大致是这个样子
+<div class="highlight"><pre class="chroma"><code class="language-java" data-lang="java"><span class="ln">1</span><span class="nd">@RestController</span>
+<span class="ln">2</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">K8sDemoController</span> <span class="o">{</span>
+<span class="ln">3</span>  
+<span class="ln">4</span>    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">&#34;/hello&#34;</span><span class="o">)</span>
+<span class="ln">5</span>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">(){</span>
+<span class="ln">6</span>        <span class="k">return</span> <span class="s">&#34;hello k8s demo.&#34;</span><span class="o">;</span>
+<span class="ln">7</span>    <span class="o">}</span>
+<span class="ln">8</span><span class="o">}</span>
+</code></pre></div></li>
+</ul>
+<h3 id="1-宿主机上如何运行">1. 宿主机上如何运行</h3>
+<ol>
+<li>mvn编译代码打成jar包</li>
+<li>执行<code>java -jar k8s-demo.jar &amp;</code></li>
+<li>浏览器中输入 http://10.1.69.101:8080/hello 地址访问服务</li>
+</ol>
+<h3 id="2-docker容器上如何运行">2. Docker容器上如何运行</h3>
+<ol>
+<li>mvn编译代码打成jar包</li>
+<li><strong>将jar包打成docker镜像</strong></li>
+<li>执行<code>docker run --name k8s-demo -d -p 8080:8080 k8s-demo:0.0.1-SNAPSHOT</code></li>
+<li>浏览器中输入 http://10.1.69.101:8080/hello 地址访问服务</li>
+</ol>
+<h3 id="3-在k8s中如何运行">3. 在k8s中如何运行</h3>
+<blockquote>
+<p>这一步大致感受一下yaml的样子，不需要关心脚本的细节，后面介绍资源时会细说。只需要有个大体的印象，部署一个k8s服务的基本流程。</p>
+</blockquote>
+<ol>
+<li>mvn编译代码打成jar包</li>
+<li>将jar包打成docker镜像</li>
+<li><strong>构建一个运行服务的yaml文件</strong></li>
+<li>执行kubectl apply -f k8s-demo.yaml</li>
+<li>浏览器中输入 <a href="http://www.k8s-demo.com/hello">http://www.k8s-demo.com/hello</a> 地址访问服务</li>
+</ol>
+<ul>
+<li>
+<h5 id="yaml文件内容">yaml文件内容</h5>
+</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="ln"> 1</span><span class="c"># 文件名为k8s-demo.yaml</span><span class="w">
+</span><span class="ln"> 2</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">extensions/v1beta1</span><span class="w">
+</span><span class="ln"> 3</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span><span class="ln"> 4</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 5</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln"> 6</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">spring-test</span><span class="w">
+</span><span class="ln"> 7</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 8</span><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span><span class="ln"> 9</span><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span><span class="ln">10</span><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln">11</span><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="ln">12</span><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">13</span><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln">14</span><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="ln">15</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">16</span><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo:0.0.1-SNAPSHOT</span><span class="w">
+</span><span class="ln">17</span><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="ln">18</span><span class="w">          </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w">
+</span><span class="ln">19</span><span class="w">
+</span><span class="ln">20</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="ln">21</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="ln">22</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span><span class="ln">23</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln">24</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">25</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">spring-test</span><span class="w">
+</span><span class="ln">26</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln">27</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">NodePort</span><span class="w">
+</span><span class="ln">28</span><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span><span class="ln">29</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">30</span><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="ln">31</span><span class="w">   </span>- <span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span><span class="ln">32</span><span class="w">     </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8888</span><span class="w">
+</span><span class="ln">33</span><span class="w">     </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w">
+</span><span class="ln">34</span><span class="w">     </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="m">30003</span><span class="w">
+</span><span class="ln">35</span><span class="w">
+</span><span class="ln">36</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="ln">37</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">extensions/v1beta1</span><span class="w">
+</span><span class="ln">38</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Ingress</span><span class="w">
+</span><span class="ln">39</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln">40</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">41</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">spring-test</span><span class="w">
+</span><span class="ln">42</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln">43</span><span class="w">  </span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="ln">44</span><span class="w">  </span>- <span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">www.k8s-demo.com</span><span class="w">
+</span><span class="ln">45</span><span class="w">    </span><span class="nt">http</span><span class="p">:</span><span class="w">
+</span><span class="ln">46</span><span class="w">      </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span><span class="ln">47</span><span class="w">      </span>- <span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/hello</span><span class="w">
+</span><span class="ln">48</span><span class="w">        </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span><span class="ln">49</span><span class="w">          </span><span class="nt">serviceName</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">50</span><span class="w">          </span><span class="nt">servicePort</span><span class="p">:</span><span class="w"> </span><span class="m">8888</span><span class="w">
+</span></code></pre></div><h3 id="4-总结三种部署方式">4. 总结三种部署方式</h3>
+<ul>
+<li><a href="https://www.processon.com/view/link/5d3ebef3e4b0208611155e51">三种部署方式高清图</a></li>
+</ul>
+<blockquote>
+<p>为了减少部署复杂度，代码并没有使用redis，只是实例图增加了redis</p>
+</blockquote>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/29/16c3d7b18f5a8a60?w=1089&amp;h=1028&amp;f=png&amp;s=107009" alt=""></p>
+<h3 id="5-流程越来越复杂为什么不直接部署在宿主机">5. 流程越来越复杂，为什么不直接部署在宿主机？</h3>
+<h4 id="51-容器比宿主机优势在哪">5.1 容器比宿主机优势在哪？</h4>
+<ul>
+<li>可移植性：容器提供了运行应用程序的基本包装，可以在任何支持容器的云上部署</li>
+<li>高效率：启动一个容器只需一个镜像，且启动时间非常短</li>
+<li>隔离性：宿主机上往往安装很多服务，且各自依赖不一样。而一个容器只跑一个服务</li>
+<li>版本控制：方便追溯不同版本差异，方便快速回滚，只需替换镜像版本，无需宿主机上一套复杂的流程</li>
+<li>低成本：小巧轻便，不需要像宿主机或虚拟机一样占用很多资源</li>
+</ul>
+<h4 id="52-k8s的出现又解决了容器的什么问题">5.2 k8s的出现又解决了容器的什么问题？</h4>
+<ul>
+<li>自动编排调度：大量容器剧增后，如何管理、如何调度的问题</li>
+<li>分布式解决方案：节点可水平扩展，容器可方便扩缩容</li>
+<li>自愈能力：故障自动发现，并进行自我修复</li>
+</ul>
+<blockquote>
+<p>我们说容器实现了单个应用程序的基本包装实现可移植。上图中，宿主机部署的方式如果加上一个nginx做反向代理，就和k8s中ingress的部署方式是一样的。也就是k8s实现了整套分布式应用的可移植</p>
+</blockquote>
+<h2 id="二-基本架构和原理">二. 基本架构和原理</h2>
+<ul>
+<li><a href="https://www.processon.com/view/link/5d1d5cfde4b0878e40a4969f">k8s架构图简版</a></li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/19/16c08504b3103615?w=1063&amp;h=553&amp;f=png&amp;s=33469" alt=""></p>
+<ul>
+<li><a href="https://www.processon.com/view/link/5d1d5cfde4b0878e40a4969f">k8s数据流转图</a></li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/19/16c081d657e6899c?w=1350&amp;h=948&amp;f=png&amp;s=120628" alt="k8s架构图"></p>
+<h3 id="1-master节点的组件">1. Master节点的组件</h3>
+<h4 id="apiserver">apiServer</h4>
+<ul>
+<li>提供资源操作的唯一入口，提供api注册、发现、认证、访问控制等功能</li>
+</ul>
+<h4 id="etcd">etcd</h4>
+<ul>
+<li>一个key-value数据库</li>
+<li>保存整个机器的状态</li>
+</ul>
+<h4 id="controller-manager">controller-manager</h4>
+<ul>
+<li>负责维护机器状态，比如：自动扩容、故障检查、滚动更新</li>
+<li>实现集群自动化的关键组件</li>
+</ul>
+<h4 id="scheduler">scheduler</h4>
+<ul>
+<li>负责资源调度</li>
+<li>将未分配节点的pod调度到合适的节点上</li>
+</ul>
+<h3 id="2-node节点的组件">2. Node节点的组件</h3>
+<h4 id="kubelet">kubelet</h4>
+<ul>
+<li>负责容器生命周期管理，比如：创建、删除</li>
+<li>同时负责Volume，网络的管理</li>
+</ul>
+<h4 id="kube-proxy">kube-proxy</h4>
+<ul>
+<li>负责为Service提供负载均衡、服务发现</li>
+</ul>
+<h4 id="container-runtime">Container Runtime</h4>
+<ul>
+<li>容器运行环境</li>
+<li>默认是Docker，同时还支持其他容器引擎</li>
+</ul>
+<h2 id="三-资源对象">三. 资源对象</h2>
+<h3 id="概述">概述</h3>
+<ul>
+<li>k8s中大部分概念，如Node，Pod，Service都可以看做一种资源对象</li>
+<li>资源的描述：yaml文件或json文件</li>
+<li>资源的操作：对象可以通过kubectl（或者api）执行增、删、改、查</li>
+<li>资源的存储：信息在etcd中持久化</li>
+</ul>
+<blockquote>
+<p>k8s通过对比资源的“实际状态”和etcd中的“期望状态”，实现自动化控制</p>
+</blockquote>
+<ul>
+<li><a href="https://www.processon.com/view/link/5d33da50e4b0511f130ca3c8">常用资源概述图</a></li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/30/16c41b50a744882f?w=1400&amp;h=639&amp;f=png&amp;s=108937" alt=""></p>
+<h3 id="1-pod">1. Pod</h3>
+<ul>
+<li>Pod是k8s中最重要最基本的资源</li>
+<li>pod是在容器之外又封装的一层概念</li>
+<li>pod是容器<strong>调度的基本单元</strong>（不是docker容器）</li>
+<li>每个pod包含一个特殊的根容器：Pause容器，和一个或多个业务容器</li>
+<li>每个pod有唯一的ip，pod内的容器可通过localhost通讯</li>
+</ul>
+<blockquote>
+<p>为什么要新增pod这个概念？</p>
+<ol>
+<li>一组容器作为一个单元，很难判断整体状态，以及对整体进行管控。新增业务无关的pause容器，用于管控整体</li>
+<li>简化了关联容器通信和共享的问题</li>
+</ol>
+</blockquote>
+<h3 id="2-deployment">2. Deployment</h3>
+<ul>
+<li>实现Pod自动编排：创建、删除、扩容、缩容</li>
+<li>通过replicas控制pod数量，template控制要创建的pod的模板</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="ln"> 1</span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">extensions/v1beta1</span><span class="w">
+</span><span class="ln"> 2</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span><span class="ln"> 3</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln"> 5</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">spring-test</span><span class="w">
+</span><span class="ln"> 6</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 7</span><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span><span class="ln"> 8</span><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 9</span><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln">10</span><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="ln">11</span><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">12</span><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln">13</span><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="ln">14</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">15</span><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo:0.0.1-SNAPSHOT</span><span class="w">
+</span><span class="ln">16</span><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="ln">17</span><span class="w">          </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w">
+</span></code></pre></div><h3 id="3-service">3. Service</h3>
+<blockquote>
+<ul>
+<li>pod异常时，可能会被调度到另一台机器，导致pod的ip改变，使用ip访问服务不可靠</li>
+</ul>
+</blockquote>
+<h4 id="31概述">3.1概述</h4>
+<ul>
+<li>k8s里最核心的资源之一，类似微服务架构中的“微服务”</li>
+<li>前端应用通过入口地址访问服务，服务通过label对接到后端的pod，即使pod的ip变了</li>
+<li>kube-proxy负责把service请求转发到后端，并做负载均衡</li>
+<li>service整个生命周期内，ClusterIp不会变，对外提供的服务地址也就不会变</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="ln"> 1</span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="ln"> 2</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span><span class="ln"> 3</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln"> 5</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">spring-test</span><span class="w">
+</span><span class="ln"> 6</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 7</span><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">NodePort</span><span class="w">
+</span><span class="ln"> 8</span><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 9</span><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">10</span><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span><span class="ln">11</span><span class="w">   </span>- <span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span><span class="ln">12</span><span class="w">     </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">8888</span><span class="w">
+</span><span class="ln">13</span><span class="w">     </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">8080</span><span class="w">
+</span><span class="ln">14</span><span class="w">     </span><span class="nt">nodePort</span><span class="p">:</span><span class="w"> </span><span class="m">30003</span><span class="w">
+</span></code></pre></div><h3 id="4-ingress">4. Ingress</h3>
+<blockquote>
+<p>service提供了ip:port的访问方式，即工作在tcp/ip层，而http服务需要将不同的url对应到不同的后端服务，service是无法实现这一功能的。</p>
+</blockquote>
+<ul>
+<li>Ingress提供http层的负载分发功能</li>
+<li>Ingress可以实现不同的请求，分发到不同的后端服务</li>
+<li>Ingress定义后，需要结合Ingress Controller，才能形成完整的功能</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="ln"> 1</span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">extensions/v1beta1</span><span class="w">
+</span><span class="ln"> 2</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Ingress</span><span class="w">
+</span><span class="ln"> 3</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 4</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln"> 5</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">spring-test</span><span class="w">
+</span><span class="ln"> 6</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 7</span><span class="w">  </span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="ln"> 8</span><span class="w">  </span>- <span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l">www.k8s-demo.com</span><span class="w">
+</span><span class="ln"> 9</span><span class="w">    </span><span class="nt">http</span><span class="p">:</span><span class="w">
+</span><span class="ln">10</span><span class="w">      </span><span class="nt">paths</span><span class="p">:</span><span class="w">
+</span><span class="ln">11</span><span class="w">      </span>- <span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">/hello</span><span class="w">
+</span><span class="ln">12</span><span class="w">        </span><span class="nt">backend</span><span class="p">:</span><span class="w">
+</span><span class="ln">13</span><span class="w">          </span><span class="nt">serviceName</span><span class="p">:</span><span class="w"> </span><span class="l">k8s-demo</span><span class="w">
+</span><span class="ln">14</span><span class="w">          </span><span class="nt">servicePort</span><span class="p">:</span><span class="w"> </span><span class="m">8888</span><span class="w">
+</span></code></pre></div><h4 id="41-ingress-controller定义">4.1 Ingress Controller定义</h4>
+<ul>
+<li>可以使用公有云提供的Ingress Controller</li>
+<li>也可以使用google提供的Ingress Controller，以pod形式运行，功能如下：
+<ul>
+<li>监听apiserver，获取ingress的定义</li>
+<li>基于ingress定义，生成nginx的配置文件的内容</li>
+<li>执行nginx -s reload，重新加载配置</li>
+</ul>
+</li>
+</ul>
+<h4 id="42-ingress定义">4.2 Ingress定义</h4>
+<ul>
+<li>创建类型为Ingress的yaml文件</li>
+<li>配置spec.rules，指定hostname中url和service的对应关系</li>
+</ul>
+<h2 id="四-k8s网络模型">四. k8s网络模型</h2>
+<p>前面hello world程序中，对于如何访问到服务，有必要了解一下k8s的网络模型，在这之前先介绍docker的网络模型</p>
+<h3 id="1-docker网络模型">1. Docker网络模型</h3>
+<p><a href="https://www.processon.com/view/link/5d33252fe4b092b33462cbc5">docker网络模型</a></p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/30/16c41d62fa5e09a3?w=1049&amp;h=715&amp;f=png&amp;s=52568" alt=""></p>
+<ul>
+<li>docker第一次启动时，会创建虚拟网桥docker0</li>
+<li>为docker0分配一个子网</li>
+<li>docker创建每个容器时，会创建veth设备对，一端关联到网桥上，另一端使用linux的网络命名空间技术连接到容器内，并给容器内eth0设备分配一个ip地址</li>
+</ul>
+<h3 id="2-docker网络的局限性">2. Docker网络的局限性</h3>
+<ul>
+<li>Docker网络模型没有考虑到多主机互联的网络解决方案，崇尚简单为美</li>
+<li>同一机器内的容器之间可以直接通讯，但是不同机器之间的容器无法通讯</li>
+<li>为了跨节点通讯，必须在主机的地址上分配端口，通过端口路由或代理到容器</li>
+<li>分配和管理容器特别困难，特别是水平扩展时</li>
+</ul>
+<h3 id="3-k8s网络模型概述">3. k8s网络模型概述</h3>
+<h4 id="31-k8s网络模型的原则">3.1 k8s网络模型的原则：</h4>
+<ul>
+<li>每个pod都拥有唯一个独立的ip地址，称IP-Per-Pod模型</li>
+<li>所有pod都在一个可连通的网络环境中</li>
+<li>不管是否在同一个node，都可以通过ip直接通讯</li>
+<li>pod被看作一台独立的物理机或虚拟机</li>
+</ul>
+<blockquote>
+<p>目前原生docker和kubernetes还不能打通多节点容器与容器的通讯，要支持该模型，必须依靠第三方网络插件实现，比如：flannel</p>
+</blockquote>
+<h4 id="32-设计这个原则的原因">3.2 设计这个原则的原因：</h4>
+<ul>
+<li>用户不需要额外考虑如何建立pod之间的连接</li>
+<li>用户不需要考虑将容器端口映射到主机端口的问题</li>
+<li>可以兼容过去跑在宿主机和KVM的应用</li>
+</ul>
+<h4 id="33-ip-per-pod与docker端口映射的区别">3.3 IP-Per-Pod与Docker端口映射的区别</h4>
+<ul>
+<li>docker端口映射到宿主机会引入端口管理的复杂性</li>
+<li>docker最终被访问的ip和端口，与提供的不一致，引起配置的复杂性</li>
+</ul>
+<h3 id="4-k8s网络模型详解">4. k8s网络模型详解</h3>
+<p><a href="https://www.processon.com/view/link/5d332158e4b092b33462c9f2">k8s网络实现</a></p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/21/16c12866ad4555a3?w=1049&amp;h=754&amp;f=png&amp;s=71854" alt=""></p>
+<h4 id="41-容器与容器的通讯">4.1 容器与容器的通讯</h4>
+<ul>
+<li>同一个容器的pod直接共享同一个linux协议栈</li>
+<li>就像在同一台机器上，可通过localhost访问</li>
+<li>可类比一个物理机上不同应用程序的情况</li>
+</ul>
+<h4 id="42-pod与pod的通讯">4.2 pod与pod的通讯</h4>
+<h5 id="同一node内的pod之间通讯">同一Node内的pod之间通讯</h5>
+<ul>
+<li>同一Node内的pod都是通过veth连接在同一个docker0网桥上，地址段相同，所以可以直接通讯</li>
+</ul>
+<h5 id="不同node的pod之间通讯">不同Node的pod之间通讯</h5>
+<ul>
+<li>docker0网段与宿主机不在同一个网段，所以不同pod之间的pod不能直接通讯</li>
+<li>不同node之间通讯只能通过宿主机物理网卡</li>
+<li>前面说过k8s网络模型需要不同的pod之间能通讯，所以ip不能重复，这就要求k8s部署时要规划好docker0的网段</li>
+<li>同时，要记录每个pod的ip地址挂在哪个具体的node上</li>
+<li>为了达到这个目的，有很多开源软件增强了docker和k8s的网络</li>
+</ul>
+<h3 id="4-开源网络组件flannel">4. 开源网络组件Flannel</h3>
+<h4 id="41-实现的功能">4.1 实现的功能</h4>
+<ul>
+<li>协助k8s给每个Node上的docker容器分配互不冲突的ip地址</li>
+<li>能在这些ip地址之间建立覆盖网络（Overlay Network），将数据传递到目标容器</li>
+</ul>
+<h4 id="42-底层原理">4.2 底层原理</h4>
+<ul>
+<li>Flannel创建名为flannel0的网桥</li>
+<li>flannel0网桥一端连接docker0网桥，另一端连接flanneld进程</li>
+<li>flanneld进程一端连接etcd，利用etcd管理分配的ip地址资源，同时监控pod地址，建立pod节点路由表</li>
+<li>flanneld进程一端连接docker0和物理网络，配合路由表，完成数据包投递，完成pod之间通讯</li>
+</ul>
+<h4 id="43-缺点">4.3 缺点</h4>
+<ul>
+<li>引入多个网络组件，带来网络时延和损耗</li>
+<li>默认使用udp作为底层传输协议，具有不可靠性</li>
+</ul>
+<h2 id="五-总结">五. 总结</h2>
+<ul>
+<li>本文先通过一个demo，部署在不同的环境中，直观感受了如何使用k8s。这个过程我们需要思考k8s诞生解决了什么问题？核心的提供了一个平台，主要负责容器的自动调度和编排</li>
+<li>对k8s有直观感受后，介绍了下k8s的基本架构。各个组件是如何交互的，在使用k8s过程中不断回想架构图，能加深对k8s的了解</li>
+<li>掌握了基本架构后，想要将服务部署到k8s中，需要对常用的资源对象有一定了解，因此接着介绍了主要的资源对象。k8s中其他的资源对象可类比学习</li>
+<li>当你把一个服务部署到k8s之后，如何做验证呢，如何暴露你的服务呢？需要对k8s的网络模型有一定了解，才能真正掌握它暴露服务的方式。因此最后部分着重介绍了k8s的网络模型</li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li>《kubernetes权威指南》</li>
+</ul>
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">查看更多</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go协程原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/" class="nav-link">java基础-集合框架</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/" class="nav-link">k8s源码分析- kube-apiserver</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/" class="nav-link">k8s源码分析： kube-scheduler</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/net-http/" class="nav-link">Golang http请求源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/" class="nav-link">go协程入门</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>4</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent">
+          博客搭建
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>22</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>9</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
+          CLIENT-GO
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">All tags</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent" data-position=11>BREAKPAD<span class='button_tally'>11</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=3>CLIENT-GO<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent" data-position=9>GO<span class='button_tally'>9</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent" data-position=8>GO基础入门<span class='button_tally'>8</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=1>GO第三方库<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent" data-position=1>INDEX<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=5>JAVA基础<span class='button_tally'>5</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=10>K8S<span class='button_tally'>10</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=2>MYSQL<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=22>源码分析<span class='button_tally'>22</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script type="text/javascript" src = "https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous"></script>
+  </body>
+</html>

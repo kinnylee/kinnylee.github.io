@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.75.0-DEV" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="前言 房角石系统实现部署的前提是：应用在房角石上架。经过几个版本的演进，上架流程支持各种形式：包括完整上架、模板上架、自动上架。虽然形式不同，">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "" />
+<meta property = "og:url" content = "https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/" />
+<meta property = "og:title" content = "" />
+<meta property = "og:description" content = "前言 房角石系统实现部署的前提是：应用在房角石上架。经过几个版本的演进，上架流程支持各种形式：包括完整上架、模板上架、自动上架。虽然形式不同，" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/'>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity = "sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" as="script" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous">
+
+    
+    <link rel="stylesheet" type="text/css" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity="sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" crossorigin="anonymous">
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <div>
+          <svg class="icon">
+            <use xlink:href="#open-menu"></use>
+          </svg>
+          <svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg>
+        </div>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>Mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>Redis</a>
+          <a href = 'https://kinnylee.github.io/categories/rocketmq' class = 'nav_child nav_item'>RocketMQ</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/categories/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/docker' class = 'nav_child nav_item'>Docker</a>
+          <a href = 'https://kinnylee.github.io/categories/linux' class = 'nav_child nav_item'>Linux内核</a>
+          <a href = 'https://kinnylee.github.io/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0' class = 'nav_child nav_item'>机器学习</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'></h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Jan 1, 0001</span>
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 5050 字</span>，阅读约<span class="more-meta"> 11 分钟</span>
+    <div class='post_share'>
+  | 复制链接:
+  <a href="https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    <h2 id="前言">前言</h2>
+<p>房角石系统实现部署的前提是：应用在房角石上架。经过几个版本的演进，上架流程支持各种形式：包括完整上架、模板上架、自动上架。虽然形式不同，但目的只有一个：解耦脚本与数据，下图是演进的大体流程，后续有详细介绍。</p>
+<p><img src="./assets/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E6%BC%94%E8%BF%9B%E8%BF%87%E7%A8%8B.jpg" alt="房角石上架演进过程"></p>
+<h2 id="一用户诉求">一、用户诉求</h2>
+<ul>
+<li>快速将服务部署起来，不关心怎么写脚本，不关心什么是上架</li>
+<li>增加需求或修复bug等原因，需要频繁发版，如何快速部署新服务</li>
+</ul>
+<h2 id="二完整上架">二、完整上架：</h2>
+<h3 id="我们设想的优势">我们设想的优势</h3>
+<ul>
+<li>自由度高、可定制性强</li>
+<li>可实现任意功能</li>
+</ul>
+<h3 id="用户使用后的痛点">用户使用后的痛点</h3>
+<ul>
+<li>痛点一：编写ansible脚本难度大、门槛高，产品对接困难</li>
+<li>痛点二：脚本变更频率低、更多的是数据信息变更，都需要重新上架。</li>
+<li>痛点三：如果版本已经生成实例，还不能删除重新上架。（基本是后台改数据）</li>
+</ul>
+<h3 id="反思总结">反思总结</h3>
+<ul>
+<li>没有考虑用户使用体验</li>
+<li>架构设计不合理，将变和不变的糅杂在一起。</li>
+<li>中间件上架使用完整上架是可行的，因为团队有专业运维人员。但是给产品线使用不太合适</li>
+</ul>
+<h2 id="三脚本替换">三、脚本替换</h2>
+<ul>
+<li>为了解决上述的痛点二，开发了脚本替换功能，可以编辑修改的数据后重新上架</li>
+<li>为了解决上述的痛点三，脚本替换自动把所有引用到该版本的实例也自动替换了</li>
+</ul>
+<blockquote>
+<p>施工3+10项目中，因为每个产品都会添加依赖项，所以项目中同一个版本的实例会存在很多个，替换脚本时需要把所有的实例都要做替换</p>
+</blockquote>
+<h3 id="优势">优势</h3>
+<ul>
+<li>解决应用上架后需要变更部署脚本或数据的问题</li>
+</ul>
+<h3 id="带来的问题">带来的问题</h3>
+<ul>
+<li>脚本上架后，属性可能存在引用问题，变更脚本需要解决属性冲突（界面上需要手动确认，不可取消）</li>
+<li>引用该版本的项目实例，状态被强制变成未部署</li>
+</ul>
+<h3 id="总结">总结</h3>
+<ul>
+<li>解决某些痛点的同时，引入更多的系统复杂性、矛盾性、侵入性</li>
+</ul>
+<h2 id="四分步部署">四、分步部署</h2>
+<h3 id="为什么需要分步部署">为什么需要分步部署</h3>
+<p>最开始版本的房角石只支持完整的脚本部署，部署的最小执行单元也是整个应用。分步部署解决了哪些问题</p>
+<ul>
+<li>某些操作步骤需要反复执行（比如k8s的yaml执行），而某些操作步骤只允许执行一次（比如mysql初始化），如果每次都以整个应用作为最下执行单元，会出现数据被冲掉的情况</li>
+<li>某些应用部署时间很长，正确的使用应该是从失败的地方开始执行，避免每次从头执行浪费额外的时间</li>
+</ul>
+<h3 id="分步部署的重要性">分步部署的重要性</h3>
+<ul>
+<li>模板上架的基础实际就是分步部署</li>
+<li>分步部署的核心：把部署的最小单元由版本细化为每个步骤</li>
+</ul>
+<h2 id="五模板上架">五、模板上架</h2>
+<h3 id="为什么需要模板上架">为什么需要模板上架</h3>
+<ul>
+<li>为了解决上述痛点一，开发了模板上架功能，用户提供数据包，加上房角石提供的通用脚本，即可组装成完整应用</li>
+</ul>
+<h3 id="优势-1">优势</h3>
+<ul>
+<li>上架门槛降低，只需要提供数据即可完成上架和部署</li>
+<li>更新文件时，直接将所有实例和版本都删除，重新生成新的</li>
+</ul>
+<blockquote>
+<p>这里有一个基本假设是：上架的版本是私有的，不会被别的版本添加到依赖项中，也不会被别的项目拖拽为实例。因此能直接删除。</p>
+</blockquote>
+<h3 id="不足">不足</h3>
+<ul>
+<li>缺乏灵活性，目前支持10多种模板，新的需求需要逐步开发</li>
+<li>上架流程变得复杂，组装完整包的过程涉及大量文件操作</li>
+</ul>
+<h2 id="六自动上架">六、自动上架</h2>
+<h3 id="为什么需要自动上架">为什么需要自动上架</h3>
+<p>有了模板上架，实现了资源和脚本的分离，产品提供资源，房角石提供脚本。各自维护，各司其职。但是还存在一个问题，用户每次更新资源，都要走一遍上架或者更新接口，将资源推送到房角石，房角石完成脚本组装，生成完整的版本脚本。能否进一步解耦，完全实现脚本和资源动态分离，省去组装脚本的步骤，只有当真正部署时，才动态的将资源和数据拉取到本地执行。</p>
+<blockquote>
+<p>如果是C++开发人员，可以很容易的类比静态链接库和动态链接库的区别。静态链接库（模板上架）在执行之前需要把所有的依赖打包成完整的可执行文件，而动态链接库（自动上架）是在程序真正执行（应用部署）时，才进行动态调用。</p>
+</blockquote>
+<ul>
+<li></li>
+</ul>
+<h3 id="带来的好处">带来的好处</h3>
+<ul>
+<li>彻底实现脚本和数据分离</li>
+<li>不需要版本更新、脚本替换等功能，任何变更只需要修改obs存储的资源，然后部署前刷新一下资源</li>
+<li>支持版本资源、实例资源编辑，且互不影响</li>
+</ul>
+<blockquote>
+<p>前面的功能都不支持实例资源编辑，只能通过版本编辑实现，且编辑版本会影响所有的实例</p>
+</blockquote>
+<h3 id="需要的功能调整支持">需要的功能调整支持</h3>
+<ul>
+<li>版本上架：只将模板信息、每个模板的资源路径存入数据库。不进行版本脚本组装</li>
+<li>资源同步：动态下载所有的模板，并按一定规则存放，按照规则执行，抛弃组装完整脚本的逻辑</li>
+<li>脚本执行：执行粒度包括完整模式和分步部署模式</li>
+</ul>
+<h3 id="技术难点">技术难点</h3>
+<ul>
+<li>规划脚本和数据存放目录和执行规则，以满足执行完整脚本时同样的逻辑</li>
+</ul>
+<h2 id="七目录结构">七、目录结构</h2>
+<h3 id="旧目录结构说明">旧目录结构说明</h3>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span>.
+<span class="ln"> 2</span>├── app
+<span class="ln"> 3</span>│   ├── cloudt
+<span class="ln"> 4</span>│   │   └── PTC
+<span class="ln"> 5</span>│   │       └── 0.0.1
+<span class="ln"> 6</span>│   │           ├── group_vars
+<span class="ln"> 7</span>│   │           ├── hosts.yaml
+<span class="ln"> 8</span>│   │           ├── inventory
+<span class="ln"> 9</span>│   │           ├── playbook.yaml
+<span class="ln">10</span>│   │           ├── properties.yaml
+<span class="ln">11</span>│   │           ├── roles
+<span class="ln">12</span>│   │           ├── stages.yaml
+<span class="ln">13</span>│   │           ├── start.yaml
+<span class="ln">14</span>│   │           ├── stop.yaml
+<span class="ln">15</span>│   │           └── verify.yaml
+<span class="ln">16</span>│   └── cornerstone
+<span class="ln">17</span>│       ├── Kubernetes
+<span class="ln">18</span>│       └── MySQL
+<span class="ln">19</span>│           └── bin-5.7.21
+<span class="ln">20</span>│               ├── group_vars
+<span class="ln">21</span>│               ├── hosts.yaml
+<span class="ln">22</span>│               ├── inventory
+<span class="ln">23</span>│               ├── playbook.yaml
+<span class="ln">24</span>│               ├── properties.yaml
+<span class="ln">25</span>│               ├── roles
+<span class="ln">26</span>│               ├── stages.yaml
+<span class="ln">27</span>│               ├── start.yaml
+<span class="ln">28</span>│               ├── stop.yaml
+<span class="ln">29</span>│               └── verify.yaml
+<span class="ln">30</span>└── project
+<span class="ln">31</span>    ├── bimface-project
+<span class="ln">32</span>    └── cloudt-project
+<span class="ln">33</span>        ├── de5UPz0Z
+<span class="ln">34</span>        │   ├── post_deploy
+<span class="ln">35</span>        │   │   └── run.sh
+<span class="ln">36</span>        │   └── pre_deploy
+<span class="ln">37</span>        │       └── run.sh
+<span class="ln">38</span>        ├── project.json
+<span class="ln">39</span>        └── zCE4KP0U
+<span class="ln">40</span>            ├── post_deploy
+<span class="ln">41</span>            │   └── run.sh
+<span class="ln">42</span>            └── pre_deploy
+<span class="ln">43</span>                └── run.sh
+</code></pre></div><h3 id="新目录结构说明">新目录结构说明</h3>
+<ul>
+<li>app：只存放房角石官方提供的、完整上架的ansible脚本</li>
+<li>stage：只存放房角石官方提供的、模板上架用的ansible模板脚本</li>
+<li>app-resource：只存放产品组通过模板组装方式的资源文件</li>
+<li>project：存放项目相关数据，如果版本拖拽到项目中生成实例后，相关数据被覆盖，就在对应实例目录下存放实例特有的数据。当实例下没有数据时，说明使用的是版本的数据（app_resource目录下）</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-fallback" data-lang="fallback"><span class="ln"> 1</span>└── cornerstone-ansible-playbook
+<span class="ln"> 2</span>    ├── app
+<span class="ln"> 3</span>    │   └── cornerstone
+<span class="ln"> 4</span>    │       ├── Kubernetes
+<span class="ln"> 5</span>    │       └── MySQL
+<span class="ln"> 6</span>    │           └── bin-5.7.21
+<span class="ln"> 7</span>    │               ├── group_vars
+<span class="ln"> 8</span>    │               ├── hosts.yaml
+<span class="ln"> 9</span>    │               ├── inventory
+<span class="ln">10</span>    │               ├── playbook.yaml
+<span class="ln">11</span>    │               ├── properties.yaml
+<span class="ln">12</span>    │               ├── roles
+<span class="ln">13</span>    │               ├── stages.yaml
+<span class="ln">14</span>    │               ├── start.yaml
+<span class="ln">15</span>    │               ├── stop.yaml
+<span class="ln">16</span>    │               └── verify.yaml
+<span class="ln">17</span>    ├── app-resource
+<span class="ln">18</span>    │   └── cloudt
+<span class="ln">19</span>    │       └── PTC
+<span class="ln">20</span>    │           └── 0.0.1
+<span class="ln">21</span>    │               ├── k8s_app_init
+<span class="ln">22</span>    │               │   └── k8s-yaml-2020-0430.zip
+<span class="ln">23</span>    │               └── mysql_init
+<span class="ln">24</span>    │                   └── sql-2020-0430.zip
+<span class="ln">25</span>    ├── project
+<span class="ln">26</span>    │   ├── bimface-project
+<span class="ln">27</span>    │   └── cloudt-project
+<span class="ln">28</span>    │       ├── de5UPz0Z
+<span class="ln">29</span>    │       │   ├── k8s_app_init
+<span class="ln">30</span>    │       │   │   └── k8s-yaml-2020-0431.zip
+<span class="ln">31</span>    │       │   ├── mysql_init
+<span class="ln">32</span>    │       │   │   └── sql-2020-0430.zip
+<span class="ln">33</span>    │       │   ├── post_deploy
+<span class="ln">34</span>    │       │   │   └── run.sh
+<span class="ln">35</span>    │       │   └── pre_deploy
+<span class="ln">36</span>    │       │       └── run.sh
+<span class="ln">37</span>    │       ├── project.json
+<span class="ln">38</span>    │       └── zCE4KP0U
+<span class="ln">39</span>    │           ├── post_deploy
+<span class="ln">40</span>    │           │   └── run.sh
+<span class="ln">41</span>    │           └── pre_deploy
+<span class="ln">42</span>    │               └── run.sh
+<span class="ln">43</span>    └── stage
+<span class="ln">44</span>        ├── k8s_app_init
+<span class="ln">45</span>        └── mysql_order_init
+<span class="ln">46</span>            └── 1.0.0
+<span class="ln">47</span>                ├── description.yaml
+<span class="ln">48</span>                ├── inventory
+<span class="ln">49</span>                ├── mysql_order_init.yaml
+<span class="ln">50</span>                ├── properties.yaml
+<span class="ln">51</span>                ├── roles
+<span class="ln">52</span>                └── tags.yaml
+<span class="ln">53</span>
+<span class="ln">54</span>
+</code></pre></div><h2 id="八projectjson">八、project.json</h2>
+<ul>
+<li>节点applicationInstances/instance-name节点下新增type字段，区分是之前的完整部署模式，还是stage部署模式</li>
+<li>节点applicationInstances/stages节点下新增properties、groups字段，记录每个模板的属性信息和节点分组信息</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-json" data-lang="json"><span class="ln">  1</span><span class="p">{</span>
+<span class="ln">  2</span>  <span class="nt">&#34;applicationInstances&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">  3</span>    <span class="nt">&#34;91Xo7qym&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">  4</span>      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;middleware&#34;</span><span class="p">,</span>
+<span class="ln">  5</span>      <span class="nt">&#34;applicationName&#34;</span><span class="p">:</span> <span class="s2">&#34;MySQL&#34;</span><span class="p">,</span>
+<span class="ln">  6</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">  7</span>      <span class="nt">&#34;groups&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">  8</span>        <span class="nt">&#34;mysql_cluster&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">  9</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;请选择mysql安装节点, 支持单节点部署, 集群部署时仅支持两个节点&#34;</span><span class="p">,</span>
+<span class="ln"> 10</span>          <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql集群分组&#34;</span><span class="p">,</span>
+<span class="ln"> 11</span>          <span class="nt">&#34;nodes&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln"> 12</span>            <span class="p">{</span>
+<span class="ln"> 13</span>              <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;group&#34;</span><span class="p">,</span>
+<span class="ln"> 14</span>              <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;group-mid-mysql&#34;</span>
+<span class="ln"> 15</span>            <span class="p">}</span>
+<span class="ln"> 16</span>          <span class="p">],</span>
+<span class="ln"> 17</span>          <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[]</span>
+<span class="ln"> 18</span>        <span class="p">}</span>
+<span class="ln"> 19</span>      <span class="p">},</span>
+<span class="ln"> 20</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln"> 21</span>      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;91Xo7qym&#34;</span><span class="p">,</span>
+<span class="ln"> 22</span>      <span class="nt">&#34;namespace&#34;</span><span class="p">:</span> <span class="s2">&#34;cornerstone&#34;</span><span class="p">,</span>
+<span class="ln"> 23</span>      <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/MySQL/bin-1.0.0&#34;</span><span class="p">,</span>
+<span class="ln"> 24</span>      <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln"> 25</span>        <span class="p">{</span>
+<span class="ln"> 26</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql连接地址(host)&#34;</span><span class="p">,</span>
+<span class="ln"> 27</span>          <span class="nt">&#34;key&#34;</span><span class="p">:</span> <span class="s2">&#34;_mysql_host&#34;</span><span class="p">,</span>
+<span class="ln"> 28</span>          <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql连接地址&#34;</span><span class="p">,</span>
+<span class="ln"> 29</span>          <span class="nt">&#34;required&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="ln"> 30</span>          <span class="nt">&#34;runtime&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="ln"> 31</span>          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span><span class="p">,</span>
+<span class="ln"> 32</span>          <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
+<span class="ln"> 33</span>        <span class="p">},</span>
+<span class="ln"> 34</span>        <span class="p">{</span>
+<span class="ln"> 35</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql端口&#34;</span><span class="p">,</span>
+<span class="ln"> 36</span>          <span class="nt">&#34;key&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql_port&#34;</span><span class="p">,</span>
+<span class="ln"> 37</span>          <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql端口&#34;</span><span class="p">,</span>
+<span class="ln"> 38</span>          <span class="nt">&#34;required&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="ln"> 39</span>          <span class="nt">&#34;runtime&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 40</span>          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span><span class="p">,</span>
+<span class="ln"> 41</span>          <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;3306&#34;</span>
+<span class="ln"> 42</span>        <span class="p">},</span>
+<span class="ln"> 43</span>        <span class="p">{</span>
+<span class="ln"> 44</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;请尽量设置复杂密码&#34;</span><span class="p">,</span>
+<span class="ln"> 45</span>          <span class="nt">&#34;key&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql_root_passwd&#34;</span><span class="p">,</span>
+<span class="ln"> 46</span>          <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql管理员密码&#34;</span><span class="p">,</span>
+<span class="ln"> 47</span>          <span class="nt">&#34;required&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="ln"> 48</span>          <span class="nt">&#34;runtime&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 49</span>          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span><span class="p">,</span>
+<span class="ln"> 50</span>          <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql@bimface.com&#34;</span>
+<span class="ln"> 51</span>        <span class="p">},</span>
+<span class="ln"> 52</span>        <span class="p">{</span>
+<span class="ln"> 53</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql管理员用户名称&#34;</span><span class="p">,</span>
+<span class="ln"> 54</span>          <span class="nt">&#34;key&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql_root_user&#34;</span><span class="p">,</span>
+<span class="ln"> 55</span>          <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql管理员用户&#34;</span><span class="p">,</span>
+<span class="ln"> 56</span>          <span class="nt">&#34;required&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="ln"> 57</span>          <span class="nt">&#34;runtime&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 58</span>          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span><span class="p">,</span>
+<span class="ln"> 59</span>          <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln"> 60</span>        <span class="p">},</span>
+<span class="ln"> 61</span>        <span class="p">{</span>
+<span class="ln"> 62</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;私有化仓库url地址&#34;</span><span class="p">,</span>
+<span class="ln"> 63</span>          <span class="nt">&#34;key&#34;</span><span class="p">:</span> <span class="s2">&#34;warehouse_url&#34;</span><span class="p">,</span>
+<span class="ln"> 64</span>          <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;私有化仓库url&#34;</span><span class="p">,</span>
+<span class="ln"> 65</span>          <span class="nt">&#34;required&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="ln"> 66</span>          <span class="nt">&#34;runtime&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 67</span>          <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span><span class="p">,</span>
+<span class="ln"> 68</span>          <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;css.glodon.com&#34;</span>
+<span class="ln"> 69</span>        <span class="p">}</span>
+<span class="ln"> 70</span>      <span class="p">],</span>
+<span class="ln"> 71</span>      <span class="nt">&#34;stages&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln"> 72</span>        <span class="p">{</span>
+<span class="ln"> 73</span>          <span class="nt">&#34;applicationInstanceId&#34;</span><span class="p">:</span> <span class="mi">100665</span><span class="p">,</span>
+<span class="ln"> 74</span>          <span class="nt">&#34;createTime&#34;</span><span class="p">:</span> <span class="s2">&#34;2020-08-19 13:47:01&#34;</span><span class="p">,</span>
+<span class="ln"> 75</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;启动服务&#34;</span><span class="p">,</span>
+<span class="ln"> 76</span>          <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">323544</span><span class="p">,</span>
+<span class="ln"> 77</span>          <span class="nt">&#34;playbook&#34;</span><span class="p">:</span> <span class="s2">&#34;start.yaml&#34;</span><span class="p">,</span>
+<span class="ln"> 78</span>          <span class="nt">&#34;selected&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 79</span>          <span class="nt">&#34;skipFailure&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 80</span>          <span class="nt">&#34;stage&#34;</span><span class="p">:</span> <span class="s2">&#34;启动服务&#34;</span><span class="p">,</span>
+<span class="ln"> 81</span>          <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">0</span>
+<span class="ln"> 82</span>        <span class="p">},</span>
+<span class="ln"> 83</span>        <span class="p">{</span>
+<span class="ln"> 84</span>          <span class="nt">&#34;applicationInstanceId&#34;</span><span class="p">:</span> <span class="mi">100665</span><span class="p">,</span>
+<span class="ln"> 85</span>          <span class="nt">&#34;createTime&#34;</span><span class="p">:</span> <span class="s2">&#34;2020-08-19 13:47:01&#34;</span><span class="p">,</span>
+<span class="ln"> 86</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;停止服务&#34;</span><span class="p">,</span>
+<span class="ln"> 87</span>          <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">323545</span><span class="p">,</span>
+<span class="ln"> 88</span>          <span class="nt">&#34;playbook&#34;</span><span class="p">:</span> <span class="s2">&#34;stop.yaml&#34;</span><span class="p">,</span>
+<span class="ln"> 89</span>          <span class="nt">&#34;selected&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 90</span>          <span class="nt">&#34;skipFailure&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln"> 91</span>          <span class="nt">&#34;stage&#34;</span><span class="p">:</span> <span class="s2">&#34;停止服务&#34;</span><span class="p">,</span>
+<span class="ln"> 92</span>          <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">0</span>
+<span class="ln"> 93</span>        <span class="p">},</span>
+<span class="ln"> 94</span>        <span class="p">{</span>
+<span class="ln"> 95</span>          <span class="nt">&#34;applicationInstanceId&#34;</span><span class="p">:</span> <span class="mi">100665</span><span class="p">,</span>
+<span class="ln"> 96</span>          <span class="nt">&#34;createTime&#34;</span><span class="p">:</span> <span class="s2">&#34;2020-08-19 13:47:01&#34;</span><span class="p">,</span>
+<span class="ln"> 97</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;检查服务状态, 并暴露动态参数&#34;</span><span class="p">,</span>
+<span class="ln"> 98</span>          <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">323546</span><span class="p">,</span>
+<span class="ln"> 99</span>          <span class="nt">&#34;playbook&#34;</span><span class="p">:</span> <span class="s2">&#34;verify.yaml&#34;</span><span class="p">,</span>
+<span class="ln">100</span>          <span class="nt">&#34;selected&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln">101</span>          <span class="nt">&#34;skipFailure&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln">102</span>          <span class="nt">&#34;stage&#34;</span><span class="p">:</span> <span class="s2">&#34;服务状态检查&#34;</span><span class="p">,</span>
+<span class="ln">103</span>          <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">0</span>
+<span class="ln">104</span>        <span class="p">}</span>
+<span class="ln">105</span>      <span class="p">],</span>
+<span class="ln">106</span>      <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="ln">107</span>      <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;bin-1.0.0&#34;</span>
+<span class="ln">108</span>    <span class="p">},</span>
+<span class="ln">109</span>    <span class="nt">&#34;2TAKkKZO&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">110</span>      <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;stage&#34;</span><span class="p">,</span>
+<span class="ln">111</span>      <span class="nt">&#34;applicationName&#34;</span><span class="p">:</span> <span class="s2">&#34;PTC&#34;</span><span class="p">,</span>
+<span class="ln">112</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">113</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">114</span>      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;2TAKkKZO&#34;</span><span class="p">,</span>
+<span class="ln">115</span>      <span class="nt">&#34;namespace&#34;</span><span class="p">:</span> <span class="s2">&#34;cornerstone&#34;</span><span class="p">,</span>
+<span class="ln">116</span>      <span class="nt">&#34;stages&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">117</span>        <span class="p">{</span>
+<span class="ln">118</span>          <span class="nt">&#34;applicationInstanceId&#34;</span><span class="p">:</span> <span class="mi">100668</span><span class="p">,</span>
+<span class="ln">119</span>          <span class="nt">&#34;createTime&#34;</span><span class="p">:</span> <span class="s2">&#34;2020-08-19 13:50:52&#34;</span><span class="p">,</span>
+<span class="ln">120</span>          <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;MySQL初始化&#34;</span><span class="p">,</span>
+<span class="ln">121</span>          <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">323553</span><span class="p">,</span>
+<span class="ln">122</span>          <span class="nt">&#34;playbook&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql_order_init.yaml&#34;</span><span class="p">,</span>
+<span class="ln">123</span>          <span class="nt">&#34;selected&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln">124</span>          <span class="nt">&#34;skipFailure&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln">125</span>          <span class="nt">&#34;stage&#34;</span><span class="p">:</span> <span class="s2">&#34;MySQL初始化&#34;</span><span class="p">,</span>
+<span class="ln">126</span>          <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln">127</span>          <span class="nt">&#34;properties&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">128</span>            <span class="p">{</span>
+<span class="ln">129</span>              <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql端口&#34;</span><span class="p">,</span>
+<span class="ln">130</span>              <span class="nt">&#34;key&#34;</span><span class="p">:</span> <span class="s2">&#34;port&#34;</span><span class="p">,</span>
+<span class="ln">131</span>              <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;端口&#34;</span><span class="p">,</span>
+<span class="ln">132</span>              <span class="nt">&#34;required&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="ln">133</span>              <span class="nt">&#34;runtime&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="ln">134</span>              <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;string&#34;</span><span class="p">,</span>
+<span class="ln">135</span>              <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
+<span class="ln">136</span>            <span class="p">}</span>
+<span class="ln">137</span>          <span class="p">],</span>
+<span class="ln">138</span>          <span class="nt">&#34;groups&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">139</span>            <span class="nt">&#34;vm_hosts&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">140</span>              <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;请选择需要初始化的虚拟主机&#34;</span><span class="p">,</span>
+<span class="ln">141</span>              <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;待初始化的虚拟主机&#34;</span><span class="p">,</span>
+<span class="ln">142</span>              <span class="nt">&#34;nodes&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">143</span>                <span class="p">{</span>
+<span class="ln">144</span>                  <span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;group&#34;</span><span class="p">,</span>
+<span class="ln">145</span>                  <span class="nt">&#34;value&#34;</span><span class="p">:</span> <span class="s2">&#34;group-mid-minio&#34;</span>
+<span class="ln">146</span>                <span class="p">}</span>
+<span class="ln">147</span>              <span class="p">],</span>
+<span class="ln">148</span>              <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[]</span>
+<span class="ln">149</span>            <span class="p">}</span>
+<span class="ln">150</span>          <span class="p">}</span>
+<span class="ln">151</span>        <span class="p">}</span>
+<span class="ln">152</span>      <span class="p">],</span>
+<span class="ln">153</span>      <span class="nt">&#34;status&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="ln">154</span>      <span class="nt">&#34;version&#34;</span><span class="p">:</span> <span class="s2">&#34;bin-1.0.0&#34;</span>
+<span class="ln">155</span>    <span class="p">}</span>
+<span class="ln">156</span>  <span class="p">},</span>
+<span class="ln">157</span>  <span class="nt">&#34;applicationTopology&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">158</span>    <span class="p">{</span>
+<span class="ln">159</span>      <span class="nt">&#34;dependencies&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">160</span>      <span class="nt">&#34;instanceName&#34;</span><span class="p">:</span> <span class="s2">&#34;91Xo7qym&#34;</span><span class="p">,</span>
+<span class="ln">161</span>      <span class="nt">&#34;instanceType&#34;</span><span class="p">:</span> <span class="s2">&#34;none&#34;</span><span class="p">,</span>
+<span class="ln">162</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
+<span class="ln">163</span>    <span class="p">},</span>
+<span class="ln">164</span>    <span class="p">{</span>
+<span class="ln">165</span>      <span class="nt">&#34;dependencies&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">166</span>      <span class="nt">&#34;instanceName&#34;</span><span class="p">:</span> <span class="s2">&#34;2TAKkKZO&#34;</span><span class="p">,</span>
+<span class="ln">167</span>      <span class="nt">&#34;instanceType&#34;</span><span class="p">:</span> <span class="s2">&#34;none&#34;</span><span class="p">,</span>
+<span class="ln">168</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span>
+<span class="ln">169</span>    <span class="p">}</span>
+<span class="ln">170</span>  <span class="p">],</span>
+<span class="ln">171</span>  <span class="nt">&#34;code&#34;</span><span class="p">:</span> <span class="s2">&#34;cloudt-project&#34;</span><span class="p">,</span>
+<span class="ln">172</span>  <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface_deploy_IDC&#34;</span><span class="p">,</span>
+<span class="ln">173</span>  <span class="nt">&#34;groups&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">174</span>    <span class="nt">&#34;group-mid-jdk&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">175</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;jdk部署机器&#34;</span><span class="p">,</span>
+<span class="ln">176</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;jdk部署机器&#34;</span><span class="p">,</span>
+<span class="ln">177</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">178</span>        <span class="s2">&#34;bimface-job-inf&#34;</span><span class="p">,</span>
+<span class="ln">179</span>        <span class="s2">&#34;bimface-data&#34;</span><span class="p">,</span>
+<span class="ln">180</span>        <span class="s2">&#34;bimface-file&#34;</span><span class="p">,</span>
+<span class="ln">181</span>        <span class="s2">&#34;bimface-api&#34;</span>
+<span class="ln">182</span>      <span class="p">]</span>
+<span class="ln">183</span>    <span class="p">},</span>
+<span class="ln">184</span>    <span class="nt">&#34;group-svc-inf&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">185</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;inf服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">186</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;inf服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">187</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">188</span>        <span class="s2">&#34;bimface-job-inf&#34;</span>
+<span class="ln">189</span>      <span class="p">]</span>
+<span class="ln">190</span>    <span class="p">},</span>
+<span class="ln">191</span>    <span class="nt">&#34;group-svc-job&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">192</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;job服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">193</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;job服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">194</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">195</span>        <span class="s2">&#34;bimface-job-inf&#34;</span>
+<span class="ln">196</span>      <span class="p">]</span>
+<span class="ln">197</span>    <span class="p">},</span>
+<span class="ln">198</span>    <span class="nt">&#34;group-mid-redis&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">199</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;redis部署机器&#34;</span><span class="p">,</span>
+<span class="ln">200</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;redis部署机器&#34;</span><span class="p">,</span>
+<span class="ln">201</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">202</span>        <span class="s2">&#34;bimface-middleware&#34;</span>
+<span class="ln">203</span>      <span class="p">]</span>
+<span class="ln">204</span>    <span class="p">},</span>
+<span class="ln">205</span>    <span class="nt">&#34;group-mid-minio&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">206</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;minio部署机器&#34;</span><span class="p">,</span>
+<span class="ln">207</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;minio部署机器&#34;</span><span class="p">,</span>
+<span class="ln">208</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">209</span>        <span class="s2">&#34;bimface-middleware&#34;</span>
+<span class="ln">210</span>      <span class="p">]</span>
+<span class="ln">211</span>    <span class="p">},</span>
+<span class="ln">212</span>    <span class="nt">&#34;group-svc-api&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">213</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;api服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">214</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;api服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">215</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">216</span>        <span class="s2">&#34;bimface-api&#34;</span>
+<span class="ln">217</span>      <span class="p">]</span>
+<span class="ln">218</span>    <span class="p">},</span>
+<span class="ln">219</span>    <span class="nt">&#34;group-svc-data&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">220</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;data服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">221</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;data服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">222</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">223</span>        <span class="s2">&#34;bimface-data&#34;</span>
+<span class="ln">224</span>      <span class="p">]</span>
+<span class="ln">225</span>    <span class="p">},</span>
+<span class="ln">226</span>    <span class="nt">&#34;group-mid-mysql&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">227</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql部署机器&#34;</span><span class="p">,</span>
+<span class="ln">228</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;mysql部署机器&#34;</span><span class="p">,</span>
+<span class="ln">229</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">230</span>        <span class="s2">&#34;bimface-middleware&#34;</span>
+<span class="ln">231</span>      <span class="p">]</span>
+<span class="ln">232</span>    <span class="p">},</span>
+<span class="ln">233</span>    <span class="nt">&#34;group-svc-file&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">234</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;file服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">235</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;file服务部署机器&#34;</span><span class="p">,</span>
+<span class="ln">236</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">237</span>        <span class="s2">&#34;bimface-file&#34;</span>
+<span class="ln">238</span>      <span class="p">]</span>
+<span class="ln">239</span>    <span class="p">},</span>
+<span class="ln">240</span>    <span class="nt">&#34;group-mid-mongo&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">241</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;mongo部署机器&#34;</span><span class="p">,</span>
+<span class="ln">242</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;mongo部署机器&#34;</span><span class="p">,</span>
+<span class="ln">243</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">244</span>        <span class="s2">&#34;bimface-middleware&#34;</span>
+<span class="ln">245</span>      <span class="p">]</span>
+<span class="ln">246</span>    <span class="p">},</span>
+<span class="ln">247</span>    <span class="nt">&#34;group-mid-nginx&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">248</span>      <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;nginx机器部署&#34;</span><span class="p">,</span>
+<span class="ln">249</span>      <span class="nt">&#34;label&#34;</span><span class="p">:</span> <span class="s2">&#34;nginx机器部署&#34;</span><span class="p">,</span>
+<span class="ln">250</span>      <span class="nt">&#34;nodeNames&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">251</span>        <span class="s2">&#34;bimface-nginx&#34;</span>
+<span class="ln">252</span>      <span class="p">]</span>
+<span class="ln">253</span>    <span class="p">}</span>
+<span class="ln">254</span>  <span class="p">},</span>
+<span class="ln">255</span>  <span class="nt">&#34;id&#34;</span><span class="p">:</span> <span class="mi">1827</span><span class="p">,</span>
+<span class="ln">256</span>  <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;cloudt-project&#34;</span><span class="p">,</span>
+<span class="ln">257</span>  <span class="nt">&#34;nodes&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">258</span>    <span class="nt">&#34;bimface-file&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">259</span>      <span class="nt">&#34;hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface-file&#34;</span><span class="p">,</span>
+<span class="ln">260</span>      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.197.249&#34;</span><span class="p">,</span>
+<span class="ln">261</span>      <span class="nt">&#34;password&#34;</span><span class="p">:</span> <span class="s2">&#34;IK!e30V!T@9jVkxY&#34;</span><span class="p">,</span>
+<span class="ln">262</span>      <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+<span class="ln">263</span>      <span class="nt">&#34;sshKey&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">264</span>      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">265</span>      <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln">266</span>    <span class="p">},</span>
+<span class="ln">267</span>    <span class="nt">&#34;bimface-data&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">268</span>      <span class="nt">&#34;hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface-data&#34;</span><span class="p">,</span>
+<span class="ln">269</span>      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.197.249&#34;</span><span class="p">,</span>
+<span class="ln">270</span>      <span class="nt">&#34;password&#34;</span><span class="p">:</span> <span class="s2">&#34;IK!e30V!T@9jVkxY&#34;</span><span class="p">,</span>
+<span class="ln">271</span>      <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+<span class="ln">272</span>      <span class="nt">&#34;sshKey&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">273</span>      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">274</span>      <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln">275</span>    <span class="p">},</span>
+<span class="ln">276</span>    <span class="nt">&#34;bimface-job-inf&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">277</span>      <span class="nt">&#34;hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface-job-inf&#34;</span><span class="p">,</span>
+<span class="ln">278</span>      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.198.25&#34;</span><span class="p">,</span>
+<span class="ln">279</span>      <span class="nt">&#34;password&#34;</span><span class="p">:</span> <span class="s2">&#34;-r3YPwteme-68ds-&#34;</span><span class="p">,</span>
+<span class="ln">280</span>      <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+<span class="ln">281</span>      <span class="nt">&#34;sshKey&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">282</span>      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">283</span>      <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln">284</span>    <span class="p">},</span>
+<span class="ln">285</span>    <span class="nt">&#34;bimface-middleware&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">286</span>      <span class="nt">&#34;hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface-middleware&#34;</span><span class="p">,</span>
+<span class="ln">287</span>      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.197.249&#34;</span><span class="p">,</span>
+<span class="ln">288</span>      <span class="nt">&#34;password&#34;</span><span class="p">:</span> <span class="s2">&#34;IK!e30V!T@9jVkxY&#34;</span><span class="p">,</span>
+<span class="ln">289</span>      <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+<span class="ln">290</span>      <span class="nt">&#34;sshKey&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">291</span>      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">292</span>      <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln">293</span>    <span class="p">},</span>
+<span class="ln">294</span>    <span class="nt">&#34;bimface-api&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">295</span>      <span class="nt">&#34;hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface-api&#34;</span><span class="p">,</span>
+<span class="ln">296</span>      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.198.21&#34;</span><span class="p">,</span>
+<span class="ln">297</span>      <span class="nt">&#34;password&#34;</span><span class="p">:</span> <span class="s2">&#34;GGTC7wE^-k@YESTS&#34;</span><span class="p">,</span>
+<span class="ln">298</span>      <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+<span class="ln">299</span>      <span class="nt">&#34;sshKey&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">300</span>      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">301</span>      <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln">302</span>    <span class="p">},</span>
+<span class="ln">303</span>    <span class="nt">&#34;bimface-nginx&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">304</span>      <span class="nt">&#34;hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface-nginx&#34;</span><span class="p">,</span>
+<span class="ln">305</span>      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.198.24&#34;</span><span class="p">,</span>
+<span class="ln">306</span>      <span class="nt">&#34;password&#34;</span><span class="p">:</span> <span class="s2">&#34;Y8z7MGDhjeij8jG8&#34;</span><span class="p">,</span>
+<span class="ln">307</span>      <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+<span class="ln">308</span>      <span class="nt">&#34;sshKey&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">309</span>      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">310</span>      <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln">311</span>    <span class="p">},</span>
+<span class="ln">312</span>    <span class="nt">&#34;bimface&#34;</span><span class="p">:</span> <span class="p">{</span>
+<span class="ln">313</span>      <span class="nt">&#34;hostname&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface&#34;</span><span class="p">,</span>
+<span class="ln">314</span>      <span class="nt">&#34;ip&#34;</span><span class="p">:</span> <span class="s2">&#34;10.0.198.15&#34;</span><span class="p">,</span>
+<span class="ln">315</span>      <span class="nt">&#34;password&#34;</span><span class="p">:</span> <span class="s2">&#34;Bm(4fbFfzkxwMz$S&#34;</span><span class="p">,</span>
+<span class="ln">316</span>      <span class="nt">&#34;port&#34;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+<span class="ln">317</span>      <span class="nt">&#34;sshKey&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">318</span>      <span class="nt">&#34;tags&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">319</span>      <span class="nt">&#34;user&#34;</span><span class="p">:</span> <span class="s2">&#34;root&#34;</span>
+<span class="ln">320</span>    <span class="p">}</span>
+<span class="ln">321</span>  <span class="p">},</span>
+<span class="ln">322</span>  <span class="nt">&#34;projectProperties&#34;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="ln">323</span>  <span class="nt">&#34;resources&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">324</span>    <span class="p">{</span>
+<span class="ln">325</span>      <span class="nt">&#34;directory&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface_deploy_IDC&#34;</span><span class="p">,</span>
+<span class="ln">326</span>      <span class="nt">&#34;files&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">327</span>        <span class="p">{</span>
+<span class="ln">328</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/api-bimface/v0.0.2/roles/mysql_init&#34;</span><span class="p">,</span>
+<span class="ln">329</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/roles_engine/mysql_init/0.0.1/stage.zip&#34;</span>
+<span class="ln">330</span>        <span class="p">},</span>
+<span class="ln">331</span>        <span class="p">{</span>
+<span class="ln">332</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/api-bimface/v0.0.2/roles/res/k8s_app_init&#34;</span><span class="p">,</span>
+<span class="ln">333</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/cloudt/mysql_init/sql.zip&#34;</span>
+<span class="ln">334</span>        <span class="p">},</span>
+<span class="ln">335</span>        <span class="p">{</span>
+<span class="ln">336</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/api-bimface/v0.0.2/roles/&#34;</span><span class="p">,</span>
+<span class="ln">337</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/api-bimface/v0.0.2/palybook.yaml&#34;</span>
+<span class="ln">338</span>        <span class="p">},</span>
+<span class="ln">339</span>        <span class="p">{</span>
+<span class="ln">340</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/api-bimface/v0.0.2/roles/k8s_app_init&#34;</span><span class="p">,</span>
+<span class="ln">341</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/roles_engine/k8s_app_init/0.0.1/stage.zip&#34;</span>
+<span class="ln">342</span>        <span class="p">},</span>
+<span class="ln">343</span>        <span class="p">{</span>
+<span class="ln">344</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/api-bimface/v0.0.2/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">345</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/api-bimface/v0.0.2/app.zip&#34;</span>
+<span class="ln">346</span>        <span class="p">},</span>
+<span class="ln">347</span>        <span class="p">{</span>
+<span class="ln">348</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/config-init-bimface/v0.0.1/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">349</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/config-init-bimface/v0.0.1/app.zip&#34;</span>
+<span class="ln">350</span>        <span class="p">},</span>
+<span class="ln">351</span>        <span class="p">{</span>
+<span class="ln">352</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/data-bimface/v0.0.2/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">353</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/data-bimface/v0.0.2/app.zip&#34;</span>
+<span class="ln">354</span>        <span class="p">},</span>
+<span class="ln">355</span>        <span class="p">{</span>
+<span class="ln">356</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/file-bimface/v0.0.3/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">357</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/file-bimface/v0.0.3/app.zip&#34;</span>
+<span class="ln">358</span>        <span class="p">},</span>
+<span class="ln">359</span>        <span class="p">{</span>
+<span class="ln">360</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/inf-bimface/v0.0.2/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">361</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/inf-bimface/v0.0.2/app.zip&#34;</span>
+<span class="ln">362</span>        <span class="p">},</span>
+<span class="ln">363</span>        <span class="p">{</span>
+<span class="ln">364</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/job-bimface/v0.0.2/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">365</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/job-bimface/v0.0.2/app.zip&#34;</span>
+<span class="ln">366</span>        <span class="p">},</span>
+<span class="ln">367</span>        <span class="p">{</span>
+<span class="ln">368</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/minio-init-bimface/v0.0.1/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">369</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/minio-init-bimface/v0.0.1/app.zip&#34;</span>
+<span class="ln">370</span>        <span class="p">},</span>
+<span class="ln">371</span>        <span class="p">{</span>
+<span class="ln">372</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/mongo-init-bimface/v0.0.2/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">373</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/mongo-init-bimface/v0.0.2/app.zip&#34;</span>
+<span class="ln">374</span>        <span class="p">},</span>
+<span class="ln">375</span>        <span class="p">{</span>
+<span class="ln">376</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/bimface/nginx-init-bimface/v0.0.1/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">377</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/bimface/nginx-init-bimface/v0.0.1/app.zip&#34;</span>
+<span class="ln">378</span>        <span class="p">},</span>
+<span class="ln">379</span>        <span class="p">{</span>
+<span class="ln">380</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/MinIO/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">381</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/cornerstone/MinIO/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">382</span>        <span class="p">},</span>
+<span class="ln">383</span>        <span class="p">{</span>
+<span class="ln">384</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/MongoDB/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">385</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/cornerstone/MongoDB/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">386</span>        <span class="p">},</span>
+<span class="ln">387</span>        <span class="p">{</span>
+<span class="ln">388</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/MySQL/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">389</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/cornerstone/MySQL/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">390</span>        <span class="p">},</span>
+<span class="ln">391</span>        <span class="p">{</span>
+<span class="ln">392</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/Nginx/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">393</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/cornerstone/Nginx/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">394</span>        <span class="p">},</span>
+<span class="ln">395</span>        <span class="p">{</span>
+<span class="ln">396</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/OpenJDK/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">397</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/cornerstone/OpenJDK/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">398</span>        <span class="p">},</span>
+<span class="ln">399</span>        <span class="p">{</span>
+<span class="ln">400</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/Redis/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">401</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/cornerstone/Redis/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">402</span>        <span class="p">},</span>
+<span class="ln">403</span>        <span class="p">{</span>
+<span class="ln">404</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;app/cornerstone/sys-init/1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">405</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/app/cornerstone/sys-init/1.0.0/app.zip&#34;</span>
+<span class="ln">406</span>        <span class="p">},</span>
+<span class="ln">407</span>        <span class="p">{</span>
+<span class="ln">408</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;project/QAtest-03/bimface_deploy_IDC/de5UPz0Z/res/post_deploy/run.sh&#34;</span><span class="p">,</span>
+<span class="ln">409</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/project/QAtest-03/bimface_deploy_IDC/de5UPz0Z/res/post_deploy/run.sh&#34;</span>
+<span class="ln">410</span>        <span class="p">},</span>
+<span class="ln">411</span>        <span class="p">{</span>
+<span class="ln">412</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;project/QAtest-03/bimface_deploy_IDC/de5UPz0Z/res/pre_deploy/run.sh&#34;</span><span class="p">,</span>
+<span class="ln">413</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/project/QAtest-03/bimface_deploy_IDC/de5UPz0Z/res/pre_deploy/run.sh&#34;</span>
+<span class="ln">414</span>        <span class="p">},</span>
+<span class="ln">415</span>        <span class="p">{</span>
+<span class="ln">416</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;project/QAtest-03/bimface_deploy_IDC/zCE4KP0U/res/post_deploy/run.sh&#34;</span><span class="p">,</span>
+<span class="ln">417</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/project/QAtest-03/bimface_deploy_IDC/zCE4KP0U/res/post_deploy/run.sh&#34;</span>
+<span class="ln">418</span>        <span class="p">},</span>
+<span class="ln">419</span>        <span class="p">{</span>
+<span class="ln">420</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;project/QAtest-03/bimface_deploy_IDC/zCE4KP0U/res/pre_deploy/run.sh&#34;</span><span class="p">,</span>
+<span class="ln">421</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/project/QAtest-03/bimface_deploy_IDC/zCE4KP0U/res/pre_deploy/run.sh&#34;</span>
+<span class="ln">422</span>        <span class="p">},</span>
+<span class="ln">423</span>        <span class="p">{</span>
+<span class="ln">424</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;project/QAtest-03/bimface_deploy_IDC/project.json&#34;</span><span class="p">,</span>
+<span class="ln">425</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/project/QAtest-03/bimface_deploy_IDC/project.json&#34;</span>
+<span class="ln">426</span>        <span class="p">}</span>
+<span class="ln">427</span>      <span class="p">],</span>
+<span class="ln">428</span>      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;bimface_deploy_IDC&#34;</span><span class="p">,</span>
+<span class="ln">429</span>      <span class="nt">&#34;packageType&#34;</span><span class="p">:</span> <span class="s2">&#34;zip&#34;</span>
+<span class="ln">430</span>    <span class="p">},</span>
+<span class="ln">431</span>    <span class="p">{</span>
+<span class="ln">432</span>      <span class="nt">&#34;directory&#34;</span><span class="p">:</span> <span class="s2">&#34;cse&#34;</span><span class="p">,</span>
+<span class="ln">433</span>      <span class="nt">&#34;files&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">434</span>        <span class="p">{</span>
+<span class="ln">435</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;binary/cornerstone/MinIO/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">436</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/binary/cornerstone/MinIO/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">437</span>        <span class="p">},</span>
+<span class="ln">438</span>        <span class="p">{</span>
+<span class="ln">439</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;binary/cornerstone/MongoDB/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">440</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/binary/cornerstone/MongoDB/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">441</span>        <span class="p">},</span>
+<span class="ln">442</span>        <span class="p">{</span>
+<span class="ln">443</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;binary/cornerstone/MySQL/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">444</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/binary/cornerstone/MySQL/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">445</span>        <span class="p">},</span>
+<span class="ln">446</span>        <span class="p">{</span>
+<span class="ln">447</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;binary/cornerstone/OpenJDK/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">448</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/binary/cornerstone/OpenJDK/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">449</span>        <span class="p">},</span>
+<span class="ln">450</span>        <span class="p">{</span>
+<span class="ln">451</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;binary/cornerstone/Redis/bin-1.0.0/app.zip&#34;</span><span class="p">,</span>
+<span class="ln">452</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/binary/cornerstone/Redis/bin-1.0.0/app.zip&#34;</span>
+<span class="ln">453</span>        <span class="p">}</span>
+<span class="ln">454</span>      <span class="p">],</span>
+<span class="ln">455</span>      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;binary&#34;</span><span class="p">,</span>
+<span class="ln">456</span>      <span class="nt">&#34;packageType&#34;</span><span class="p">:</span> <span class="s2">&#34;zip&#34;</span>
+<span class="ln">457</span>    <span class="p">},</span>
+<span class="ln">458</span>    <span class="p">{</span>
+<span class="ln">459</span>      <span class="nt">&#34;directory&#34;</span><span class="p">:</span> <span class="s2">&#34;cse&#34;</span><span class="p">,</span>
+<span class="ln">460</span>      <span class="nt">&#34;files&#34;</span><span class="p">:</span> <span class="p">[</span>
+<span class="ln">461</span>        <span class="p">{</span>
+<span class="ln">462</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">463</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/cse/installer/installer.tar.gz&#34;</span>
+<span class="ln">464</span>        <span class="p">},</span>
+<span class="ln">465</span>        <span class="p">{</span>
+<span class="ln">466</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">467</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/yum-repo/yum-repo.zip&#34;</span>
+<span class="ln">468</span>        <span class="p">},</span>
+<span class="ln">469</span>        <span class="p">{</span>
+<span class="ln">470</span>          <span class="nt">&#34;path&#34;</span><span class="p">:</span> <span class="s2">&#34;&#34;</span><span class="p">,</span>
+<span class="ln">471</span>          <span class="nt">&#34;url&#34;</span><span class="p">:</span> <span class="s2">&#34;https://obs.cn-north-4.myhuaweicloud.com/cornerstone-app-qa/cse/installer/install.sh&#34;</span>
+<span class="ln">472</span>        <span class="p">}</span>
+<span class="ln">473</span>      <span class="p">],</span>
+<span class="ln">474</span>      <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;cse&#34;</span><span class="p">,</span>
+<span class="ln">475</span>      <span class="nt">&#34;packageType&#34;</span><span class="p">:</span> <span class="s2">&#34;tar.gz&#34;</span>
+<span class="ln">476</span>    <span class="p">}</span>
+<span class="ln">477</span>  <span class="p">]</span>
+<span class="ln">478</span><span class="p">}</span>
+</code></pre></div><h2 id="九部署流程">九、部署流程</h2>
+<blockquote>
+<p>部署前按照规则自动组装脚本的一个难点是：需要让脚本知道它的数据在哪？完整上架的时候，数据放在固定目录下，脚本到写死的目录下去寻找。新的方式因为数据目录的动态改变的，需要将这个属性动态传给脚本。</p>
+</blockquote>
+<ul>
+<li>动态将每个实例的resource资源路径作为属性传进去，ansible脚本执行时，有了脚本和资源路径，就可以正确执行了。</li>
+<li>为了兼容完整上架的中间件部署，需要区分每种实例的部署方式。</li>
+<li>每种模板脚本属性约定好规则：名字都取名为data_path，替代默认的mysql_init_data_path等名字。便于project.json中动态传入这个属性的资源地址</li>
+</ul>
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">查看更多</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go协程原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+      </li>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/" class="nav-link">java基础-集合框架</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/" class="nav-link">k8s源码分析- kube-apiserver</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/" class="nav-link">k8s源码分析： kube-scheduler</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/net-http/" class="nav-link">Golang http请求源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/" class="nav-link">go协程入门</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>4</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent">
+          博客搭建
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>22</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>9</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
+          CLIENT-GO
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">All tags</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent" data-position=11>BREAKPAD<span class='button_tally'>11</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=3>CLIENT-GO<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent" data-position=9>GO<span class='button_tally'>9</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent" data-position=8>GO基础入门<span class='button_tally'>8</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=1>GO第三方库<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent" data-position=1>INDEX<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=5>JAVA基础<span class='button_tally'>5</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=10>K8S<span class='button_tally'>10</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=2>MYSQL<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=22>源码分析<span class='button_tally'>22</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script type="text/javascript" src = "https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous"></script>
+  </body>
+</html>

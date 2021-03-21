@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.75.0-DEV" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="一、业务场景和现状分析 1. 目前房角石所处的角色 图片链接地址 2. 完整的部署流程 目前真正到客户现场实施私有化的产品有： bimface：在没有房角石之">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/devops/%E9%83%A8%E7%BD%B2%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90%E5%92%8C%E5%B8%B8%E7%94%A8%E9%83%A8%E7%BD%B2%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94/" />
+<meta property = "og:title" content = "" />
+<meta property = "og:description" content = "一、业务场景和现状分析 1. 目前房角石所处的角色 图片链接地址 2. 完整的部署流程 目前真正到客户现场实施私有化的产品有： bimface：在没有房角石之" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/devops/%E9%83%A8%E7%BD%B2%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90%E5%92%8C%E5%B8%B8%E7%94%A8%E9%83%A8%E7%BD%B2%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94/'>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity = "sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" as="script" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous">
+
+    
+    <link rel="stylesheet" type="text/css" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity="sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" crossorigin="anonymous">
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <div>
+          <svg class="icon">
+            <use xlink:href="#open-menu"></use>
+          </svg>
+          <svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg>
+        </div>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>Mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>Redis</a>
+          <a href = 'https://kinnylee.github.io/categories/rocketmq' class = 'nav_child nav_item'>RocketMQ</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/categories/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/docker' class = 'nav_child nav_item'>Docker</a>
+          <a href = 'https://kinnylee.github.io/categories/linux' class = 'nav_child nav_item'>Linux内核</a>
+          <a href = 'https://kinnylee.github.io/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0' class = 'nav_child nav_item'>机器学习</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'></h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Jan 1, 0001</span>
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 3722 字</span>，阅读约<span class="more-meta"> 8 分钟</span>
+    <div class='post_share'>
+  | 复制链接:
+  <a href="https://kinnylee.github.io/post/devops/%E9%83%A8%E7%BD%B2%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90%E5%92%8C%E5%B8%B8%E7%94%A8%E9%83%A8%E7%BD%B2%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    <h1 id="一业务场景和现状分析">一、业务场景和现状分析</h1>
+<h3 id="1-目前房角石所处的角色">1. 目前房角石所处的角色</h3>
+<p><a href="https://www.processon.com/view/link/6007c35e0791294a0e9a13ea">图片链接地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/6007ae150791294a0e99e9b6.png" alt="研发运维流程"></p>
+<h3 id="2-完整的部署流程">2. 完整的部署流程</h3>
+<p>目前真正到客户现场实施私有化的产品有：</p>
+<ul>
+<li>bimface：在没有房角石之前，就有一套自己的部署方案。房角石出来后，也没有真正用起来。</li>
+<li>geps：没有房角石之前，手工部署过。房角石出来后，使用房角石部署过好几家。</li>
+<li>施工：房角石做出来后，才开始到用户现场做私有化部署</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>执行的操作</th>
+<th>公有云部署</th>
+<th>私有化部署期望提供该功能的客户</th>
+<th>施工私有化部署</th>
+<th>bimface私有化部署</th>
+<th>没有房角石时geps的实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k8s集群安装</td>
+<td>买实例</td>
+<td>施工3+8、geps</td>
+<td>使用房角石</td>
+<td>（没有用到）</td>
+<td>手工部署</td>
+</tr>
+<tr>
+<td>jdk安装</td>
+<td>手动部署一次</td>
+<td>bimface、施工筑联</td>
+<td></td>
+<td>shell脚本</td>
+<td>（没有用到）</td>
+</tr>
+<tr>
+<td>mysql安装</td>
+<td>买实例</td>
+<td>施工3+8、bimface</td>
+<td>使用房角石</td>
+<td>shell脚本</td>
+<td>（没有用到、安装在容器中）</td>
+</tr>
+<tr>
+<td>存储安装（对象存储minio、块存储nfs）</td>
+<td>手动操作</td>
+<td>施工3+8、bimface</td>
+<td>使用阿里云oss</td>
+<td>shell脚本部署minio</td>
+<td>手动部署nfs</td>
+</tr>
+<tr>
+<td>mysql数据初始化</td>
+<td>运维mysql审核平台 or 手动操作</td>
+<td>施工3+8</td>
+<td>shell脚本 or 手工</td>
+<td>1. 第一个版本：shell脚本 <!-- raw HTML omitted --> 2. 后续版本：代码自动实现</td>
+<td>1. 第一个版本手动初始化<!-- raw HTML omitted -->2. 后续版本：代码自动实现</td>
+</tr>
+<tr>
+<td>对象存储初始化：创建bucket</td>
+<td>手动操作</td>
+<td>施工部分产品、Bimface</td>
+<td>shell脚本 or 手工</td>
+<td>shell脚本</td>
+<td></td>
+</tr>
+<tr>
+<td>对象存储初始化：往bucket插入初始数据</td>
+<td>手动操作</td>
+<td>施工部分产品</td>
+<td></td>
+<td>服务部署成功后，调用api实现</td>
+<td></td>
+</tr>
+<tr>
+<td>mongodb初始化</td>
+<td>手动操作</td>
+<td>施工部分产品</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>apollo初始化</td>
+<td>手动操作</td>
+<td>施工部分产品</td>
+<td>手动修改</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>zookeeper初始化</td>
+<td>手动操作</td>
+<td>施工部分产品</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>nginx初始化</td>
+<td>手动操作</td>
+<td>施工部分产品</td>
+<td>手动修改</td>
+<td>手动修改</td>
+<td></td>
+</tr>
+<tr>
+<td>服务配置文件初始化</td>
+<td>手动操作</td>
+<td>施工、bimface</td>
+<td></td>
+<td>手动修改</td>
+<td></td>
+</tr>
+<tr>
+<td>部署服务</td>
+<td>jenkins or 手动</td>
+<td>所有产品</td>
+<td>shell脚本</td>
+<td>shell脚本</td>
+<td>手工部署</td>
+</tr>
+<tr>
+<td>部署后的数据初始化</td>
+<td>手动操作</td>
+<td>施工、bimface</td>
+<td></td>
+<td>服务部署成功后，调用api实现</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-应用的部署方式">3. 应用的部署方式</h3>
+<table>
+<thead>
+<tr>
+<th>部署方式</th>
+<th>期望提供功能的客户</th>
+<th>施工实施私有化的实现</th>
+<th>没有房角石时bimface的实现</th>
+<th>没有房角石时geps的实现</th>
+<th>分析</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k8s-yaml</td>
+<td>施工3+8、geps</td>
+<td>手动部署</td>
+<td>不需要</td>
+<td>手动部署</td>
+<td>k8s作为云原生时代的操作系统，业务迁入k8s必然是将来的趋势</td>
+</tr>
+<tr>
+<td>k8s-helm</td>
+<td>AECore</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>jar</td>
+<td>AECore、Bimface、建设方、电子政务</td>
+<td></td>
+<td>shell脚本启动</td>
+<td></td>
+<td>公司大部分产品还没有容器化，jar包部署会是常态</td>
+</tr>
+<tr>
+<td>war</td>
+<td>Bimface老版本</td>
+<td></td>
+<td>shell脚本启动</td>
+<td></td>
+<td>技术栈比较老的产品，这种产品应该比较少</td>
+</tr>
+<tr>
+<td>docker</td>
+<td>筑联平台<!-- raw HTML omitted -->（新的可能已经改造成k8s-yaml）</td>
+<td>筑联还未私有化</td>
+<td></td>
+<td></td>
+<td>docker本身不具备编排能力，而服务一般不会简单就一个镜像，预计单独通过docker动服务应该比较少</td>
+</tr>
+<tr>
+<td>docker-compose</td>
+<td>房角石</td>
+<td></td>
+<td></td>
+<td></td>
+<td>对于一些并没有完全改造为k8s，docker-compose具备编排能力，能满足大部分想往容器化改造、且不是单体应用的产品。这种客户应该也不少</td>
+</tr>
+<tr>
+<td>python</td>
+<td>AECore</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>nodejs</td>
+<td>AECore</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>shell</td>
+<td>bimface</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="heading"></h2>
+<h2 id="二房角石的定位">二、房角石的定位</h2>
+<h3 id="1-房角石目前持续提供的能力">1. 房角石目前持续提供的能力</h3>
+<ul>
+<li>私有云、中间件部署</li>
+</ul>
+<h3 id="2-房角石的职责边界包括上述哪些内容">2. 房角石的职责边界包括上述哪些内容？</h3>
+<ul>
+<li>负责数据初始化吗？还是借鉴bimface和geps方案，业务自己做改造，通过代码自动实现？</li>
+<li>应用部署是只提供执行命令的通道？还是针对大部分部署方式提供通用操作？</li>
+</ul>
+<h3 id="3-业务线面临什么问题-vs-谁能解决这些问题">3. 业务线面临什么问题 vs 谁能解决这些问题</h3>
+<table>
+<thead>
+<tr>
+<th>面临的问题</th>
+<th>现有工具如何解决</th>
+<th>房角石应不应该解决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>将上述流程串联起来的流水线</td>
+<td>jenkins等</td>
+<td>比jenkins优势在哪？<!-- raw HTML omitted -->集中式管理、数字化运营</td>
+</tr>
+<tr>
+<td>诸多私有化客户的管理：项目、主机、服务版本、部署脚本等</td>
+<td>无</td>
+<td>应该</td>
+</tr>
+<tr>
+<td>版本不断迭代带来的数据（sql、nginx、业务配置）变更问题</td>
+<td>脚本化</td>
+<td>不应该。作为通用系统，不应该帮业务去写脚本，应该实现通用功能</td>
+</tr>
+<tr>
+<td>版本不断迭代带来的服务部署问题</td>
+<td>jenkins</td>
+<td>比jenkins优势在哪</td>
+</tr>
+<tr>
+<td>数据回滚（sql、nginx、业务配置等）</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>服务回滚</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>灰度发布</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="三常见部署工具-vs-能解决哪步业务问题">三、常见部署工具 vs 能解决哪步业务问题</h2>
+<h3 id="1-工具对比">1. 工具对比</h3>
+<table>
+<thead>
+<tr>
+<th>工具名称</th>
+<th>核心功能</th>
+<th>概述</th>
+<th>特点</th>
+<th>能解决上述哪一步</th>
+<th>不支持上述哪些步骤</th>
+<th>语言</th>
+<th>其他说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jenkins</td>
+<td>流水线</td>
+<td>1. 一款由<a href="https://zh.wikipedia.org/wiki/Java">Java</a>编写的<a href="https://zh.wikipedia.org/wiki/%E5%BC%80%E6%BA%90">开源</a>的[持续集成（ci、cd）工具<!-- raw HTML omitted -->2. 用于自动化各种任务，包括构建、测试和部署软件</td>
+<td>1. 丰富的插件生态 <!-- raw HTML omitted -->2. 支持SCM（git、svn等）<!-- raw HTML omitted -->3. 支持手动触发和自动触发</td>
+<td>串联流水线</td>
+<td></td>
+<td>java</td>
+<td>使用最广泛，腾讯coding平台ci基于此开发</td>
+</tr>
+<tr>
+<td>阿里云效</td>
+<td>devops平台</td>
+<td>云原生时代新DevOps平台，支持公共云、专有云和混合云多种部署形态</td>
+<td>1. 从代码到部署的整个生命周期<!-- raw HTML omitted -->2. 丰富的任务模板，几乎囊括所有常见的ci、cd步骤<!-- raw HTML omitted -->3. 漂亮的可视化界面</td>
+<td>1. 串联流水线<!-- raw HTML omitted -->2. 所有应用部署</td>
+<td>1. 数据初始化</td>
+<td></td>
+<td>付费产品</td>
+</tr>
+<tr>
+<td>腾讯蓝鲸</td>
+<td>云平台</td>
+<td>包括一整套全家桶：BK-CI（ci\cd）、BK-BCS(微服务编排平台)、BK-BCS-SAAS（容器平台）、BK-PAAS(应用开发平台)、BK-SOPS（运维平台）</td>
+<td></td>
+<td></td>
+<td></td>
+<td>1. Cmdb配置管理平台-golang<!-- raw HTML omitted --> 2. paas平台-python，vue<!-- raw HTML omitted --> 3. ci平台-kotlin，lua,go,java<!-- raw HTML omitted -->4. Bcs-saas云容器管理平台：python，go<!-- raw HTML omitted -->5. ops运维平台：python<!-- raw HTML omitted --> 6. bcs容器管理平台：go</td>
+<td></td>
+</tr>
+<tr>
+<td>腾讯coding平台</td>
+<td>devops平台</td>
+<td>基于jenkins做ci<!-- raw HTML omitted -->基于spinnaker做cd</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Tekton</td>
+<td>流水线</td>
+<td>是一个功能强大且灵活的开源框架，用于创建CI / CD系统，允许开发人员跨云提供商和本地系统构建，测试和部署</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Spinnaker</td>
+<td>流水线</td>
+<td>是一个开源的持续交付平台，使开发人员能够拥有从提交到交付的应用程序代码</td>
+<td>专注于多云平台的CD</td>
+<td></td>
+<td></td>
+<td></td>
+<td>腾讯coding平台的持续部署功能基于这个组件做的二次开发</td>
+</tr>
+<tr>
+<td>Jenkinsx</td>
+<td>流水线</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Drone</td>
+<td></td>
+<td>一个容器原生的持续交付平台</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ArgoCD</td>
+<td>k8s应用部署</td>
+<td>声明式、gitops持续集成工具。<a href="https://kubeoperator.io/docs/guidelines/argocd/">中文文档</a></td>
+<td>可在 Git 存储库更改时自动同步和部署应用程序。应用程序定义，配置和环境应该是声明性的，并且受版本控制。应用程序部署和生命周期管理应是自动化的，可审核的且易于理解的。<!-- raw HTML omitted -->1. 自动部署k8s应用到指定环境<!-- raw HTML omitted -->2. 支持多种k8s部署方式：yaml、helm、kustomize等<!-- raw HTML omitted --> 3. 支持多集群部署<!-- raw HTML omitted -->4. 支持服务回滚、健康检查<!-- raw HTML omitted --> 5. 支持监控</td>
+<td></td>
+<td>1. 不支持jar、docker等其他部署方式<!-- raw HTML omitted --> 2. 不处理数据和配置初始化</td>
+<td>go，k8s的crd</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/GoogleContainerTools/skaffold">skaffold</a></td>
+<td>gitops</td>
+<td>Easy and Repeatable Kubernetes Development</td>
+<td><code>Skaffold</code>是一款命令行工具，旨在促进<code>Kubernetes</code>应用的持续开发。你可以在本地迭代应用源码，然后将其部署到本地或者远程<code>Kubernetes</code>集群中。<code>Skaffold</code>会处理构建、上传和应用部署方面的工作流。它通用可以在自动化环境中使用，例如<code>CI/CD</code>流水线，以实施同样的工作流，并作为将应用迁移到生产环境时的工具</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/fluxcd/flux">flux</a></td>
+<td>gitops</td>
+<td>The GitOps Kubernetes operator</td>
+<td>是一个通过git管理和同步Kubernetes部署状态的支持GitOps的工具，用于完成Docker镜像库与Kubernetes运行时的CD（持续交付）阶段工作的自动化</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>rancher</td>
+<td>k8s应用部署</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>openpitrix</td>
+<td>k8s应用部署</td>
+<td><a href="https://www.oschina.net/p/openpitrix">多云环境应用管理平台</a></td>
+<td>企业可能有各种类型的应用需要管理，包括传统的应用，像数据库、Tomcat、Hadoop，还有基于微服务架构的应用、以及近来发展迅猛的 Serverless 应用等。企业需要一个可以管理不同类型应用程序的一站式管理平台。基于 OpenPitrix 可以将任何应用以任何规模部署到任何基础设施上面，对开发者来说就是 Build once and run anywhere。</td>
+<td></td>
+<td></td>
+<td>Go</td>
+<td>房角石很多功能是对标openpitrix去设计的，但是只学到了皮毛</td>
+</tr>
+<tr>
+<td>walle</td>
+<td>通用应用部署</td>
+<td>Devops开源项目代码部署平台</td>
+<td>1. 支持多项目、多环境一键部署上线，一键快速回滚<!-- raw HTML omitted -->2. 上线单申请、审核、部署、实时操作日志<!-- raw HTML omitted -->3. 支持多个hook点，可以在部署前后插入自定义逻辑</td>
+<td>1. 串联流水线</td>
+<td></td>
+<td>python，fabric</td>
+<td>github上关注度挺高的，但是2020年好像就没再维护了，好多issue上的bug无人问津</td>
+</tr>
+<tr>
+<td>公司神州发版平台</td>
+<td>非k8s应用部署</td>
+<td>公司运维维护的一个部署系统</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-工具特性总结">2. 工具特性总结</h3>
+<ul>
+<li>所有工具都不提供数据初始化等有业务特性的操作</li>
+<li>工具主要聚焦于两类
+<ul>
+<li>流水线流程把控</li>
+<li>服务细粒度部署：初次部署、增量部署、回滚、持续部署等</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-各个平台的定位">3. 各个平台的定位</h3>
+<p><a href="https://www.processon.com/view/link/600a3ed86376891e88b923d9">图片地址</a></p>
+<p><img src="http://assets.processon.com/chart_image/600a2cf36376891e88b8c14f.png" alt="平台定位"></p>
+<h3 id="4-蓝鲸全家桶介绍">4. 蓝鲸全家桶介绍</h3>
+<table>
+<thead>
+<tr>
+<th>项目名称</th>
+<th>项目代号</th>
+<th>对标产品</th>
+<th>简介</th>
+<th>特性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://bk.tencent.com/docs/document/6.0/129/5868">持续集成平台</a></td>
+<td>Bk-ci</td>
+<td>jenkins</td>
+<td>是一个免费并开源的 CI 服务，可助你自动化构建-测试-发布工作流，持续、快速、高质量地交付你的产品。它是企业 IT 管理体系的核心，通过提供配置管理服务，以数据和模型相结合映射应用间的关系，保证数据的准确和一致性；</td>
+<td>工程编译 静态代码检查 运行测试用例，及时发现 BUG 部署与发布。提供了流水线、代码库、凭证管理、环境管理、研发商店 5 大核心服务</td>
+</tr>
+<tr>
+<td><a href="https://bk.tencent.com/docs/document/6.0/152/6962">配置平台</a></td>
+<td>CMDB</td>
+<td>阿里云</td>
+<td>构建其它流程的基石，而在蓝鲸智云体系里，配置平台就扮演着基石的角色，为应用提供了各种运维场景的配置数据服务。</td>
+<td>自定义配置模型（CI）管理 Web 可视化的业务拓扑 全面的 API 服务 自动发现和主机快照 支持跨云管理 动态查询分组 对外开源</td>
+</tr>
+<tr>
+<td><a href="https://bk.tencent.com/docs/document/5.1/11/274">容器管理平台</a></td>
+<td></td>
+<td>rancher</td>
+<td>同华为云的ccs容器管理控制台</td>
+<td>集群创建、集群管理、容器编排配置模板、容器视图、容器操作、镜像管理、网络管理</td>
+</tr>
+<tr>
+<td><a href="https://bk.tencent.com/docs/document/6.0/125/5748">作业平台</a></td>
+<td>Job</td>
+<td></td>
+<td>基于蓝鲸智云管控平台 Agent 管道之上，提供基础操作的原子平台；具备上万台并发处理能力，除了支持脚本执行、文件拉取 / 分发、定时任务等一系列基础运维场景以外，还支持通过流程调度能力将零碎的单个任务组装成一个自动化作业流程；而每个任务都可做为一个原子节点，提供给上层或周边系统/平台使用，实现跨系统调度自动化。</td>
+<td>执行脚本,分发文件</td>
+</tr>
+</tbody>
+</table>
+
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">查看更多</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go协程原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+      </li>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/" class="nav-link">java基础-集合框架</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/" class="nav-link">k8s源码分析- kube-apiserver</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/" class="nav-link">k8s源码分析： kube-scheduler</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/net-http/" class="nav-link">Golang http请求源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/" class="nav-link">go协程入门</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>4</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent">
+          博客搭建
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent">
+          计算机原理
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>22</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>9</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
+          CLIENT-GO
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent">
+          INDEX
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent">
+          JVM
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">All tags</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent" data-position=11>BREAKPAD<span class='button_tally'>11</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=3>CLIENT-GO<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent" data-position=9>GO<span class='button_tally'>9</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent" data-position=8>GO基础入门<span class='button_tally'>8</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=1>GO第三方库<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent" data-position=1>INDEX<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=5>JAVA基础<span class='button_tally'>5</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=10>K8S<span class='button_tally'>10</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=2>MYSQL<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=22>源码分析<span class='button_tally'>22</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script type="text/javascript" src = "https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous"></script>
+  </body>
+</html>

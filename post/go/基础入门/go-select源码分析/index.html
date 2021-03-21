@@ -2,7 +2,7 @@
 <html lang="en" data-figures="" class="page">
   <head>  <title>go-select源码分析 | kinnylee</title>
   <meta charset='utf-8'>
-  <meta name="generator" content="Hugo 0.74.3" />
+  <meta name="generator" content="Hugo 0.75.0-DEV" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
   <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
 <script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
@@ -157,7 +157,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 270 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 1659 字</span>，阅读约<span class="more-meta"> 4 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-select%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" title="Copy Link" class="link link_yank">
@@ -181,6 +181,8 @@
     <li><a href="#源码分析">源码分析</a>
       <ul>
         <li><a href="#case数据结构">case数据结构</a></li>
+        <li><a href="#编译器">编译器</a></li>
+        <li><a href="#selectgo">select.go</a></li>
       </ul>
     </li>
   </ul>
@@ -210,6 +212,316 @@
 <span class="ln">5</span>  <span class="nx">pc</span>          <span class="kt">uintptr</span> <span class="c1">// race pc (for race detector / msan)
 </span><span class="ln">6</span><span class="c1"></span>  <span class="nx">releasetime</span> <span class="kt">int64</span>
 <span class="ln">7</span><span class="p">}</span>
+</code></pre></div><h3 id="编译器">编译器</h3>
+<p>源码位置：src/cmd/compile/internal/gc/select.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-Go" data-lang="Go"><span class="ln">  1</span><span class="kd">func</span> <span class="nf">walkselect</span><span class="p">(</span><span class="nx">sel</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">  2</span>  <span class="nx">lno</span> <span class="o">:=</span> <span class="nf">setlineno</span><span class="p">(</span><span class="nx">sel</span><span class="p">)</span>
+<span class="ln">  3</span>  <span class="k">if</span> <span class="nx">sel</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">  4</span>    <span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;double walkselect&#34;</span><span class="p">)</span>
+<span class="ln">  5</span>  <span class="p">}</span>
+<span class="ln">  6</span>
+<span class="ln">  7</span>  <span class="nx">init</span> <span class="o">:=</span> <span class="nx">sel</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span>
+<span class="ln">  8</span>  <span class="nx">sel</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+<span class="ln">  9</span>
+<span class="ln"> 10</span>  <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nf">walkselectcases</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">sel</span><span class="p">.</span><span class="nx">List</span><span class="p">)</span><span class="o">...</span><span class="p">)</span>
+<span class="ln"> 11</span>  <span class="nx">sel</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+<span class="ln"> 12</span>
+<span class="ln"> 13</span>  <span class="nx">sel</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="nx">init</span><span class="p">)</span>
+<span class="ln"> 14</span>  <span class="nf">walkstmtlist</span><span class="p">(</span><span class="nx">sel</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Slice</span><span class="p">())</span>
+<span class="ln"> 15</span>
+<span class="ln"> 16</span>  <span class="nx">lineno</span> <span class="p">=</span> <span class="nx">lno</span>
+<span class="ln"> 17</span><span class="p">}</span>
+<span class="ln"> 18</span>
+<span class="ln"> 19</span><span class="kd">func</span> <span class="nf">walkselectcases</span><span class="p">(</span><span class="nx">cases</span> <span class="o">*</span><span class="nx">Nodes</span><span class="p">)</span> <span class="p">[]</span><span class="o">*</span><span class="nx">Node</span> <span class="p">{</span>
+<span class="ln"> 20</span>  <span class="nx">n</span> <span class="o">:=</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span>
+<span class="ln"> 21</span>  <span class="nx">sellineno</span> <span class="o">:=</span> <span class="nx">lineno</span>
+<span class="ln"> 22</span>
+<span class="ln"> 23</span>  <span class="c1">// optimization: zero-case select
+</span><span class="ln"> 24</span><span class="c1"></span>  <span class="c1">// 如果没有case，直接调用block函数，内部是调用的gopark阻塞
+</span><span class="ln"> 25</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 26</span>    <span class="k">return</span> <span class="p">[]</span><span class="o">*</span><span class="nx">Node</span><span class="p">{</span><span class="nf">mkcall</span><span class="p">(</span><span class="s">&#34;block&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)}</span>
+<span class="ln"> 27</span>  <span class="p">}</span>
+<span class="ln"> 28</span>
+<span class="ln"> 29</span>  <span class="c1">// optimization: one-case select: single op.
+</span><span class="ln"> 30</span><span class="c1"></span>  <span class="c1">// TODO(rsc): Reenable optimization once order.go can handle it.
+</span><span class="ln"> 31</span><span class="c1"></span>  <span class="c1">// golang.org/issue/7672.
+</span><span class="ln"> 32</span><span class="c1"></span>  <span class="c1">// 只有一个case的情况
+</span><span class="ln"> 33</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">n</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+<span class="ln"> 34</span>    <span class="nx">cas</span> <span class="o">:=</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">First</span><span class="p">()</span>
+<span class="ln"> 35</span>    <span class="nf">setlineno</span><span class="p">(</span><span class="nx">cas</span><span class="p">)</span>
+<span class="ln"> 36</span>    <span class="nx">l</span> <span class="o">:=</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span>
+<span class="ln"> 37</span>    <span class="c1">// 没有default的处理逻辑
+</span><span class="ln"> 38</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span> <span class="c1">// not default:
+</span><span class="ln"> 39</span><span class="c1"></span>      <span class="nx">n</span> <span class="o">:=</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln"> 40</span>      <span class="nx">l</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">l</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span><span class="o">...</span><span class="p">)</span>
+<span class="ln"> 41</span>      <span class="nx">n</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+<span class="ln"> 42</span>      <span class="kd">var</span> <span class="nx">ch</span> <span class="o">*</span><span class="nx">Node</span>
+<span class="ln"> 43</span>      <span class="k">switch</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="p">{</span>
+<span class="ln"> 44</span>      <span class="k">default</span><span class="p">:</span>
+<span class="ln"> 45</span>        <span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;select %v&#34;</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span><span class="p">)</span>
+<span class="ln"> 46</span>
+<span class="ln"> 47</span>        <span class="c1">// ok already
+</span><span class="ln"> 48</span><span class="c1"></span>      <span class="k">case</span> <span class="nx">OSEND</span><span class="p">:</span>
+<span class="ln"> 49</span>        <span class="nx">ch</span> <span class="p">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln"> 50</span>
+<span class="ln"> 51</span>      <span class="k">case</span> <span class="nx">OSELRECV</span><span class="p">,</span> <span class="nx">OSELRECV2</span><span class="p">:</span>
+<span class="ln"> 52</span>        <span class="nx">ch</span> <span class="p">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln"> 53</span>        <span class="k">if</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="o">==</span> <span class="nx">OSELRECV</span> <span class="o">||</span> <span class="nx">n</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 54</span>          <span class="k">if</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 55</span>            <span class="nx">n</span> <span class="p">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span>
+<span class="ln"> 56</span>          <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln"> 57</span>            <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="p">=</span> <span class="nx">OAS</span>
+<span class="ln"> 58</span>          <span class="p">}</span>
+<span class="ln"> 59</span>          <span class="k">break</span>
+<span class="ln"> 60</span>        <span class="p">}</span>
+<span class="ln"> 61</span>
+<span class="ln"> 62</span>        <span class="k">if</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 63</span>          <span class="nx">nblank</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">nblank</span><span class="p">,</span> <span class="nx">ctxExpr</span><span class="p">|</span><span class="nx">ctxAssign</span><span class="p">)</span>
+<span class="ln"> 64</span>          <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nx">nblank</span>
+<span class="ln"> 65</span>        <span class="p">}</span>
+<span class="ln"> 66</span>
+<span class="ln"> 67</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="p">=</span> <span class="nx">OAS2</span>
+<span class="ln"> 68</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nf">Prepend</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">Left</span><span class="p">)</span>
+<span class="ln"> 69</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">Rlist</span><span class="p">.</span><span class="nf">Set1</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+<span class="ln"> 70</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span> <span class="p">=</span> <span class="kc">nil</span>
+<span class="ln"> 71</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="kc">nil</span>
+<span class="ln"> 72</span>        <span class="nx">n</span><span class="p">.</span><span class="nf">SetTypecheck</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="ln"> 73</span>        <span class="nx">n</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">ctxStmt</span><span class="p">)</span>
+<span class="ln"> 74</span>      <span class="p">}</span>
+<span class="ln"> 75</span>
+<span class="ln"> 76</span>      <span class="c1">// if ch == nil { block() }; n;
+</span><span class="ln"> 77</span><span class="c1"></span>      <span class="nx">a</span> <span class="o">:=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OIF</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln"> 78</span>
+<span class="ln"> 79</span>      <span class="nx">a</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OEQ</span><span class="p">,</span> <span class="nx">ch</span><span class="p">,</span> <span class="nf">nodnil</span><span class="p">())</span>
+<span class="ln"> 80</span>      <span class="kd">var</span> <span class="nx">ln</span> <span class="nx">Nodes</span>
+<span class="ln"> 81</span>      <span class="nx">ln</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="nx">l</span><span class="p">)</span>
+<span class="ln"> 82</span>      <span class="nx">a</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Set1</span><span class="p">(</span><span class="nf">mkcall</span><span class="p">(</span><span class="s">&#34;block&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">ln</span><span class="p">))</span>
+<span class="ln"> 83</span>      <span class="nx">l</span> <span class="p">=</span> <span class="nx">ln</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span>
+<span class="ln"> 84</span>      <span class="nx">a</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">ctxStmt</span><span class="p">)</span>
+<span class="ln"> 85</span>      <span class="nx">l</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">l</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">n</span><span class="p">)</span>
+<span class="ln"> 86</span>    <span class="p">}</span>
+<span class="ln"> 87</span>
+<span class="ln"> 88</span>    <span class="nx">l</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">l</span><span class="p">,</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span><span class="o">...</span><span class="p">)</span>
+<span class="ln"> 89</span>    <span class="nx">l</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">l</span><span class="p">,</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OBREAK</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="ln"> 90</span>    <span class="k">return</span> <span class="nx">l</span>
+<span class="ln"> 91</span>  <span class="p">}</span>
+<span class="ln"> 92</span>
+<span class="ln"> 93</span>  <span class="c1">// convert case value arguments to addresses.
+</span><span class="ln"> 94</span><span class="c1"></span>  <span class="c1">// this rewrite is used by both the general code and the next optimization.
+</span><span class="ln"> 95</span><span class="c1"></span>  <span class="c1">// 多个case的情况，把每个分支转换为case结构体
+</span><span class="ln"> 96</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">cas</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 97</span>    <span class="nf">setlineno</span><span class="p">(</span><span class="nx">cas</span><span class="p">)</span>
+<span class="ln"> 98</span>    <span class="nx">n</span> <span class="o">:=</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln"> 99</span>    <span class="k">if</span> <span class="nx">n</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">100</span>      <span class="k">continue</span>
+<span class="ln">101</span>    <span class="p">}</span>
+<span class="ln">102</span>    <span class="k">switch</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="p">{</span>
+<span class="ln">103</span>    <span class="k">case</span> <span class="nx">OSEND</span><span class="p">:</span>
+<span class="ln">104</span>      <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OADDR</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">105</span>      <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">,</span> <span class="nx">ctxExpr</span><span class="p">)</span>
+<span class="ln">106</span>
+<span class="ln">107</span>    <span class="k">case</span> <span class="nx">OSELRECV</span><span class="p">,</span> <span class="nx">OSELRECV2</span><span class="p">:</span>
+<span class="ln">108</span>      <span class="k">if</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="o">==</span> <span class="nx">OSELRECV2</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">109</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="p">=</span> <span class="nx">OSELRECV</span>
+<span class="ln">110</span>      <span class="p">}</span>
+<span class="ln">111</span>
+<span class="ln">112</span>      <span class="k">if</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">113</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OADDR</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">114</span>        <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">n</span><span class="p">.</span><span class="nx">Left</span><span class="p">,</span> <span class="nx">ctxExpr</span><span class="p">)</span>
+<span class="ln">115</span>      <span class="p">}</span>
+<span class="ln">116</span>    <span class="p">}</span>
+<span class="ln">117</span>  <span class="p">}</span>
+<span class="ln">118</span>
+<span class="ln">119</span>  <span class="c1">// optimization: two-case select but one is default: single non-blocking op.
+</span><span class="ln">120</span><span class="c1"></span>  <span class="k">if</span> <span class="nx">n</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">cases</span><span class="p">.</span><span class="nf">First</span><span class="p">().</span><span class="nx">Left</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">||</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">Second</span><span class="p">().</span><span class="nx">Left</span> <span class="o">==</span> <span class="kc">nil</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">121</span>    <span class="kd">var</span> <span class="nx">cas</span> <span class="o">*</span><span class="nx">Node</span>
+<span class="ln">122</span>    <span class="kd">var</span> <span class="nx">dflt</span> <span class="o">*</span><span class="nx">Node</span>
+<span class="ln">123</span>    <span class="k">if</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">First</span><span class="p">().</span><span class="nx">Left</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">124</span>      <span class="nx">cas</span> <span class="p">=</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">Second</span><span class="p">()</span>
+<span class="ln">125</span>      <span class="nx">dflt</span> <span class="p">=</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">First</span><span class="p">()</span>
+<span class="ln">126</span>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">127</span>      <span class="nx">dflt</span> <span class="p">=</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">Second</span><span class="p">()</span>
+<span class="ln">128</span>      <span class="nx">cas</span> <span class="p">=</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">First</span><span class="p">()</span>
+<span class="ln">129</span>    <span class="p">}</span>
+<span class="ln">130</span>
+<span class="ln">131</span>    <span class="nx">n</span> <span class="o">:=</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">132</span>    <span class="nf">setlineno</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span>
+<span class="ln">133</span>    <span class="nx">r</span> <span class="o">:=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OIF</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">134</span>    <span class="nx">r</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="nx">cas</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">())</span>
+<span class="ln">135</span>    <span class="k">switch</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="p">{</span>
+<span class="ln">136</span>    <span class="k">default</span><span class="p">:</span>
+<span class="ln">137</span>      <span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;select %v&#34;</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span><span class="p">)</span>
+<span class="ln">138</span>
+<span class="ln">139</span>    <span class="k">case</span> <span class="nx">OSEND</span><span class="p">:</span>
+<span class="ln">140</span>      <span class="c1">// if selectnbsend(c, v) { body } else { default body }
+</span><span class="ln">141</span><span class="c1"></span>      <span class="nx">ch</span> <span class="o">:=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">142</span>      <span class="nx">r</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nf">mkcall1</span><span class="p">(</span><span class="nf">chanfn</span><span class="p">(</span><span class="s">&#34;selectnbsend&#34;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">ch</span><span class="p">.</span><span class="nx">Type</span><span class="p">),</span> <span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TBOOL</span><span class="p">],</span> <span class="o">&amp;</span><span class="nx">r</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">,</span> <span class="nx">ch</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">)</span>
+<span class="ln">143</span>
+<span class="ln">144</span>    <span class="k">case</span> <span class="nx">OSELRECV</span><span class="p">:</span>
+<span class="ln">145</span>      <span class="c1">// if selectnbrecv(&amp;v, c) { body } else { default body }
+</span><span class="ln">146</span><span class="c1"></span>      <span class="nx">r</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OIF</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">147</span>      <span class="nx">r</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="nx">cas</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">())</span>
+<span class="ln">148</span>      <span class="nx">ch</span> <span class="o">:=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">149</span>      <span class="nx">elem</span> <span class="o">:=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">150</span>      <span class="k">if</span> <span class="nx">elem</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">151</span>        <span class="nx">elem</span> <span class="p">=</span> <span class="nf">nodnil</span><span class="p">()</span>
+<span class="ln">152</span>      <span class="p">}</span>
+<span class="ln">153</span>      <span class="nx">r</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nf">mkcall1</span><span class="p">(</span><span class="nf">chanfn</span><span class="p">(</span><span class="s">&#34;selectnbrecv&#34;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">ch</span><span class="p">.</span><span class="nx">Type</span><span class="p">),</span> <span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TBOOL</span><span class="p">],</span> <span class="o">&amp;</span><span class="nx">r</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">,</span> <span class="nx">elem</span><span class="p">,</span> <span class="nx">ch</span><span class="p">)</span>
+<span class="ln">154</span>
+<span class="ln">155</span>    <span class="k">case</span> <span class="nx">OSELRECV2</span><span class="p">:</span>
+<span class="ln">156</span>      <span class="c1">// if selectnbrecv2(&amp;v, &amp;received, c) { body } else { default body }
+</span><span class="ln">157</span><span class="c1"></span>      <span class="nx">r</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OIF</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">158</span>      <span class="nx">r</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="nx">cas</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">())</span>
+<span class="ln">159</span>      <span class="nx">ch</span> <span class="o">:=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">160</span>      <span class="nx">elem</span> <span class="o">:=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">161</span>      <span class="k">if</span> <span class="nx">elem</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">162</span>        <span class="nx">elem</span> <span class="p">=</span> <span class="nf">nodnil</span><span class="p">()</span>
+<span class="ln">163</span>      <span class="p">}</span>
+<span class="ln">164</span>      <span class="nx">receivedp</span> <span class="o">:=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OADDR</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nf">First</span><span class="p">(),</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">165</span>      <span class="nx">receivedp</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">receivedp</span><span class="p">,</span> <span class="nx">ctxExpr</span><span class="p">)</span>
+<span class="ln">166</span>      <span class="nx">r</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nf">mkcall1</span><span class="p">(</span><span class="nf">chanfn</span><span class="p">(</span><span class="s">&#34;selectnbrecv2&#34;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">ch</span><span class="p">.</span><span class="nx">Type</span><span class="p">),</span> <span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TBOOL</span><span class="p">],</span> <span class="o">&amp;</span><span class="nx">r</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">,</span> <span class="nx">elem</span><span class="p">,</span> <span class="nx">receivedp</span><span class="p">,</span> <span class="nx">ch</span><span class="p">)</span>
+<span class="ln">167</span>    <span class="p">}</span>
+<span class="ln">168</span>
+<span class="ln">169</span>    <span class="nx">r</span><span class="p">.</span><span class="nx">Left</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Left</span><span class="p">,</span> <span class="nx">ctxExpr</span><span class="p">)</span>
+<span class="ln">170</span>    <span class="nx">r</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="nx">cas</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Slice</span><span class="p">())</span>
+<span class="ln">171</span>    <span class="nx">r</span><span class="p">.</span><span class="nx">Rlist</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="nb">append</span><span class="p">(</span><span class="nx">dflt</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">(),</span> <span class="nx">dflt</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span><span class="o">...</span><span class="p">))</span>
+<span class="ln">172</span>    <span class="k">return</span> <span class="p">[]</span><span class="o">*</span><span class="nx">Node</span><span class="p">{</span><span class="nx">r</span><span class="p">,</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OBREAK</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)}</span>
+<span class="ln">173</span>  <span class="p">}</span>
+<span class="ln">174</span>
+<span class="ln">175</span>  <span class="kd">var</span> <span class="nx">init</span> <span class="p">[]</span><span class="o">*</span><span class="nx">Node</span>
+<span class="ln">176</span>
+<span class="ln">177</span>  <span class="c1">// generate sel-struct
+</span><span class="ln">178</span><span class="c1"></span>  <span class="nx">lineno</span> <span class="p">=</span> <span class="nx">sellineno</span>
+<span class="ln">179</span>  <span class="nx">selv</span> <span class="o">:=</span> <span class="nf">temp</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nf">NewArray</span><span class="p">(</span><span class="nf">scasetype</span><span class="p">(),</span> <span class="nb">int64</span><span class="p">(</span><span class="nx">n</span><span class="p">)))</span>
+<span class="ln">180</span>  <span class="nx">r</span> <span class="o">:=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OAS</span><span class="p">,</span> <span class="nx">selv</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">181</span>  <span class="nx">r</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">ctxStmt</span><span class="p">)</span>
+<span class="ln">182</span>  <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="ln">183</span>
+<span class="ln">184</span>  <span class="nx">order</span> <span class="o">:=</span> <span class="nf">temp</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nf">NewArray</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TUINT16</span><span class="p">],</span> <span class="mi">2</span><span class="o">*</span><span class="nb">int64</span><span class="p">(</span><span class="nx">n</span><span class="p">)))</span>
+<span class="ln">185</span>  <span class="nx">r</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OAS</span><span class="p">,</span> <span class="nx">order</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">186</span>  <span class="nx">r</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">ctxStmt</span><span class="p">)</span>
+<span class="ln">187</span>  <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="ln">188</span>
+<span class="ln">189</span>  <span class="c1">// register cases
+</span><span class="ln">190</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">cas</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">191</span>    <span class="nf">setlineno</span><span class="p">(</span><span class="nx">cas</span><span class="p">)</span>
+<span class="ln">192</span>
+<span class="ln">193</span>    <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">194</span>    <span class="nx">cas</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+<span class="ln">195</span>
+<span class="ln">196</span>    <span class="c1">// Keep in sync with runtime/select.go.
+</span><span class="ln">197</span><span class="c1"></span>    <span class="kd">const</span> <span class="p">(</span>
+<span class="ln">198</span>      <span class="nx">caseNil</span> <span class="p">=</span> <span class="kc">iota</span>
+<span class="ln">199</span>      <span class="nx">caseRecv</span>
+<span class="ln">200</span>      <span class="nx">caseSend</span>
+<span class="ln">201</span>      <span class="nx">caseDefault</span>
+<span class="ln">202</span>    <span class="p">)</span>
+<span class="ln">203</span>
+<span class="ln">204</span>    <span class="kd">var</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">elem</span> <span class="o">*</span><span class="nx">Node</span>
+<span class="ln">205</span>    <span class="kd">var</span> <span class="nx">kind</span> <span class="kt">int64</span> <span class="p">=</span> <span class="nx">caseDefault</span>
+<span class="ln">206</span>
+<span class="ln">207</span>    <span class="k">if</span> <span class="nx">n</span> <span class="o">:=</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Left</span><span class="p">;</span> <span class="nx">n</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">208</span>      <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Ninit</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">209</span>
+<span class="ln">210</span>      <span class="k">switch</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="p">{</span>
+<span class="ln">211</span>      <span class="k">default</span><span class="p">:</span>
+<span class="ln">212</span>        <span class="nf">Fatalf</span><span class="p">(</span><span class="s">&#34;select %v&#34;</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span><span class="p">)</span>
+<span class="ln">213</span>      <span class="k">case</span> <span class="nx">OSEND</span><span class="p">:</span>
+<span class="ln">214</span>        <span class="nx">kind</span> <span class="p">=</span> <span class="nx">caseSend</span>
+<span class="ln">215</span>        <span class="nx">c</span> <span class="p">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">216</span>        <span class="nx">elem</span> <span class="p">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span>
+<span class="ln">217</span>      <span class="k">case</span> <span class="nx">OSELRECV</span><span class="p">,</span> <span class="nx">OSELRECV2</span><span class="p">:</span>
+<span class="ln">218</span>        <span class="nx">kind</span> <span class="p">=</span> <span class="nx">caseRecv</span>
+<span class="ln">219</span>        <span class="nx">c</span> <span class="p">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Right</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">220</span>        <span class="nx">elem</span> <span class="p">=</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Left</span>
+<span class="ln">221</span>      <span class="p">}</span>
+<span class="ln">222</span>    <span class="p">}</span>
+<span class="ln">223</span>
+<span class="ln">224</span>    <span class="nx">setField</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">f</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">val</span> <span class="o">*</span><span class="nx">Node</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">225</span>      <span class="nx">r</span> <span class="o">:=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OAS</span><span class="p">,</span> <span class="nf">nodSym</span><span class="p">(</span><span class="nx">ODOT</span><span class="p">,</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OINDEX</span><span class="p">,</span> <span class="nx">selv</span><span class="p">,</span> <span class="nf">nodintconst</span><span class="p">(</span><span class="nb">int64</span><span class="p">(</span><span class="nx">i</span><span class="p">))),</span> <span class="nf">lookup</span><span class="p">(</span><span class="nx">f</span><span class="p">)),</span> <span class="nx">val</span><span class="p">)</span>
+<span class="ln">226</span>      <span class="nx">r</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">ctxStmt</span><span class="p">)</span>
+<span class="ln">227</span>      <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="ln">228</span>    <span class="p">}</span>
+<span class="ln">229</span>
+<span class="ln">230</span>    <span class="nf">setField</span><span class="p">(</span><span class="s">&#34;kind&#34;</span><span class="p">,</span> <span class="nf">nodintconst</span><span class="p">(</span><span class="nx">kind</span><span class="p">))</span>
+<span class="ln">231</span>    <span class="k">if</span> <span class="nx">c</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">232</span>      <span class="nx">c</span> <span class="p">=</span> <span class="nf">convnop</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TUNSAFEPTR</span><span class="p">])</span>
+<span class="ln">233</span>      <span class="nf">setField</span><span class="p">(</span><span class="s">&#34;c&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span>
+<span class="ln">234</span>    <span class="p">}</span>
+<span class="ln">235</span>    <span class="k">if</span> <span class="nx">elem</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">236</span>      <span class="nx">elem</span> <span class="p">=</span> <span class="nf">convnop</span><span class="p">(</span><span class="nx">elem</span><span class="p">,</span> <span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TUNSAFEPTR</span><span class="p">])</span>
+<span class="ln">237</span>      <span class="nf">setField</span><span class="p">(</span><span class="s">&#34;elem&#34;</span><span class="p">,</span> <span class="nx">elem</span><span class="p">)</span>
+<span class="ln">238</span>    <span class="p">}</span>
+<span class="ln">239</span>
+<span class="ln">240</span>    <span class="c1">// TODO(mdempsky): There should be a cleaner way to
+</span><span class="ln">241</span><span class="c1"></span>    <span class="c1">// handle this.
+</span><span class="ln">242</span><span class="c1"></span>    <span class="k">if</span> <span class="nx">instrumenting</span> <span class="p">{</span>
+<span class="ln">243</span>      <span class="nx">r</span> <span class="p">=</span> <span class="nf">mkcall</span><span class="p">(</span><span class="s">&#34;selectsetpc&#34;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="nf">bytePtrToIndex</span><span class="p">(</span><span class="nx">selv</span><span class="p">,</span> <span class="nb">int64</span><span class="p">(</span><span class="nx">i</span><span class="p">)))</span>
+<span class="ln">244</span>      <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="ln">245</span>    <span class="p">}</span>
+<span class="ln">246</span>  <span class="p">}</span>
+<span class="ln">247</span>
+<span class="ln">248</span>  <span class="c1">// run the select
+</span><span class="ln">249</span><span class="c1"></span>  <span class="nx">lineno</span> <span class="p">=</span> <span class="nx">sellineno</span>
+<span class="ln">250</span>  <span class="nx">chosen</span> <span class="o">:=</span> <span class="nf">temp</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TINT</span><span class="p">])</span>
+<span class="ln">251</span>  <span class="nx">recvOK</span> <span class="o">:=</span> <span class="nf">temp</span><span class="p">(</span><span class="nx">types</span><span class="p">.</span><span class="nx">Types</span><span class="p">[</span><span class="nx">TBOOL</span><span class="p">])</span>
+<span class="ln">252</span>  <span class="nx">r</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OAS2</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">253</span>  <span class="nx">r</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nf">Set2</span><span class="p">(</span><span class="nx">chosen</span><span class="p">,</span> <span class="nx">recvOK</span><span class="p">)</span>
+<span class="ln">254</span>
+<span class="ln">255</span>  <span class="c1">// 调用selectgo，这个函数是决定了如何选择分支
+</span><span class="ln">256</span><span class="c1"></span>  <span class="nx">fn</span> <span class="o">:=</span> <span class="nf">syslook</span><span class="p">(</span><span class="s">&#34;selectgo&#34;</span><span class="p">)</span>
+<span class="ln">257</span>  <span class="nx">r</span><span class="p">.</span><span class="nx">Rlist</span><span class="p">.</span><span class="nf">Set1</span><span class="p">(</span><span class="nf">mkcall1</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">Type</span><span class="p">.</span><span class="nf">Results</span><span class="p">(),</span> <span class="kc">nil</span><span class="p">,</span> <span class="nf">bytePtrToIndex</span><span class="p">(</span><span class="nx">selv</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nf">bytePtrToIndex</span><span class="p">(</span><span class="nx">order</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nf">nodintconst</span><span class="p">(</span><span class="nb">int64</span><span class="p">(</span><span class="nx">n</span><span class="p">))))</span>
+<span class="ln">258</span>  <span class="nx">r</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">ctxStmt</span><span class="p">)</span>
+<span class="ln">259</span>  <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="ln">260</span>
+<span class="ln">261</span>  <span class="c1">// selv and order are no longer alive after selectgo.
+</span><span class="ln">262</span><span class="c1"></span>  <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OVARKILL</span><span class="p">,</span> <span class="nx">selv</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="ln">263</span>  <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OVARKILL</span><span class="p">,</span> <span class="nx">order</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="ln">264</span>
+<span class="ln">265</span>  <span class="c1">// dispatch cases
+</span><span class="ln">266</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">cas</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">cases</span><span class="p">.</span><span class="nf">Slice</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">267</span>    <span class="nf">setlineno</span><span class="p">(</span><span class="nx">cas</span><span class="p">)</span>
+<span class="ln">268</span>
+<span class="ln">269</span>    <span class="nx">cond</span> <span class="o">:=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OEQ</span><span class="p">,</span> <span class="nx">chosen</span><span class="p">,</span> <span class="nf">nodintconst</span><span class="p">(</span><span class="nb">int64</span><span class="p">(</span><span class="nx">i</span><span class="p">)))</span>
+<span class="ln">270</span>    <span class="nx">cond</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">cond</span><span class="p">,</span> <span class="nx">ctxExpr</span><span class="p">)</span>
+<span class="ln">271</span>    <span class="nx">cond</span> <span class="p">=</span> <span class="nf">defaultlit</span><span class="p">(</span><span class="nx">cond</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">272</span>
+<span class="ln">273</span>    <span class="nx">r</span> <span class="p">=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OIF</span><span class="p">,</span> <span class="nx">cond</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">274</span>
+<span class="ln">275</span>    <span class="k">if</span> <span class="nx">n</span> <span class="o">:=</span> <span class="nx">cas</span><span class="p">.</span><span class="nx">Left</span><span class="p">;</span> <span class="nx">n</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">n</span><span class="p">.</span><span class="nx">Op</span> <span class="o">==</span> <span class="nx">OSELRECV2</span> <span class="p">{</span>
+<span class="ln">276</span>      <span class="nx">x</span> <span class="o">:=</span> <span class="nf">nod</span><span class="p">(</span><span class="nx">OAS</span><span class="p">,</span> <span class="nx">n</span><span class="p">.</span><span class="nx">List</span><span class="p">.</span><span class="nf">First</span><span class="p">(),</span> <span class="nx">recvOK</span><span class="p">)</span>
+<span class="ln">277</span>      <span class="nx">x</span> <span class="p">=</span> <span class="nf">typecheck</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">ctxStmt</span><span class="p">)</span>
+<span class="ln">278</span>      <span class="nx">r</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Append</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+<span class="ln">279</span>    <span class="p">}</span>
+<span class="ln">280</span>
+<span class="ln">281</span>    <span class="nx">r</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">AppendNodes</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">cas</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">)</span>
+<span class="ln">282</span>    <span class="nx">r</span><span class="p">.</span><span class="nx">Nbody</span><span class="p">.</span><span class="nf">Append</span><span class="p">(</span><span class="nf">nod</span><span class="p">(</span><span class="nx">OBREAK</span><span class="p">,</span> <span class="kc">nil</span><span class="p">,</span> <span class="kc">nil</span><span class="p">))</span>
+<span class="ln">283</span>    <span class="nx">init</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">init</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="ln">284</span>  <span class="p">}</span>
+<span class="ln">285</span>
+<span class="ln">286</span>  <span class="k">return</span> <span class="nx">init</span>
+<span class="ln">287</span><span class="p">}</span>
+</code></pre></div><h3 id="selectgo">select.go</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">selectgo</span><span class="p">(</span><span class="nx">cas0</span> <span class="o">*</span><span class="nx">scase</span><span class="p">,</span> <span class="nx">order0</span> <span class="o">*</span><span class="kt">uint16</span><span class="p">,</span> <span class="nx">ncases</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="k">if</span> <span class="nx">debugSelect</span> <span class="p">{</span>
+<span class="ln"> 3</span>    <span class="nb">print</span><span class="p">(</span><span class="s">&#34;select: cas0=&#34;</span><span class="p">,</span> <span class="nx">cas0</span><span class="p">,</span> <span class="s">&#34;\n&#34;</span><span class="p">)</span>
+<span class="ln"> 4</span>  <span class="p">}</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span>  <span class="nx">cas1</span> <span class="o">:=</span> <span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">]</span><span class="nx">scase</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">cas0</span><span class="p">))</span>
+<span class="ln"> 7</span>  <span class="nx">order1</span> <span class="o">:=</span> <span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">17</span><span class="p">]</span><span class="kt">uint16</span><span class="p">)(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nf">Pointer</span><span class="p">(</span><span class="nx">order0</span><span class="p">))</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="nx">scases</span> <span class="o">:=</span> <span class="nx">cas1</span><span class="p">[:</span><span class="nx">ncases</span><span class="p">:</span><span class="nx">ncases</span><span class="p">]</span>
+<span class="ln">10</span>  <span class="nx">pollorder</span> <span class="o">:=</span> <span class="nx">order1</span><span class="p">[:</span><span class="nx">ncases</span><span class="p">:</span><span class="nx">ncases</span><span class="p">]</span>
+<span class="ln">11</span>  <span class="nx">lockorder</span> <span class="o">:=</span> <span class="nx">order1</span><span class="p">[</span><span class="nx">ncases</span><span class="p">:][:</span><span class="nx">ncases</span><span class="p">:</span><span class="nx">ncases</span><span class="p">]</span>
+<span class="ln">12</span>
+<span class="ln">13</span>  <span class="c1">// 生成随机顺序
+</span><span class="ln">14</span><span class="c1"></span>  <span class="c1">// generate permuted order
+</span><span class="ln">15</span><span class="c1"></span>  <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">ncases</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+<span class="ln">16</span>    <span class="nx">j</span> <span class="o">:=</span> <span class="nf">fastrandn</span><span class="p">(</span><span class="nb">uint32</span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+<span class="ln">17</span>    <span class="nx">pollorder</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">pollorder</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span>
+<span class="ln">18</span>    <span class="nx">pollorder</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="p">=</span> <span class="nb">uint16</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+<span class="ln">19</span>  <span class="p">}</span>
+<span class="ln">20</span>  <span class="p">}</span>
 </code></pre></div>
   </article>
 <aside class="sidebar">
@@ -223,7 +535,7 @@
     <ul>
     
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">图解Golang channel源码</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
       </li>
     
       <li>
@@ -235,7 +547,7 @@
       </li>
     
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go协程原理</a>
       </li>
     
       <li>
@@ -247,7 +559,7 @@
       </li>
     
       <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
       </li>
     
     </ul>
@@ -255,13 +567,19 @@
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">图解Golang channel源码</a>
+        <a href="https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/" class="nav-link">java基础-集合框架</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/" class="nav-link">k8s组件kube-apiserver源码分析</a>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/" class="nav-link">k8s源码分析- kube-apiserver</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/" class="nav-link">k8s源码分析： kube-scheduler</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
@@ -272,12 +590,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/" class="nav-link">go协程入门</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" class="nav-link">go-map原理解析</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" class="nav-link">Docker核心原理</a>
-      </li>
     </ul> 
     
     <div>
@@ -285,7 +597,7 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
           K8S
-          <span class='button_tally'>12</span>
+          <span class='button_tally'>13</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
@@ -295,12 +607,12 @@
         
         <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
           JAVA
-          <span class='button_tally'>5</span>
+          <span class='button_tally'>6</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>5</span>
+          <span class='button_tally'>6</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
@@ -370,13 +682,13 @@
           <span class='button_tally'>11</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
-          GO
-          <span class='button_tally'>9</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
           K8S
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
           <span class='button_tally'>9</span>
         </a>
         
@@ -387,7 +699,7 @@
         
         <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
           JAVA基础
-          <span class='button_tally'>4</span>
+          <span class='button_tally'>5</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
@@ -472,7 +784,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=4>JAVA基础<span class='button_tally'>4</span>
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=5>JAVA基础<span class='button_tally'>5</span>
             </a>
             
             
@@ -480,7 +792,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=9>K8S<span class='button_tally'>9</span>
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=10>K8S<span class='button_tally'>10</span>
             </a>
             
             

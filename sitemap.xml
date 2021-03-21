@@ -4,12 +4,37 @@
   
   <url>
     <loc>https://kinnylee.github.io/</loc>
-    <lastmod>2020-09-22T00:00:00+00:00</lastmod>
+    <lastmod>2020-10-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/categories/</loc>
-    <lastmod>2020-09-22T00:00:00+00:00</lastmod>
+    <lastmod>2020-10-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/categories/java/</loc>
+    <lastmod>2020-10-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/</loc>
+    <lastmod>2020-10-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/</loc>
+    <lastmod>2020-10-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/</loc>
+    <lastmod>2020-10-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/</loc>
+    <lastmod>2020-10-03T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -28,17 +53,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/</loc>
-    <lastmod>2020-09-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/tags/</loc>
-    <lastmod>2020-09-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/</loc>
     <lastmod>2020-09-22T00:00:00+00:00</lastmod>
   </url>
   
@@ -58,12 +73,17 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/</loc>
     <lastmod>2020-09-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/</loc>
+    <lastmod>2020-09-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/</loc>
     <lastmod>2020-09-20T00:00:00+00:00</lastmod>
   </url>
   
@@ -118,17 +138,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/categories/java/</loc>
-    <lastmod>2020-09-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://kinnylee.github.io/post/java/jdk/java%E5%8F%8D%E5%B0%84/</loc>
-    <lastmod>2020-09-03T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/</loc>
     <lastmod>2020-09-03T00:00:00+00:00</lastmod>
   </url>
   
@@ -148,7 +158,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-%E8%B5%84%E6%BA%90%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B/</loc>
     <lastmod>2020-09-02T00:00:00+00:00</lastmod>
   </url>
   
@@ -158,7 +168,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%80-%E5%9B%9B%E7%A7%8D%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AF%B9%E8%B1%A1/</loc>
     <lastmod>2020-09-01T00:00:00+00:00</lastmod>
   </url>
   
@@ -188,7 +198,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-k8%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</loc>
     <lastmod>2020-08-29T00:00:00+00:00</lastmod>
   </url>
   
@@ -248,7 +258,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/</loc>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
     <lastmod>2020-08-25T00:00:00+00:00</lastmod>
   </url>
   
@@ -378,7 +388,7 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/</loc>
     <lastmod>2020-06-28T00:00:00+00:00</lastmod>
   </url>
   
@@ -418,17 +428,49 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89-workqueue/</loc>
     <lastmod>2018-09-10T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/client-go/client-go%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%BA%8C-informer%E6%9C%BA%E5%88%B6/</loc>
     <lastmod>2018-08-30T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
+    <loc>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E8%93%9D%E9%B2%B8paas%E5%B9%B3%E5%8F%B0/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E8%93%9D%E9%B2%B8%E5%B9%B3%E5%8F%B0%E5%88%86%E6%9E%90/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/devops/%E8%85%BE%E8%AE%AF%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86cmdb%E5%B9%B3%E5%8F%B0/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/devops/%E9%83%A8%E7%BD%B2%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90%E5%92%8C%E5%B8%B8%E7%94%A8%E9%83%A8%E7%BD%B2%E5%B9%B3%E5%8F%B0%E5%AF%B9%E6%AF%94/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/gc/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-context/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/context/</loc>
   </url>
   
   <url>
@@ -436,7 +478,23 @@
   </url>
   
   <url>
+    <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/string/</loc>
+  </url>
+  
+  <url>
     <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/sync/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/template/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%9F%A5%E5%90%8Dgo%E5%8D%9A%E4%B8%BB/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/orm/xorm/</loc>
   </url>
   
   <url>
@@ -444,7 +502,119 @@
   </url>
   
   <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/waypoint/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6/go%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%A1%86%E6%9E%B6%E5%AF%B9%E6%AF%94/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%BF%BB%E8%AF%91/%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9B%AE%E5%89%8Dgolang%E8%BF%98%E4%B8%8D%E5%85%B7%E5%A4%87%E4%BC%81%E4%B8%9A%E7%BA%A7%E5%BC%80%E5%8F%91%E8%83%BD%E5%8A%9B/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/redis/redis-cluster/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/redis/redis-sentinel/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%B9%A6%E5%8D%95/2020%E4%B9%A6%E5%8D%95/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/gitops/flux/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/scheme/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-apprepository-controller/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-asset-syncer/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-assetsvc/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubevela/%E5%9F%BA%E4%BA%8Ekubevela&#43;argocd&#43;teckton%E5%AE%9E%E7%8E%B0%E5%BA%94%E7%94%A8gitops/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</loc>
+  </url>
+  
+  <url>
     <loc>https://kinnylee.github.io/posts/_about/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tmp/aecore%E5%AF%B9%E6%8E%A5%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tmp/%E6%96%BD%E5%B7%A5%E5%AF%B9%E6%8E%A5%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tmp/%E7%89%88%E6%9C%AC%E5%B1%9E%E6%80%A7%E8%AE%BE%E8%AE%A1/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tmp/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E5%92%8Cproject.json%E6%96%87%E4%BB%B6/</loc>
   </url>
   
   <url>
@@ -453,6 +623,10 @@
   
   <url>
     <loc>https://kinnylee.github.io/posts/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tmp/</loc>
   </url>
   
 </urlset>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tmps on kinnylee</title>
+    <link>https://kinnylee.github.io/tmp/</link>
+    <description>Recent content in Tmps on kinnylee</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>Copyright © 2020; all rights reserved.</copyright>
+    
+	<atom:link href="https://kinnylee.github.io/tmp/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/aecore%E5%AF%B9%E6%8E%A5%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/aecore%E5%AF%B9%E6%8E%A5%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</guid>
+      <description>对接AECore方案设计 [TOC] 一、实体对应关系 AECore的SP对应房角石的应用 AECore的一个部署包对应房角石的一个应用（或者一个Actio</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E6%88%BF%E8%A7%92%E7%9F%B3%E4%B8%8A%E6%9E%B6%E4%B8%8E%E9%83%A8%E7%BD%B2%E9%80%BB%E8%BE%91%E6%95%B4%E7%90%86/</guid>
+      <description>前言 房角石系统实现部署的前提是：应用在房角石上架。经过几个版本的演进，上架流程支持各种形式：包括完整上架、模板上架、自动上架。虽然形式不同，</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E6%96%BD%E5%B7%A5%E5%AF%B9%E6%8E%A5%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E6%96%BD%E5%B7%A5%E5%AF%B9%E6%8E%A5%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3/</guid>
+      <description>一、接口说明 1. 创建项目接口 input name：项目名称，必填 description：项目描述，非必填 output uuid：项目唯一标识，32位 project表</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E7%89%88%E6%9C%AC%E5%B1%9E%E6%80%A7%E8%AE%BE%E8%AE%A1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E7%89%88%E6%9C%AC%E5%B1%9E%E6%80%A7%E8%AE%BE%E8%AE%A1/</guid>
+      <description>目的 简化配置，让用户尽量少的配置，拖拽完实例后即可快速部署，降低用户的使用门槛 属性规范 key：部署引擎识别的唯一标识 label：界面上展示的</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/tmp/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E5%92%8Cproject.json%E6%96%87%E4%BB%B6/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/tmp/%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E5%92%8Cproject.json%E6%96%87%E4%BB%B6/</guid>
+      <description>脚本目录结构 1└── cornerstone-ansible-playbook 2 ├── app 3 │ └── cornerstone 4 │ ├── Kubernetes 5 │ └── MySQL 6 │ └── bin-5.7.21 7 │ ├── group_vars 8 │ ├── hosts.yaml 9 │ ├── inventory 10 │ ├── playbook.yaml 11 │ ├── properties.yaml</description>
+    </item>
+    
+  </channel>
+</rss>

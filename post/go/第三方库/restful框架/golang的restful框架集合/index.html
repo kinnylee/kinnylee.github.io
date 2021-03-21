@@ -2,7 +2,7 @@
 <html lang="en" data-figures="" class="page">
   <head>  <title>Golang的web框架对比 | kinnylee</title>
   <meta charset='utf-8'>
-  <meta name="generator" content="Hugo 0.74.3" />
+  <meta name="generator" content="Hugo 0.75.0-DEV" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
   <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
 <script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
@@ -195,321 +195,321 @@
 <table>
 <thead>
 <tr>
-<th align="left">Name</th>
-<th align="center">Iris</th>
-<th align="center">Beego</th>
-<th align="center">Revel</th>
-<th align="center">Echo</th>
-<th align="center">Gin</th>
-<th align="center">Buffalo</th>
+<th style="text-align:left">Name</th>
+<th style="text-align:center">Iris</th>
+<th style="text-align:center">Beego</th>
+<th style="text-align:center">Revel</th>
+<th style="text-align:center">Echo</th>
+<th style="text-align:center">Gin</th>
+<th style="text-align:center">Buffalo</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">Router: Named Path Parameters &amp; Wildcard<a href="#router-named-path-parameters--wildcard">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted -->-</td>
+<td style="text-align:left">Router: Named Path Parameters &amp; Wildcard<a href="#router-named-path-parameters--wildcard">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted -->-</td>
 </tr>
 <tr>
-<td align="left">Router: Regex<a href="#router-regex">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted -->-</td>
+<td style="text-align:left">Router: Regex<a href="#router-regex">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted -->-</td>
 </tr>
 <tr>
-<td align="left">Router: Grouping<a href="#router-grouping">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">❔</td>
-<td align="center">❔</td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted -->-</td>
+<td style="text-align:left">Router: Grouping<a href="#router-grouping">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">❔</td>
+<td style="text-align:center">❔</td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted -->-</td>
 </tr>
 <tr>
-<td align="left">Router: All the above Mixed Without Conflict<a href="#all-the-above-mixed-without-conflict">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Router: All the above Mixed Without Conflict<a href="#all-the-above-mixed-without-conflict">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Router: Custom HTTP Errors<a href="#router-custom-http-errors">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Router: Custom HTTP Errors<a href="#router-custom-http-errors">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">100% compatible with net/http<a href="#100-compatible-with-nethttp">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">❔</td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">100% compatible with net/http<a href="#100-compatible-with-nethttp">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">❔</td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Middleware ecosystem<a href="#middleware-ecosystem">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Middleware ecosystem<a href="#middleware-ecosystem">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Sinatra-like API<a href="#sinatra-like-api">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Sinatra-like API<a href="#sinatra-like-api">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Server: Automatic HTTPS<a href="#server-automatic-https">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">❔</td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Server: Automatic HTTPS<a href="#server-automatic-https">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">❔</td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Server: Gracefully Shutdown<a href="#server-gracefully-shutdown">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Server: Gracefully Shutdown<a href="#server-gracefully-shutdown">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Server: Multi Listeners<a href="#server-multi-listeners">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Server: Multi Listeners<a href="#server-multi-listeners">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Full HTTP/2<a href="#full-http2">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">❔</td>
-<td align="center">❔</td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">standard</td>
-<td align="center">standard</td>
+<td style="text-align:left">Full HTTP/2<a href="#full-http2">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">❔</td>
+<td style="text-align:center">❔</td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">standard</td>
+<td style="text-align:center">standard</td>
 </tr>
 <tr>
-<td align="left">Subdomains<a href="#subdomains">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">secondary</td>
-<td align="center">secondary</td>
-<td align="center">secondary</td>
-<td align="center">secondary</td>
-<td align="center">secondary</td>
+<td style="text-align:left">Subdomains<a href="#subdomains">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">secondary</td>
+<td style="text-align:center">secondary</td>
+<td style="text-align:center">secondary</td>
+<td style="text-align:center">secondary</td>
+<td style="text-align:center">secondary</td>
 </tr>
 <tr>
-<td align="left">Sessions<a href="#sessions">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">secondary</td>
+<td style="text-align:left">Sessions<a href="#sessions">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">secondary</td>
 </tr>
 <tr>
-<td align="left">Websockets<a href="#websockets">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Websockets<a href="#websockets">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">View (aka Templates) Embedded Into App<a href="#view-aka-templates-embedded-into-app">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">View (aka Templates) Embedded Into App<a href="#view-aka-templates-embedded-into-app">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">View Engine: STD<a href="#view-engine-std">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">View Engine: STD<a href="#view-engine-std">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">View Engine: Pug<a href="#view-engine-pug">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">View Engine: Pug<a href="#view-engine-pug">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">View Engine: Django<a href="#view-engine-django">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">View Engine: Django<a href="#view-engine-django">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">View Engine: Handlebars<a href="#view-engine-handlebars">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">View Engine: Handlebars<a href="#view-engine-handlebars">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">View Engine: Amber<a href="#view-engine-amber">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">View Engine: Amber<a href="#view-engine-amber">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Renderer: Markdown, JSON, JSONP, XML&hellip;<a href="#renderer-markdown-json-jsonp-xml">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Renderer: Markdown, JSON, JSONP, XML&hellip;<a href="#renderer-markdown-json-jsonp-xml">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">MVC<a href="#mvc">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted -->-</td>
-<td align="center">generator</td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">MVC<a href="#mvc">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted -->-</td>
+<td style="text-align:center">generator</td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Caching<a href="#catching">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Caching<a href="#catching">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">File Server<a href="#file-server">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">File Server<a href="#file-server">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">File Server: Embedded Into App<a href="#file-server-embedded-into-app">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">File Server: Embedded Into App<a href="#file-server-embedded-into-app">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Response can be Modified Many times through lifecycle before sent<a href="#response-can-be-modified-many-times-through-lifecycle-before-sent">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Response can be Modified Many times through lifecycle before sent<a href="#response-can-be-modified-many-times-through-lifecycle-before-sent">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Gzip<a href="#gzip">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center">middleware</td>
-<td align="center">middleware</td>
-<td align="center">middleware</td>
+<td style="text-align:left">Gzip<a href="#gzip">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center">middleware</td>
+<td style="text-align:center">middleware</td>
+<td style="text-align:center">middleware</td>
 </tr>
 <tr>
-<td align="left">Testing Framework<a href="#testing-framework">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Testing Framework<a href="#testing-framework">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Typescript Transpiler<a href="#typescript-transpiler">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Typescript Transpiler<a href="#typescript-transpiler">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Online Editor<a href="#online-editor">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Online Editor<a href="#online-editor">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Logging System<a href="#logging-system">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted -->-</td>
-<td align="center"><!-- raw HTML omitted -->-</td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Logging System<a href="#logging-system">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted -->-</td>
+<td style="text-align:center"><!-- raw HTML omitted -->-</td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Maintenance &amp; Auto-Updates<a href="#maintenance--auto-updates">*</a></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
-<td align="center"><!-- raw HTML omitted --></td>
+<td style="text-align:left">Maintenance &amp; Auto-Updates<a href="#maintenance--auto-updates">*</a></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
+<td style="text-align:center"><!-- raw HTML omitted --></td>
 </tr>
 <tr>
-<td align="left">Performance</td>
-<td align="center">★★★★★</td>
-<td align="center">★★★</td>
-<td align="center">★★</td>
-<td align="center">★★★★★</td>
-<td align="center">★★★★★</td>
-<td align="center">★★★</td>
+<td style="text-align:left">Performance</td>
+<td style="text-align:center">★★★★★</td>
+<td style="text-align:center">★★★</td>
+<td style="text-align:center">★★</td>
+<td style="text-align:center">★★★★★</td>
+<td style="text-align:center">★★★★★</td>
+<td style="text-align:center">★★★</td>
 </tr>
 </tbody>
 </table>
@@ -526,7 +526,7 @@
     <ul>
     
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">图解Golang channel源码</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
       </li>
     
       <li>
@@ -538,7 +538,7 @@
       </li>
     
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E5%8D%8F%E7%A8%8B%E5%8E%9F%E7%90%86/" class="nav-link">go协程原理</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go协程原理</a>
       </li>
     
       <li>
@@ -550,7 +550,7 @@
       </li>
     
       <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
       </li>
     
     </ul>
@@ -558,13 +558,19 @@
     <ul class="flex-column">
       
       <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-channel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">图解Golang channel源码</a>
+        <a href="https://kinnylee.github.io/post/java/java8/java8%E6%96%B0%E5%A2%9E%E7%89%B9%E6%80%A7/" class="nav-link">java基础-集合框架</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
       </li>
       <li>
-        <a href="https://kinnylee.github.io/post/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-kube-apiserver/" class="nav-link">k8s组件kube-apiserver源码分析</a>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/kubernetes%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90-etcd%E5%AD%98%E5%82%A8%E6%A0%B8%E5%BF%83%E5%AE%9E%E7%8E%B0/" class="nav-link">k8s存储组件Etcd核心源码分析</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kube-apiserver/" class="nav-link">k8s源码分析- kube-apiserver</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD/k8s%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90kube-scheduler/" class="nav-link">k8s源码分析： kube-scheduler</a>
       </li>
       <li>
         <a href="https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/restful%E6%A1%86%E6%9E%B6/go-restful/" class="nav-link">k8s使用的web框架：go-restful 源码分析</a>
@@ -575,12 +581,6 @@
       <li>
         <a href="https://kinnylee.github.io/post/go/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/file-filepath/" class="nav-link">go协程入门</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go-map%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" class="nav-link">go-map原理解析</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/docker/docker%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86/" class="nav-link">Docker核心原理</a>
-      </li>
     </ul> 
     
     <div>
@@ -588,7 +588,7 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
           K8S
-          <span class='button_tally'>12</span>
+          <span class='button_tally'>13</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
@@ -598,12 +598,12 @@
         
         <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
           JAVA
-          <span class='button_tally'>5</span>
+          <span class='button_tally'>6</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>5</span>
+          <span class='button_tally'>6</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
@@ -673,13 +673,13 @@
           <span class='button_tally'>11</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
-          GO
-          <span class='button_tally'>9</span>
-        </a>
-        
         <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
           K8S
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
           <span class='button_tally'>9</span>
         </a>
         
@@ -690,7 +690,7 @@
         
         <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
           JAVA基础
-          <span class='button_tally'>4</span>
+          <span class='button_tally'>5</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
@@ -775,7 +775,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=4>JAVA基础<span class='button_tally'>4</span>
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=5>JAVA基础<span class='button_tally'>5</span>
             </a>
             
             
@@ -783,7 +783,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=9>K8S<span class='button_tally'>9</span>
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=10>K8S<span class='button_tally'>10</span>
             </a>
             
             
