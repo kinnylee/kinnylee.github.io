@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>kinnylee</title>
+  <meta charset='utf-8'>
+  <meta name="generator" content="Hugo 0.75.0-DEV" />
+  <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+  <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'XXXXXXXXXX');
+</script>
+<meta property = "og:locale" content = "en_US" />
+<meta property="og:type" content="article">
+<meta name="description" content="Istio源码分析-pilot-discovery 概述 pilot-discovery扮演服务注册中心、istio控制平面到Envoy之间的桥">
+<meta name = "twitter:card" content = "summary" />
+<meta name = "twitter:creator" content = "@janedoe">
+<meta name = "twitter:title" content = "" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-discovery/" />
+<meta property = "og:title" content = "" />
+<meta property = "og:description" content = "Istio源码分析-pilot-discovery 概述 pilot-discovery扮演服务注册中心、istio控制平面到Envoy之间的桥" />
+<meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
+<link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
+<link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
+<link rel='icon' type='image/png' sizes='16x16' href='https://kinnylee.github.io/icons/favicon-16x16.png'>
+<link rel='manifest' href='https://kinnylee.github.io/icons/site.webmanifest'>
+<link rel="mask-icon" href= 'https://kinnylee.github.io/safari-pinned-tab.svg' color="#002538">
+<meta name="msapplication-TileColor" content="#002538">
+<meta name="theme-color" content="#002538">
+
+  <link rel='canonical' href='https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-discovery/'>
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+    
+    <link rel="preload" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity = "sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" as="script" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous">
+
+    
+    <link rel="stylesheet" type="text/css" href="https://kinnylee.github.io/css/styles.8bc680de0775aea5cf0aed97e851ca175a505e7f48b18035e53401fb191c70c5c3e1916800a681af4e7d6211169c415c09fa178c63b103df859c63229acfcc81.css" integrity="sha512-i8aA3gd1rqXPCu2X6FHKF1pQXn9IsYA15TQB&#43;xkccMXD4ZFoAKaBr059YhEWnEFcCfoXjGOxA9&#43;FnGMims/MgQ==" crossorigin="anonymous">
+	  
+  </head>
+  
+  
+  
+    
+  
+  <body data-code="100" data-lines="true" id="documentTop">
+
+<header class = 'nav_header' >
+  <nav class = 'nav'>
+    <a href='https://kinnylee.github.io/' class = 'nav_brand nav_item'>
+      <img src="https://kinnylee.github.io/logos/logo.png" class="logo">
+      <div class = 'nav_close'>
+        <div>
+          <svg class="icon">
+            <use xlink:href="#open-menu"></use>
+          </svg>
+          <svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg>
+        </div>
+      </div>
+    </a>
+    <div class = 'nav_body nav_body_left'>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>首页 </a>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>编程语言 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/go/' class = 'nav_child nav_item'>Go</a>
+          <a href = 'https://kinnylee.github.io/categories/java' class = 'nav_child nav_item'>Java</a>
+          <a href = 'https://kinnylee.github.io/categories/c&#43;&#43;' class = 'nav_child nav_item'>C&#43;&#43;</a>
+          <a href = 'https://kinnylee.github.io/categories/python' class = 'nav_child nav_item'>Python</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>云原生 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/categories/prometheus' class = 'nav_child nav_item'>prometheus</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>中间件 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/mysql' class = 'nav_child nav_item'>Mysql</a>
+          <a href = 'https://kinnylee.github.io/categories/redis' class = 'nav_child nav_item'>Redis</a>
+          <a href = 'https://kinnylee.github.io/categories/rocketmq' class = 'nav_child nav_item'>RocketMQ</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>源码阅读 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'nav_child nav_item'>breakpad</a>
+          <a href = 'https://kinnylee.github.io/tags/redis' class = 'nav_child nav_item'>redis</a>
+          <a href = 'https://kinnylee.github.io/tags/go' class = 'nav_child nav_item'>go</a>
+          <a href = 'https://kinnylee.github.io/tags/k8s' class = 'nav_child nav_item'>k8s</a>
+          <a href = 'https://kinnylee.github.io/tags/linux' class = 'nav_child nav_item'>linux</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/' class = 'nav_item'>技术 <img src= https://kinnylee.github.io/icons/caret-icon.svg alt="icon" class="nav_icon"></a>
+        <div class = 'nav_sub'>
+          <a href = 'https://kinnylee.github.io/categories/computer' class = 'nav_child nav_item'>计算机原理</a>
+          <a href = 'https://kinnylee.github.io/categories/ansible' class = 'nav_child nav_item'>Ansible</a>
+          <a href = 'https://kinnylee.github.io/categories/docker' class = 'nav_child nav_item'>Docker</a>
+          <a href = 'https://kinnylee.github.io/categories/linux' class = 'nav_child nav_item'>Linux内核</a>
+          <a href = 'https://kinnylee.github.io/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0' class = 'nav_child nav_item'>机器学习</a>
+        </div>
+      </div>
+      <div class = 'nav_parent'>
+        <a href = 'https://kinnylee.github.io/about/' class = 'nav_item'>关于我 </a>
+      </div>
+<div class='follow'>
+  <a href='https://github.com/kinnylee'>
+    <svg class="icon">
+      <use xlink:href="#github"></use>
+    </svg>
+  </a>
+  <a href='https://juejin.im/user/3878732754069272'>
+    <svg class="icon">
+      <use xlink:href="#%e6%8e%98%e9%87%91"></use>
+    </svg>
+  </a>
+<div class = 'color_mode'>
+  <input type = 'checkbox' class = 'color_choice' id = 'mode'>
+</div>
+
+</div>
+
+    </div>
+  </nav>
+</header>
+
+    <main>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'></h1><div class = 'post_meta'>
+  <svg class="icon">
+    <use xlink:href="#calendar"></use>
+  </svg>
+  <span class="post_date">
+    Jan 1, 0001</span>
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 6941 字</span>，阅读约<span class="more-meta"> 14 分钟</span>
+    <div class='post_share'>
+  | 复制链接:
+  <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-discovery/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
+  </a>
+</div>
+
+    
+    <h1 id="istio源码分析-pilot-discovery">Istio源码分析-pilot-discovery</h1>
+<h2 id="概述">概述</h2>
+<p>pilot-discovery扮演服务注册中心、istio控制平面到Envoy之间的桥梁作用。pilot-discovery的主要功能包括：</p>
+<ol>
+<li>监控服务注册中心（如Kubernetes）的服务注册情况。在Kubernetes环境下，会监控<code>service</code>、<code>endpoint</code>、<code>pod</code>、<code>node</code>等资源信息</li>
+<li>监控istio控制面信息变化，在Kubernetes环境下，会监控包括<code>RouteRule</code>、 <code>VirtualService</code>、<code>Gateway</code>、<code>EgressRule</code>、<code>ServiceEntry</code>等以Kubernetes CRD形式存在的istio控制面配置信息。</li>
+<li>将上述两类信息合并组合为Envoy可以理解的（即遵循Envoy data plane api的）配置信息，并将这些信息以gRPC协议提供给Envoy</li>
+</ol>
+<h2 id="功能概述">功能概述</h2>
+<ul>
+<li>初始化</li>
+<li>istio控制面信息监控与处理</li>
+<li>服务注册信息监控与处理</li>
+<li>Envoy控制面信息服务</li>
+</ul>
+<h3 id="初始化">初始化</h3>
+<ul>
+<li>初始化kubeclient</li>
+<li>初始化xdsserver</li>
+<li>初始化controller
+<ul>
+<li>初始化configController</li>
+<li>初始化serviceController</li>
+</ul>
+</li>
+<li>初始化discoveryservice</li>
+</ul>
+<h3 id="istio控制面信息监控与处理">istio控制面信息监控与处理</h3>
+<h3 id="服务注册信息监控与处理">服务注册信息监控与处理</h3>
+<h3 id="envoy控制面信息服务">Envoy控制面信息服务</h3>
+<p>pilot-discovery创建 envoy xds server对外提供grpc协议discovery服务</p>
+<h2 id="源码分析">源码分析</h2>
+<h3 id="启动入口">启动入口</h3>
+<p>代码路径：istio/pilot/cmd/pilot-discovery/，包括两个文件</p>
+<ul>
+<li>main.go：定义了根命令及discovery命令，是启动服务发现和配置下发的主流程</li>
+<li>request.go：用来请求pilot中的metrics/debug接口，多用来调试</li>
+</ul>
+<h4 id="支持的子命令">支持的子命令</h4>
+<ul>
+<li>discovery：启动代理发现服务</li>
+<li>collateral：</li>
+<li>request：</li>
+<li>version：</li>
+</ul>
+<h4 id="discovery命令">discovery命令</h4>
+<p>istio/pilot/cmd/pilot-discovery/main.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span>
+<span class="ln"> 2</span><span class="c1">// 创建一个空的channel，用来停止所有的servers
+</span><span class="ln"> 3</span><span class="c1"></span><span class="nx">stop</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span>
+<span class="ln"> 4</span><span class="c1">// 创建服务发现的server
+</span><span class="ln"> 5</span><span class="c1"></span><span class="nx">discoveryServer</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">bootstrap</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">(</span><span class="nx">serverArgs</span><span class="p">)</span>
+<span class="ln"> 6</span><span class="o">...</span>
+<span class="ln"> 7</span><span class="c1">// 运行server中注册的所有服务
+</span><span class="ln"> 8</span><span class="c1"></span><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">discoveryServer</span><span class="p">.</span><span class="nf">Start</span><span class="p">(</span><span class="nx">stop</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 9</span>    <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;failed to start discovery service: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln">10</span><span class="p">}</span>
+<span class="ln">11</span><span class="c1">// 等待退出信号并关闭channel
+</span><span class="ln">12</span><span class="c1"></span><span class="nx">cmd</span><span class="p">.</span><span class="nf">WaitSignal</span><span class="p">(</span><span class="nx">stop</span><span class="p">)</span>
+<span class="ln">13</span>
+</code></pre></div><h4 id="request命令">request命令</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="c1">// 请求 15014 端口数据
+</span><span class="ln"> 2</span><span class="c1"></span><span class="nx">command</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">request</span><span class="p">.</span><span class="nx">Command</span><span class="p">{</span>
+<span class="ln"> 3</span>    <span class="nx">Address</span><span class="p">:</span> <span class="s">&#34;127.0.0.1:15014&#34;</span><span class="p">,</span>
+<span class="ln"> 4</span>    <span class="nx">Client</span><span class="p">:</span> <span class="o">&amp;</span><span class="nx">http</span><span class="p">.</span><span class="nx">Client</span><span class="p">{</span>
+<span class="ln"> 5</span>        <span class="nx">Timeout</span><span class="p">:</span> <span class="mi">60</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">,</span>
+<span class="ln"> 6</span>    <span class="p">},</span>
+<span class="ln"> 7</span><span class="p">}</span>
+<span class="ln"> 8</span><span class="nx">body</span> <span class="o">:=</span> <span class="s">&#34;&#34;</span>
+<span class="ln"> 9</span><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">2</span> <span class="p">{</span>
+<span class="ln">10</span>    <span class="nx">body</span> <span class="p">=</span> <span class="nx">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="ln">11</span><span class="p">}</span>
+<span class="ln">12</span><span class="k">return</span> <span class="nx">command</span><span class="p">.</span><span class="nf">Do</span><span class="p">(</span><span class="nx">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">body</span><span class="p">)</span>
+</code></pre></div><h3 id="server">Server</h3>
+<p>bootstrap.NewServer返回的对象是Server，看下Server的数据结构</p>
+<p>pilot/pkg/bootstrap/server.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Server</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="c1">// xds 服务
+</span><span class="ln"> 3</span><span class="c1"></span>    <span class="nx">XDSServer</span> <span class="o">*</span><span class="nx">xds</span><span class="p">.</span><span class="nx">DiscoveryServer</span>
+<span class="ln"> 4</span>	<span class="c1">// 集群id
+</span><span class="ln"> 5</span><span class="c1"></span>    <span class="nx">clusterID</span>   <span class="kt">string</span>
+<span class="ln"> 6</span>    <span class="c1">// pilot 环境所需的 API 集合
+</span><span class="ln"> 7</span><span class="c1"></span>    <span class="nx">environment</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">Environment</span>
+<span class="ln"> 8</span>	<span class="o">...</span>
+<span class="ln"> 9</span>    <span class="c1">// 处理 k8s 多个集群的注册中心
+</span><span class="ln">10</span><span class="c1"></span>    <span class="c1">// istio支持使用一个istio control plane来管理跨多个Kubernetes集群上的service mesh
+</span><span class="ln">11</span><span class="c1"></span>    <span class="c1">// stio的控制平面组件（如pilot-discovery）运行所在的Kubernetes集群叫本地集群，通过这个istio控制面板连接的其他Kubernetes集群叫远程集群（remote cluster）
+</span><span class="ln">12</span><span class="c1"></span>    <span class="nx">multicluster</span> <span class="o">*</span><span class="nx">kubecontroller</span><span class="p">.</span><span class="nx">Multicluster</span>
+<span class="ln">13</span>    <span class="c1">// 统一处理配置数据（比如VirtualService等）的 controller
+</span><span class="ln">14</span><span class="c1"></span>    <span class="nx">configController</span>  <span class="nx">model</span><span class="p">.</span><span class="nx">ConfigStoreCache</span>
+<span class="ln">15</span>    <span class="c1">// 不同配置信息的缓存器，提供Get、List、Create方法
+</span><span class="ln">16</span><span class="c1"></span>    <span class="nx">ConfigStores</span>      <span class="p">[]</span><span class="nx">model</span><span class="p">.</span><span class="nx">ConfigStoreCache</span>
+<span class="ln">17</span>    <span class="c1">// 单独处理 ServiceEntry 的 Controller
+</span><span class="ln">18</span><span class="c1"></span>    <span class="nx">serviceEntryStore</span> <span class="o">*</span><span class="nx">serviceentry</span><span class="p">.</span><span class="nx">ServiceEntryStore</span>
+<span class="ln">19</span>	<span class="o">...</span>
+<span class="ln">20</span>    <span class="c1">// 文件监听器，主要监听配置文件
+</span><span class="ln">21</span><span class="c1"></span>    <span class="c1">// fileWatcher used to watch mesh config, networks and certificates.
+</span><span class="ln">22</span><span class="c1"></span>    <span class="nx">fileWatcher</span> <span class="nx">filewatcher</span><span class="p">.</span><span class="nx">FileWatcher</span>
+<span class="ln">23</span>	<span class="o">...</span>
+<span class="ln">24</span><span class="p">}</span>
+</code></pre></div><h4 id="newserver">NewServer</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">NewServer</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">Server</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="c1">// Environment 初始化
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nx">e</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">model</span><span class="p">.</span><span class="nx">Environment</span><span class="p">{</span>
+<span class="ln"> 4</span>		<span class="nx">PushContext</span><span class="p">:</span>  <span class="nx">model</span><span class="p">.</span><span class="nf">NewPushContext</span><span class="p">(),</span>
+<span class="ln"> 5</span>		<span class="nx">DomainSuffix</span><span class="p">:</span> <span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">KubeOptions</span><span class="p">.</span><span class="nx">DomainSuffix</span><span class="p">,</span>
+<span class="ln"> 6</span>	<span class="p">}</span>
+<span class="ln"> 7</span>	<span class="o">...</span>
+<span class="ln"> 8</span>	<span class="nx">s</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Server</span><span class="p">{</span>
+<span class="ln"> 9</span>		<span class="nx">clusterID</span><span class="p">:</span>           <span class="nf">getClusterID</span><span class="p">(</span><span class="nx">args</span><span class="p">),</span>
+<span class="ln">10</span>		<span class="nx">environment</span><span class="p">:</span>         <span class="nx">e</span><span class="p">,</span>
+<span class="ln">11</span>		<span class="nx">fileWatcher</span><span class="p">:</span>         <span class="nx">filewatcher</span><span class="p">.</span><span class="nf">NewWatcher</span><span class="p">(),</span>
+<span class="ln">12</span>		<span class="nx">httpMux</span><span class="p">:</span>             <span class="nx">http</span><span class="p">.</span><span class="nf">NewServeMux</span><span class="p">(),</span>
+<span class="ln">13</span>		<span class="nx">monitoringMux</span><span class="p">:</span>       <span class="nx">http</span><span class="p">.</span><span class="nf">NewServeMux</span><span class="p">(),</span>
+<span class="ln">14</span>		<span class="nx">readinessProbes</span><span class="p">:</span>     <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">readinessProbe</span><span class="p">),</span>
+<span class="ln">15</span>		<span class="nx">workloadTrustBundle</span><span class="p">:</span> <span class="nx">tb</span><span class="p">.</span><span class="nf">NewTrustBundle</span><span class="p">(</span><span class="kc">nil</span><span class="p">),</span>
+<span class="ln">16</span>		<span class="nx">server</span><span class="p">:</span>              <span class="nx">server</span><span class="p">.</span><span class="nf">New</span><span class="p">(),</span>
+<span class="ln">17</span>	<span class="p">}</span>
+<span class="ln">18</span>	<span class="c1">// XDS server 初始化
+</span><span class="ln">19</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nx">XDSServer</span> <span class="p">=</span> <span class="nx">xds</span><span class="p">.</span><span class="nf">NewDiscoveryServer</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">Plugins</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">PodName</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">)</span>
+<span class="ln">20</span>	<span class="o">...</span>
+<span class="ln">21</span>	<span class="c1">// Apply the arguments to the configuration.
+</span><span class="ln">22</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initKubeClient</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">23</span>		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;error initializing kube client: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln">24</span>	<span class="p">}</span>
+<span class="ln">25</span>
+<span class="ln">26</span>    <span class="c1">// mesh config 初始化
+</span><span class="ln">27</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">initMeshConfiguration</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">fileWatcher</span><span class="p">)</span>
+<span class="ln">28</span>	<span class="nx">spiffe</span><span class="p">.</span><span class="nf">SetTrustDomain</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">environment</span><span class="p">.</span><span class="nf">Mesh</span><span class="p">().</span><span class="nf">GetTrustDomain</span><span class="p">())</span>
+<span class="ln">29</span>
+<span class="ln">30</span>    <span class="c1">// mesh network 初始化
+</span><span class="ln">31</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">initMeshNetworks</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">fileWatcher</span><span class="p">)</span>
+<span class="ln">32</span>    <span class="c1">// mesh handler 初始化
+</span><span class="ln">33</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">initMeshHandlers</span><span class="p">()</span>
+<span class="ln">34</span>	<span class="nx">s</span><span class="p">.</span><span class="nx">environment</span><span class="p">.</span><span class="nf">Init</span><span class="p">()</span>
+<span class="ln">35</span>	<span class="o">...</span>
+<span class="ln">36</span>    <span class="c1">// controller 初始化
+</span><span class="ln">37</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initControllers</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">38</span>		<span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+<span class="ln">39</span>	<span class="p">}</span>
+<span class="ln">40</span>	<span class="o">...</span>
+<span class="ln">41</span>    <span class="c1">// sidercar 自动注入初始化
+</span><span class="ln">42</span><span class="c1"></span>	<span class="nx">wh</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initSidecarInjector</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span>
+<span class="ln">43</span>	<span class="o">...</span>
+<span class="ln">44</span>    <span class="c1">// 初始化 RegistryEnventHandler
+</span><span class="ln">45</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">initRegistryEventHandlers</span><span class="p">()</span>
+<span class="ln">46</span>
+<span class="ln">47</span>    <span class="c1">// 初始化服务发现
+</span><span class="ln">48</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">initDiscoveryService</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span>
+<span class="ln">49</span>	<span class="nx">s</span><span class="p">.</span><span class="nf">initSDSServer</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span>
+<span class="ln">50</span>	<span class="o">...</span>
+<span class="ln">51</span>    <span class="c1">// 最后启动 kubeclient 的运行和监听
+</span><span class="ln">52</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">s</span><span class="p">.</span><span class="nx">kubeClient</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">53</span>		<span class="nx">s</span><span class="p">.</span><span class="nf">addStartFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">stop</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">54</span>			<span class="nx">s</span><span class="p">.</span><span class="nx">kubeClient</span><span class="p">.</span><span class="nf">RunAndWait</span><span class="p">(</span><span class="nx">stop</span><span class="p">)</span>
+<span class="ln">55</span>			<span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">56</span>		<span class="p">})</span>
+<span class="ln">57</span>	<span class="p">}</span>
+<span class="ln">58</span>    <span class="o">...</span>
+<span class="ln">59</span><span class="p">}</span>
+</code></pre></div><h4 id="初始化environment">初始化Environment</h4>
+<p>Environment为pilot提供了一个汇总的、运行中所需的API集合</p>
+<p>pilot/pkg/model/context.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">Environment</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="c1">// 服务发现的接口，用于列出 services 和 instances
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nx">ServiceDiscovery</span>
+<span class="ln"> 4</span>    <span class="c1">// 配置接口，用于列出配置规则
+</span><span class="ln"> 5</span><span class="c1"></span>	<span class="nx">IstioConfigStore</span>
+<span class="ln"> 6</span>    <span class="c1">// 下面两个监听器负责监听istiod启动时挂载的两个配置文件，通过configmap挂载进去
+</span><span class="ln"> 7</span><span class="c1"></span>    <span class="c1">// 监听到配置文件变化时，运行预先注册的handler
+</span><span class="ln"> 8</span><span class="c1"></span>    <span class="c1">// mesh config 文件的监听器
+</span><span class="ln"> 9</span><span class="c1"></span>	<span class="nx">mesh</span><span class="p">.</span><span class="nx">Watcher</span>
+<span class="ln">10</span>    <span class="c1">// mesh network config 文件的监听器
+</span><span class="ln">11</span><span class="c1"></span>	<span class="nx">mesh</span><span class="p">.</span><span class="nx">NetworksWatcher</span>
+<span class="ln">12</span>    <span class="c1">// 持有推送xds信息期间的上下文信息
+</span><span class="ln">13</span><span class="c1"></span>	<span class="nx">PushContext</span> <span class="o">*</span><span class="nx">PushContext</span>
+<span class="ln">14</span>	<span class="c1">// 默认的后缀域名                       
+</span><span class="ln">15</span><span class="c1"></span>	<span class="nx">DomainSuffix</span> <span class="kt">string</span>
+<span class="ln">16</span>	<span class="o">...</span>
+<span class="ln">17</span><span class="p">}</span>
+</code></pre></div><p>Environment初始化</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="c1">// 初始化 Environment
+</span><span class="ln"> 2</span><span class="c1"></span><span class="nx">e</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">model</span><span class="p">.</span><span class="nx">Environment</span><span class="p">{</span>
+<span class="ln"> 3</span>		<span class="nx">PushContext</span><span class="p">:</span>  <span class="nx">model</span><span class="p">.</span><span class="nf">NewPushContext</span><span class="p">(),</span>
+<span class="ln"> 4</span>		<span class="nx">DomainSuffix</span><span class="p">:</span> <span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">KubeOptions</span><span class="p">.</span><span class="nx">DomainSuffix</span><span class="p">,</span>
+<span class="ln"> 5</span>	<span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="c1">// 初始化 PushContext，并传给 Environment
+</span><span class="ln"> 8</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewPushContext</span><span class="p">()</span> <span class="o">*</span><span class="nx">PushContext</span> <span class="p">{</span>
+<span class="ln"> 9</span>	<span class="c1">// TODO: detect push in progress, don&#39;t update status if set
+</span><span class="ln">10</span><span class="c1"></span>	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">PushContext</span><span class="p">{</span>
+<span class="ln">11</span>        <span class="c1">// 存储所有 Service 的 map
+</span><span class="ln">12</span><span class="c1"></span>		<span class="nx">ServiceIndex</span><span class="p">:</span>            <span class="nf">newServiceIndex</span><span class="p">(),</span>
+<span class="ln">13</span>        <span class="c1">// 存储所有 VirtualService 的 map
+</span><span class="ln">14</span><span class="c1"></span>		<span class="nx">virtualServiceIndex</span><span class="p">:</span>     <span class="nf">newVirtualServiceIndex</span><span class="p">(),</span>
+<span class="ln">15</span>        <span class="c1">// 存储所有 DestinationRule 的 map
+</span><span class="ln">16</span><span class="c1"></span>		<span class="nx">destinationRuleIndex</span><span class="p">:</span>    <span class="nf">newDestinationRuleIndex</span><span class="p">(),</span>
+<span class="ln">17</span>		<span class="nx">sidecarsByNamespace</span><span class="p">:</span>     <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="o">*</span><span class="nx">SidecarScope</span><span class="p">{},</span>
+<span class="ln">18</span>		<span class="nx">envoyFiltersByNamespace</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">][]</span><span class="o">*</span><span class="nx">EnvoyFilterWrapper</span><span class="p">{},</span>
+<span class="ln">19</span>        <span class="c1">// 存储所有 Gateway 的 map
+</span><span class="ln">20</span><span class="c1"></span>		<span class="nx">gatewayIndex</span><span class="p">:</span>            <span class="nf">newGatewayIndex</span><span class="p">(),</span>
+<span class="ln">21</span>		<span class="nx">ProxyStatus</span><span class="p">:</span>             <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">ProxyPushStatus</span><span class="p">{},</span>
+<span class="ln">22</span>		<span class="nx">ServiceAccounts</span><span class="p">:</span>         <span class="kd">map</span><span class="p">[</span><span class="nx">host</span><span class="p">.</span><span class="nx">Name</span><span class="p">]</span><span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">][]</span><span class="kt">string</span><span class="p">{},</span>
+<span class="ln">23</span>	<span class="p">}</span>
+<span class="ln">24</span><span class="p">}</span>
+</code></pre></div><h4 id="初始化聚合所有注册中心的controller">初始化聚合所有注册中心的controller</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="nx">ac</span> <span class="o">:=</span> <span class="nx">aggregate</span><span class="p">.</span><span class="nf">NewController</span><span class="p">(</span><span class="nx">aggregate</span><span class="p">.</span><span class="nx">Options</span><span class="p">{</span>
+<span class="ln"> 2</span>		<span class="nx">MeshHolder</span><span class="p">:</span> <span class="nx">e</span><span class="p">,</span>
+<span class="ln"> 3</span>	<span class="p">})</span>
+<span class="ln"> 4</span><span class="c1">// 初始化后的聚合服务，传给Environment
+</span><span class="ln"> 5</span><span class="c1"></span><span class="nx">e</span><span class="p">.</span><span class="nx">ServiceDiscovery</span> <span class="p">=</span> <span class="nx">ac</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="c1">// 创建一个聚合的controller
+</span><span class="ln"> 8</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewController</span><span class="p">(</span><span class="nx">opt</span> <span class="nx">Options</span><span class="p">)</span> <span class="o">*</span><span class="nx">Controller</span> <span class="p">{</span>
+<span class="ln"> 9</span>	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">Controller</span><span class="p">{</span>
+<span class="ln">10</span>		<span class="nx">registries</span><span class="p">:</span> <span class="nb">make</span><span class="p">([]</span><span class="nx">serviceregistry</span><span class="p">.</span><span class="nx">Instance</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="ln">11</span>		<span class="nx">meshHolder</span><span class="p">:</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">MeshHolder</span><span class="p">,</span>
+<span class="ln">12</span>		<span class="nx">running</span><span class="p">:</span>    <span class="nx">atomic</span><span class="p">.</span><span class="nf">NewBool</span><span class="p">(</span><span class="kc">false</span><span class="p">),</span>
+<span class="ln">13</span>	<span class="p">}</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div><h4 id="初始化xdsserver">初始化XDSServer</h4>
+<p>xds服务类是 DiscoveryServer</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">s</span><span class="p">.</span><span class="nx">XDSServer</span> <span class="p">=</span> <span class="nx">xds</span><span class="p">.</span><span class="nf">NewDiscoveryServer</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">Plugins</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">PodName</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">)</span>
+</code></pre></div><p>DiscoveryServer</p>
+<p>pilot/pkg/xds/discovery.go</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">DiscoveryServer</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="c1">// 前面介绍的 Environment
+</span><span class="ln"> 3</span><span class="c1"></span>    <span class="nx">Env</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">Environment</span>
+<span class="ln"> 4</span>    <span class="c1">// 用于调试和加载测试数据
+</span><span class="ln"> 5</span><span class="c1"></span>    <span class="nx">MemRegistry</span> <span class="o">*</span><span class="nx">memory</span><span class="p">.</span><span class="nx">ServiceDiscovery</span>
+<span class="ln"> 6</span>    <span class="c1">// 控制面 Istio 配置生成器
+</span><span class="ln"> 7</span><span class="c1"></span>    <span class="nx">ConfigGenerator</span> <span class="nx">core</span><span class="p">.</span><span class="nx">ConfigGenerator</span>
+<span class="ln"> 8</span>    <span class="c1">// 针对不同配置的定制化生成器
+</span><span class="ln"> 9</span><span class="c1"></span>    <span class="c1">// key 是生成器类型
+</span><span class="ln">10</span><span class="c1"></span>    <span class="nx">Generators</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">model</span><span class="p">.</span><span class="nx">XdsResourceGenerator</span>
+<span class="ln">11</span>    <span class="o">...</span>
+<span class="ln">12</span>    <span class="c1">// 不同服务的所有实例集合
+</span><span class="ln">13</span><span class="c1"></span>    <span class="c1">// 增林更新，key 为 service、namespace
+</span><span class="ln">14</span><span class="c1"></span>    <span class="nx">EndpointShardsByService</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">EndpointShards</span>
+<span class="ln">15</span>	<span class="c1">// 接受push请求的channel
+</span><span class="ln">16</span><span class="c1"></span>    <span class="nx">pushChannel</span> <span class="kd">chan</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span>
+<span class="ln">17</span>
+<span class="ln">18</span>    <span class="c1">// mutex used for config update scheduling (former cache update mutex)
+</span><span class="ln">19</span><span class="c1"></span>    <span class="nx">updateMutex</span> <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+<span class="ln">20</span>
+<span class="ln">21</span>    <span class="c1">// push xds 之前的缓冲队列
+</span><span class="ln">22</span><span class="c1"></span>    <span class="nx">pushQueue</span> <span class="o">*</span><span class="nx">PushQueue</span>
+<span class="ln">23</span>
+<span class="ln">24</span>    <span class="c1">// debugHandlers is the list of all the supported debug handlers.
+</span><span class="ln">25</span><span class="c1"></span>    <span class="nx">debugHandlers</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">string</span>
+<span class="ln">26</span>
+<span class="ln">27</span>    <span class="c1">// adsClients reflect active gRPC channels, for both ADS and EDS.
+</span><span class="ln">28</span><span class="c1"></span>    <span class="c1">// xds 和 eds 之间的 grpc 连接
+</span><span class="ln">29</span><span class="c1"></span>    <span class="nx">adsClients</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">Connection</span>
+<span class="ln">30</span>
+<span class="ln">31</span>    <span class="c1">// StatusGen is notified of connect/disconnect/nack on all connections
+</span><span class="ln">32</span><span class="c1"></span>    <span class="c1">// 状态更新生成器
+</span><span class="ln">33</span><span class="c1"></span>    <span class="c1">// 状态更新后向所有 connection 推送 DiscoveryResponse
+</span><span class="ln">34</span><span class="c1"></span>    <span class="nx">StatusGen</span>               <span class="o">*</span><span class="nx">StatusGen</span>
+<span class="ln">35</span>    <span class="nx">WorkloadEntryController</span> <span class="o">*</span><span class="nx">workloadentry</span><span class="p">.</span><span class="nx">Controller</span>
+<span class="ln">36</span>
+<span class="ln">37</span>    <span class="c1">// serverReady indicates caches have been synced up and server is ready to process requests.
+</span><span class="ln">38</span><span class="c1"></span>    <span class="c1">// 缓存已同步，可以接收请求
+</span><span class="ln">39</span><span class="c1"></span>    <span class="nx">serverReady</span> <span class="nx">atomic</span><span class="p">.</span><span class="nx">Bool</span>
+<span class="ln">40</span>    <span class="o">...</span>
+<span class="ln">41</span>    <span class="c1">// XDS 资源缓存
+</span><span class="ln">42</span><span class="c1"></span>    <span class="nx">Cache</span> <span class="nx">model</span><span class="p">.</span><span class="nx">XdsCache</span>
+<span class="ln">43</span>    <span class="o">...</span>
+<span class="ln">44</span><span class="p">}</span>
+</code></pre></div><h4 id="初始化kubeclient">初始化kubeclient</h4>
+<p>根据服务注册中心配置是否包含k8s创建kubeClient，保存在Server.kubeClient成员中，有两种创建方式：</p>
+<ul>
+<li>用户提供kubeConfig文件，kubeconfig参数指定，默认为空</li>
+<li>集群内模式，通过自动感知pod所在环境，自动完成配置</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initKubeClient</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">2</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;error initializing kube client: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln">3</span><span class="p">}</span>
+</code></pre></div><h4 id="初始化-mesh-config--mesh-network">初始化 mesh config &amp; mesh network</h4>
+<p>通过 fileWatcher 对 Istiod 从 configmap 中挂载的两个配置文件 mesh 和 meshNetworks 进行监听，当配置文件发生变化时重载配置并触发相应的handlers</p>
+<blockquote>
+<p>filewatcher 在单独的项目中，底层用到了 fsnotify 库来推送文件变化事件</p>
+</blockquote>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">s</span><span class="p">.</span><span class="nf">initMeshConfiguration</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">fileWatcher</span><span class="p">)</span>
+<span class="ln">2</span><span class="nx">s</span><span class="p">.</span><span class="nf">initMeshNetworks</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">fileWatcher</span><span class="p">)</span>
+</code></pre></div><p>Mesh配置由MeshConfig结构体定义</p>
+<h4 id="初始化-mesh-handler">初始化 mesh handler</h4>
+<p>为前面介绍的 mesh 和 meshNetworks 配置文件注册两个handler，当配置文件发生变化时触发全量xDS下发</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">s</span><span class="p">.</span><span class="nx">initMeshHandlers</span>
+</code></pre></div><h3 id="初始化-controller核心">初始化 controller（核心）</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initControllers</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">2</span>    <span class="k">return</span> <span class="kc">nil</span><span class="p">,</span> <span class="nx">err</span>
+<span class="ln">3</span><span class="p">}</span>
+</code></pre></div><p>初始化了三种控制器：</p>
+<ul>
+<li>证书处理控制器（不重要）</li>
+<li>配置信息控制器：当CRD资源变更时，触发回调函数，下发xds</li>
+<li>注册信息控制器：当k8s原生资源发生变更时，触发回调函数，下发xds</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initControllers</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="nx">log</span><span class="p">.</span><span class="nf">Info</span><span class="p">(</span><span class="s">&#34;initializing controllers&#34;</span><span class="p">)</span>
+<span class="ln"> 3</span>	<span class="c1">// Certificate controller is created before MCP controller in case MCP server pod
+</span><span class="ln"> 4</span><span class="c1"></span>	<span class="c1">// waits to mount a certificate to be provisioned by the certificate controller.
+</span><span class="ln"> 5</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initCertController</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 6</span>		<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;error initializing certificate controller: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln"> 7</span>	<span class="p">}</span>
+<span class="ln"> 8</span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initConfigController</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 9</span>		<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;error initializing config controller: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln">10</span>	<span class="p">}</span>
+<span class="ln">11</span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initServiceControllers</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">12</span>		<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;error initializing service controllers: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+<span class="ln">13</span>	<span class="p">}</span>
+<span class="ln">14</span>	<span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">15</span><span class="p">}</span>
+</code></pre></div><h4 id="配置信息控制器初始化">配置信息控制器初始化</h4>
+<ul>
+<li>配置信息是系列CRD，比如 VirtualService、DestinationRule</li>
+<li>配置信息的来源有三种：
+<ul>
+<li>k8s原生服务注册中心</li>
+<li>MCP协议的服务注册中心</li>
+<li>本地文件服务注册中心</li>
+</ul>
+</li>
+<li>配置信息保存在ConfigStore对象中</li>
+<li>这一步主要是通过client-go的informer机制注册CRD资源的Add、Update、Delete事件处理函数</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initConfigController</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="nx">s</span><span class="p">.</span><span class="nf">initStatusController</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">features</span><span class="p">.</span><span class="nx">EnableStatus</span><span class="p">)</span>
+<span class="ln"> 3</span>	<span class="nx">meshConfig</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nx">environment</span><span class="p">.</span><span class="nf">Mesh</span><span class="p">()</span>
+<span class="ln"> 4</span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">meshConfig</span><span class="p">.</span><span class="nx">ConfigSources</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln"> 5</span>    <span class="c1">// 处理 MCP 配置
+</span><span class="ln"> 6</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initConfigSources</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 7</span>			<span class="k">return</span> <span class="nx">err</span>
+<span class="ln"> 8</span>		<span class="p">}</span>
+<span class="ln"> 9</span>	<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">FileDir</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
+<span class="ln">10</span>    <span class="c1">// 处理本地文件
+</span><span class="ln">11</span><span class="c1"></span>		<span class="nx">store</span> <span class="o">:=</span> <span class="nx">memory</span><span class="p">.</span><span class="nf">Make</span><span class="p">(</span><span class="nx">collections</span><span class="p">.</span><span class="nx">Pilot</span><span class="p">)</span>
+<span class="ln">12</span>		<span class="nx">configController</span> <span class="o">:=</span> <span class="nx">memory</span><span class="p">.</span><span class="nf">NewController</span><span class="p">(</span><span class="nx">store</span><span class="p">)</span>
+<span class="ln">13</span>
+<span class="ln">14</span>		<span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">makeFileMonitor</span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">FileDir</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">KubeOptions</span><span class="p">.</span><span class="nx">DomainSuffix</span><span class="p">,</span> <span class="nx">configController</span><span class="p">)</span>
+<span class="ln">15</span>		<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">16</span>			<span class="k">return</span> <span class="nx">err</span>
+<span class="ln">17</span>		<span class="p">}</span>
+<span class="ln">18</span>		<span class="nx">s</span><span class="p">.</span><span class="nx">ConfigStores</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">ConfigStores</span><span class="p">,</span> <span class="nx">configController</span><span class="p">)</span>
+<span class="ln">19</span>	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">20</span>    <span class="c1">// 初始化 k8s 配置存储
+</span><span class="ln">21</span><span class="c1"></span>		<span class="nx">err2</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initK8SConfigStore</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span>
+<span class="ln">22</span>		<span class="k">if</span> <span class="nx">err2</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">23</span>			<span class="k">return</span> <span class="nx">err2</span>
+<span class="ln">24</span>		<span class="p">}</span>
+<span class="ln">25</span>	<span class="p">}</span>
+<span class="ln">26</span>	
+<span class="ln">27</span>	<span class="o">...</span>
+<span class="ln">28</span>    <span class="c1">// 将所有的 configStore 聚合并缓存
+</span><span class="ln">29</span><span class="c1"></span>	<span class="nx">aggregateConfigController</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">configaggregate</span><span class="p">.</span><span class="nf">MakeCache</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">ConfigStores</span><span class="p">)</span>
+<span class="ln">30</span>	<span class="c1">// 通过 configController 统一操作 configStore
+</span><span class="ln">31</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nx">configController</span> <span class="p">=</span> <span class="nx">aggregateConfigController</span>
+<span class="ln">32</span>  
+<span class="ln">33</span>  <span class="c1">// 初始化 IstioConfigStore 对象
+</span><span class="ln">34</span><span class="c1"></span>	<span class="c1">// configStore 保存到 Environment 中
+</span><span class="ln">35</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nx">environment</span><span class="p">.</span><span class="nx">IstioConfigStore</span> <span class="p">=</span> <span class="nx">model</span><span class="p">.</span><span class="nf">MakeIstioStore</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">configController</span><span class="p">)</span>
+<span class="ln">36</span>
+<span class="ln">37</span>    <span class="c1">// 当服务创建成功后，会启动controller
+</span><span class="ln">38</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">addStartFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">stop</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">39</span>        <span class="c1">// 注册启动函数到 StartFunc中
+</span><span class="ln">40</span><span class="c1"></span>		<span class="k">go</span> <span class="nx">s</span><span class="p">.</span><span class="nx">configController</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">stop</span><span class="p">)</span>
+<span class="ln">41</span>		<span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">42</span>	<span class="p">})</span>
+<span class="ln">43</span>
+<span class="ln">44</span>	<span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">45</span><span class="p">}</span>
+</code></pre></div><ul>
+<li>读取所有的CRD资源，获取Infromer，并注册 AddHandler、UpdateHandler、DeleteHandler。当这些CRD资源发生变更时，触发相应的handler</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initK8SConfigStore</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="c1">// 初始化 config controller
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nx">configController</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">makeKubeConfigController</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span>
+<span class="ln"> 4</span>	<span class="o">...</span>
+<span class="ln"> 5</span><span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="c1">// makeKubeConfigController
+</span><span class="ln"> 8</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">makeKubeConfigController</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">ConfigStoreCache</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 9</span>	<span class="c1">// 初始化一个处理 Istio CRD 的 client
+</span><span class="ln">10</span><span class="c1"></span>    <span class="nx">c</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">crdclient</span><span class="p">.</span><span class="nf">New</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">kubeClient</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">Revision</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">KubeOptions</span><span class="p">.</span><span class="nx">DomainSuffix</span><span class="p">)</span>
+<span class="ln">11</span>	<span class="o">...</span>
+<span class="ln">12</span><span class="p">}</span>
+<span class="ln">13</span>
+<span class="ln">14</span><span class="c1">// 初始化 Client
+</span><span class="ln">15</span><span class="c1"></span><span class="kd">func</span> <span class="nf">New</span><span class="p">(</span><span class="nx">client</span> <span class="nx">kube</span><span class="p">.</span><span class="nx">Client</span><span class="p">,</span> <span class="nx">revision</span><span class="p">,</span> <span class="nx">domainSuffix</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">ConfigStoreCache</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">16</span>	<span class="o">...</span>
+<span class="ln">17</span>	<span class="k">return</span> <span class="nf">NewForSchemas</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">revision</span><span class="p">,</span> <span class="nx">domainSuffix</span><span class="p">,</span> <span class="nx">schemas</span><span class="p">)</span>
+<span class="ln">18</span><span class="p">}</span>
+<span class="ln">19</span>
+<span class="ln">20</span><span class="c1">// NewForSchemas
+</span><span class="ln">21</span><span class="c1"></span><span class="kd">func</span> <span class="nf">NewForSchemas</span><span class="p">(</span><span class="nx">client</span> <span class="nx">kube</span><span class="p">.</span><span class="nx">Client</span><span class="p">,</span> <span class="nx">revision</span><span class="p">,</span> <span class="nx">domainSuffix</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">schemas</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">Schemas</span><span class="p">)</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">ConfigStoreCache</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">22</span>    <span class="c1">// 创建 client 对象
+</span><span class="ln">23</span><span class="c1"></span>	<span class="nx">out</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Client</span><span class="p">{</span>
+<span class="ln">24</span>		<span class="nx">domainSuffix</span><span class="p">:</span>     <span class="nx">domainSuffix</span><span class="p">,</span>
+<span class="ln">25</span>		<span class="nx">schemas</span><span class="p">:</span>          <span class="nx">schemas</span><span class="p">,</span>
+<span class="ln">26</span>		<span class="nx">revision</span><span class="p">:</span>         <span class="nx">revision</span><span class="p">,</span>
+<span class="ln">27</span>		<span class="nx">queue</span><span class="p">:</span>            <span class="nx">queue</span><span class="p">.</span><span class="nf">NewQueue</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">),</span>
+<span class="ln">28</span>		<span class="nx">kinds</span><span class="p">:</span>            <span class="kd">map</span><span class="p">[</span><span class="nx">config</span><span class="p">.</span><span class="nx">GroupVersionKind</span><span class="p">]</span><span class="o">*</span><span class="nx">cacheHandler</span><span class="p">{},</span>
+<span class="ln">29</span>		<span class="nx">istioClient</span><span class="p">:</span>      <span class="nx">client</span><span class="p">.</span><span class="nf">Istio</span><span class="p">(),</span>
+<span class="ln">30</span>		<span class="nx">gatewayAPIClient</span><span class="p">:</span> <span class="nx">client</span><span class="p">.</span><span class="nf">GatewayAPI</span><span class="p">(),</span>
+<span class="ln">31</span>	<span class="p">}</span>
+<span class="ln">32</span>    <span class="c1">// 获取所有的 CRD
+</span><span class="ln">33</span><span class="c1"></span>	<span class="nx">known</span> <span class="o">:=</span> <span class="nf">knownCRDs</span><span class="p">(</span><span class="nx">client</span><span class="p">.</span><span class="nf">Ext</span><span class="p">())</span>
+<span class="ln">34</span>	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">out</span><span class="p">.</span><span class="nx">schemas</span><span class="p">.</span><span class="nf">All</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">35</span>        <span class="o">...</span>
+<span class="ln">36</span>		<span class="k">if</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">f</span> <span class="o">:=</span> <span class="nx">known</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span> <span class="nx">f</span> <span class="p">{</span>
+<span class="ln">37</span>			<span class="o">...</span>
+<span class="ln">38</span>             <span class="c1">// 为每种 CRD 创建 handler
+</span><span class="ln">39</span><span class="c1"></span>			<span class="nx">out</span><span class="p">.</span><span class="nx">kinds</span><span class="p">[</span><span class="nx">s</span><span class="p">.</span><span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">()]</span> <span class="p">=</span> <span class="nf">createCacheHandler</span><span class="p">(</span><span class="nx">out</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
+<span class="ln">40</span>		<span class="p">}</span> 
+<span class="ln">41</span>	<span class="p">}</span>
+<span class="ln">42</span>	<span class="o">...</span>
+<span class="ln">43</span><span class="p">}</span>
+<span class="ln">44</span>
+<span class="ln">45</span><span class="c1">// 监听 infomer， 注册增、删、改、查的事件处理函数
+</span><span class="ln">46</span><span class="c1"></span><span class="kd">func</span> <span class="nf">createCacheHandler</span><span class="p">(</span><span class="nx">cl</span> <span class="o">*</span><span class="nx">Client</span><span class="p">,</span> <span class="nx">schema</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">Schema</span><span class="p">,</span> <span class="nx">i</span> <span class="nx">informers</span><span class="p">.</span><span class="nx">GenericInformer</span><span class="p">)</span> <span class="o">*</span><span class="nx">cacheHandler</span> <span class="p">{</span>
+<span class="ln">47</span>	<span class="o">...</span>
+<span class="ln">48</span>	<span class="nx">i</span><span class="p">.</span><span class="nf">Informer</span><span class="p">().</span><span class="nf">AddEventHandler</span><span class="p">(</span><span class="nx">cache</span><span class="p">.</span><span class="nx">ResourceEventHandlerFuncs</span><span class="p">{</span>
+<span class="ln">49</span>        <span class="c1">// 新增事件
+</span><span class="ln">50</span><span class="c1"></span>		<span class="nx">AddFunc</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">51</span>			<span class="nf">incrementEvent</span><span class="p">(</span><span class="nx">kind</span><span class="p">,</span> <span class="s">&#34;add&#34;</span><span class="p">)</span>
+<span class="ln">52</span>			<span class="nx">cl</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">53</span>				<span class="k">return</span> <span class="nx">h</span><span class="p">.</span><span class="nf">onEvent</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="nx">obj</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">EventAdd</span><span class="p">)</span>
+<span class="ln">54</span>			<span class="p">})</span>
+<span class="ln">55</span>		<span class="p">},</span>
+<span class="ln">56</span>        <span class="c1">// 更新事件
+</span><span class="ln">57</span><span class="c1"></span>		<span class="nx">UpdateFunc</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">old</span><span class="p">,</span> <span class="nx">cur</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">58</span>			<span class="k">if</span> <span class="p">!</span><span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">old</span><span class="p">,</span> <span class="nx">cur</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">59</span>				<span class="nf">incrementEvent</span><span class="p">(</span><span class="nx">kind</span><span class="p">,</span> <span class="s">&#34;update&#34;</span><span class="p">)</span>
+<span class="ln">60</span>				<span class="nx">cl</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">61</span>					<span class="k">return</span> <span class="nx">h</span><span class="p">.</span><span class="nf">onEvent</span><span class="p">(</span><span class="nx">old</span><span class="p">,</span> <span class="nx">cur</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">EventUpdate</span><span class="p">)</span>
+<span class="ln">62</span>				<span class="p">})</span>
+<span class="ln">63</span>			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">64</span>				<span class="nf">incrementEvent</span><span class="p">(</span><span class="nx">kind</span><span class="p">,</span> <span class="s">&#34;updatesame&#34;</span><span class="p">)</span>
+<span class="ln">65</span>			<span class="p">}</span>
+<span class="ln">66</span>		<span class="p">},</span>
+<span class="ln">67</span>        <span class="c1">// 删除事件
+</span><span class="ln">68</span><span class="c1"></span>		<span class="nx">DeleteFunc</span><span class="p">:</span> <span class="kd">func</span><span class="p">(</span><span class="nx">obj</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">69</span>			<span class="nf">incrementEvent</span><span class="p">(</span><span class="nx">kind</span><span class="p">,</span> <span class="s">&#34;delete&#34;</span><span class="p">)</span>
+<span class="ln">70</span>			<span class="nx">cl</span><span class="p">.</span><span class="nx">queue</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="kd">func</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">71</span>				<span class="k">return</span> <span class="nx">h</span><span class="p">.</span><span class="nf">onEvent</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span> <span class="nx">obj</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">EventDelete</span><span class="p">)</span>
+<span class="ln">72</span>			<span class="p">})</span>
+<span class="ln">73</span>		<span class="p">},</span>
+<span class="ln">74</span>	<span class="p">})</span>
+<span class="ln">75</span>	<span class="k">return</span> <span class="nx">h</span>
+<span class="ln">76</span><span class="p">}</span>
+</code></pre></div><h4 id="服务注册控制器初始化">服务注册控制器初始化</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initServiceControllers</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="c1">// 从之前初始化的 Environment.ServiceDiscovery 中获取已经注册的服务中心（比如k8s默认就有）
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nx">serviceControllers</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">ServiceController</span><span class="p">()</span>
+<span class="ln"> 4</span>
+<span class="ln"> 5</span>    <span class="c1">// 初始化 k8s 集群之外的服务，这些服务是通过 ServiceEntry 注册到控制面的
+</span><span class="ln"> 6</span><span class="c1"></span>    <span class="c1">// 所有的 ServiceEntry 配置目前还在前面的介绍的 configController 中
+</span><span class="ln"> 7</span><span class="c1"></span>    <span class="c1">// 将 ServiceEntry 初始化一个 ServiceEntry 注册中心，
+</span><span class="ln"> 8</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nx">serviceEntryStore</span> <span class="p">=</span> <span class="nx">serviceentry</span><span class="p">.</span><span class="nf">NewServiceDiscovery</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">configController</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">environment</span><span class="p">.</span><span class="nx">IstioConfigStore</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">XDSServer</span><span class="p">)</span>
+<span class="ln"> 9</span>    <span class="c1">// 将 serviceEntry 注册中心加入到 ServiceController
+</span><span class="ln">10</span><span class="c1"></span>	<span class="nx">serviceControllers</span><span class="p">.</span><span class="nf">AddRegistry</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">serviceEntryStore</span><span class="p">)</span>
+<span class="ln">11</span>
+<span class="ln">12</span>	<span class="nx">registered</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="nx">serviceregistry</span><span class="p">.</span><span class="nx">ProviderID</span><span class="p">]</span><span class="kt">bool</span><span class="p">)</span>
+<span class="ln">13</span>	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">r</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">Registries</span> <span class="p">{</span>
+<span class="ln">14</span>		<span class="nx">serviceRegistry</span> <span class="o">:=</span> <span class="nx">serviceregistry</span><span class="p">.</span><span class="nf">ProviderID</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+<span class="ln">15</span>		<span class="o">...</span>
+<span class="ln">16</span>		<span class="k">switch</span> <span class="nx">serviceRegistry</span> <span class="p">{</span>
+<span class="ln">17</span>         <span class="c1">// 如果注册中心是 k8s，执行 initKubeRegistry 方法
+</span><span class="ln">18</span><span class="c1"></span>		<span class="k">case</span> <span class="nx">serviceregistry</span><span class="p">.</span><span class="nx">Kubernetes</span><span class="p">:</span>
+<span class="ln">19</span>			<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">initKubeRegistry</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">20</span>				<span class="k">return</span> <span class="nx">err</span>
+<span class="ln">21</span>            <span class="p">}</span>
+<span class="ln">22</span>            <span class="o">...</span>
+<span class="ln">23</span>	<span class="p">}</span>
+<span class="ln">24</span>
+<span class="ln">25</span>    <span class="c1">// 注册 StartFunc，使得 Serveice 启动后，执行 Run 方法
+</span><span class="ln">26</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">addStartFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">stop</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">27</span>		<span class="k">go</span> <span class="nx">serviceControllers</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">stop</span><span class="p">)</span>
+<span class="ln">28</span>		<span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">29</span>	<span class="p">})</span>
+<span class="ln">30</span>
+<span class="ln">31</span>	<span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">32</span><span class="p">}</span>
+</code></pre></div><p>initKubeRegistry</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initKubeRegistry</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="p">(</span><span class="nx">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="o">...</span>
+<span class="ln"> 3</span>	<span class="c1">// initialize the &#34;main&#34; cluster registry before starting controllers for remote clusters
+</span><span class="ln"> 4</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">mc</span><span class="p">.</span><span class="nf">AddMemberCluster</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">kubeClient</span><span class="p">,</span> <span class="nx">args</span><span class="p">.</span><span class="nx">RegistryOptions</span><span class="p">.</span><span class="nx">KubeOptions</span><span class="p">.</span><span class="nx">ClusterID</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 5</span>        <span class="o">...</span>
+<span class="ln"> 6</span>    <span class="p">}</span>
+<span class="ln"> 7</span><span class="p">}</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span><span class="kd">func</span> <span class="p">(</span><span class="nx">m</span> <span class="o">*</span><span class="nx">Multicluster</span><span class="p">)</span> <span class="nf">AddMemberCluster</span><span class="p">(</span><span class="nx">client</span> <span class="nx">kubelib</span><span class="p">.</span><span class="nx">Client</span><span class="p">,</span> <span class="nx">clusterID</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">10</span>	<span class="o">...</span>
+<span class="ln">11</span>    <span class="c1">// 为k8s原生资源创建controller
+</span><span class="ln">12</span><span class="c1"></span>	<span class="nx">kubeRegistry</span> <span class="o">:=</span> <span class="nf">NewController</span><span class="p">(</span><span class="nx">client</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+<span class="ln">13</span>	<span class="nx">m</span><span class="p">.</span><span class="nx">serviceController</span><span class="p">.</span><span class="nf">AddRegistry</span><span class="p">(</span><span class="nx">kubeRegistry</span><span class="p">)</span>
+<span class="ln">14</span>    <span class="o">...</span>
+<span class="ln">15</span><span class="p">}</span>
+</code></pre></div><p>Controller初始化</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">NewController</span><span class="p">(</span><span class="nx">kubeClient</span> <span class="nx">kubelib</span><span class="p">.</span><span class="nx">Client</span><span class="p">,</span> <span class="nx">options</span> <span class="nx">Options</span><span class="p">)</span> <span class="o">*</span><span class="nx">Controller</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="c1">// The queue requires a time duration for a retry delay after a handler error
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nx">c</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Controller</span><span class="p">{</span>
+<span class="ln"> 4</span>		<span class="o">...</span>
+<span class="ln"> 5</span>	<span class="p">}</span>
+<span class="ln"> 6</span>    <span class="o">...</span>
+<span class="ln"> 7</span>	<span class="nx">c</span><span class="p">.</span><span class="nf">initDiscoveryHandlers</span><span class="p">(</span><span class="nx">kubeClient</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">EndpointMode</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">MeshWatcher</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">discoveryNamespacesFilter</span><span class="p">)</span>
+<span class="ln"> 8</span>	<span class="c1">// 对 Service 资源初始化 Informer，Lister、Map
+</span><span class="ln"> 9</span><span class="c1"></span>    <span class="c1">// 各类hander在informer监听到资源变更时推送事件到queue，再更新对应的map
+</span><span class="ln">10</span><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">serviceInformer</span> <span class="p">=</span> <span class="nx">filter</span><span class="p">.</span><span class="nf">NewFilteredSharedIndexInformer</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">discoveryNamespacesFilter</span><span class="p">.</span><span class="nx">Filter</span><span class="p">,</span> <span class="nx">kubeClient</span><span class="p">.</span><span class="nf">KubeInformer</span><span class="p">().</span><span class="nf">Core</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">Services</span><span class="p">().</span><span class="nf">Informer</span><span class="p">())</span>
+<span class="ln">11</span>	<span class="nx">c</span><span class="p">.</span><span class="nx">serviceLister</span> <span class="p">=</span> <span class="nx">listerv1</span><span class="p">.</span><span class="nf">NewServiceLister</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">serviceInformer</span><span class="p">.</span><span class="nf">GetIndexer</span><span class="p">())</span>
+<span class="ln">12</span>	<span class="nf">registerHandlers</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">serviceInformer</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">queue</span><span class="p">,</span> <span class="s">&#34;Services&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">onServiceEvent</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">13</span>	<span class="o">...</span>
+<span class="ln">14</span>    <span class="c1">// node 处理
+</span><span class="ln">15</span><span class="c1"></span>	<span class="nx">c</span><span class="p">.</span><span class="nx">nodeInformer</span> <span class="p">=</span> <span class="nx">kubeClient</span><span class="p">.</span><span class="nf">KubeInformer</span><span class="p">().</span><span class="nf">Core</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">Nodes</span><span class="p">().</span><span class="nf">Informer</span><span class="p">()</span>
+<span class="ln">16</span>	<span class="nx">c</span><span class="p">.</span><span class="nx">nodeLister</span> <span class="p">=</span> <span class="nx">kubeClient</span><span class="p">.</span><span class="nf">KubeInformer</span><span class="p">().</span><span class="nf">Core</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">Nodes</span><span class="p">().</span><span class="nf">Lister</span><span class="p">()</span>
+<span class="ln">17</span>	<span class="nf">registerHandlers</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">nodeInformer</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">queue</span><span class="p">,</span> <span class="s">&#34;Nodes&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">onNodeEvent</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">18</span>	<span class="c1">// pod 处理
+</span><span class="ln">19</span><span class="c1"></span>	<span class="nx">podInformer</span> <span class="o">:=</span> <span class="nx">filter</span><span class="p">.</span><span class="nf">NewFilteredSharedIndexInformer</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">discoveryNamespacesFilter</span><span class="p">.</span><span class="nx">Filter</span><span class="p">,</span> <span class="nx">kubeClient</span><span class="p">.</span><span class="nf">KubeInformer</span><span class="p">().</span><span class="nf">Core</span><span class="p">().</span><span class="nf">V1</span><span class="p">().</span><span class="nf">Pods</span><span class="p">().</span><span class="nf">Informer</span><span class="p">())</span>
+<span class="ln">20</span>	<span class="o">...</span>
+<span class="ln">21</span>	<span class="nf">registerHandlers</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">pods</span><span class="p">.</span><span class="nx">informer</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">queue</span><span class="p">,</span> <span class="s">&#34;Pods&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">pods</span><span class="p">.</span><span class="nx">onEvent</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="ln">22</span>	<span class="k">return</span> <span class="nx">c</span>
+<span class="ln">23</span><span class="p">}</span>
+</code></pre></div><h3 id="初始化registryeventhanders">初始化RegistryEventHanders</h3>
+<p>这个函数为配置或服务变更时，设置三个事件处理器：</p>
+<ul>
+<li>serviceHander：服务本身发生变化时，触发 xds 全量下发，所有与该服务相关的代理都会受到推送</li>
+<li>instanceHander：实例变动触发xds全量下发，不过仅在链接Consul时有效。k8s和MCP的handler在别的地方注册</li>
+<li>configHandler：</li>
+</ul>
+<p>三个事件处理都是构造 PushRequest 请求，并加入到 XDSServeice 的 pushChannel中</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initRegistryEventHandlers</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="nx">log</span><span class="p">.</span><span class="nf">Info</span><span class="p">(</span><span class="s">&#34;initializing registry event handlers&#34;</span><span class="p">)</span>
+<span class="ln"> 3</span>	<span class="c1">// Flush cached discovery responses whenever services configuration change.
+</span><span class="ln"> 4</span><span class="c1"></span>    <span class="c1">// 服务本身发生变化时，触发xds全量下发
+</span><span class="ln"> 5</span><span class="c1"></span>	<span class="nx">serviceHandler</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">svc</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">Service</span><span class="p">,</span> <span class="nx">_</span> <span class="nx">model</span><span class="p">.</span><span class="nx">Event</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 6</span>        <span class="c1">// 构造下发对象 PushRequest
+</span><span class="ln"> 7</span><span class="c1"></span>		<span class="nx">pushReq</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">{</span>
+<span class="ln"> 8</span>			<span class="nx">Full</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+<span class="ln"> 9</span>			<span class="nx">ConfigsUpdated</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="nx">model</span><span class="p">.</span><span class="nx">ConfigKey</span><span class="p">]</span><span class="kd">struct</span><span class="p">{}{{</span>
+<span class="ln">10</span>				<span class="nx">Kind</span><span class="p">:</span>      <span class="nx">gvk</span><span class="p">.</span><span class="nx">ServiceEntry</span><span class="p">,</span>
+<span class="ln">11</span>				<span class="nx">Name</span><span class="p">:</span>      <span class="nb">string</span><span class="p">(</span><span class="nx">svc</span><span class="p">.</span><span class="nx">Hostname</span><span class="p">),</span>
+<span class="ln">12</span>				<span class="nx">Namespace</span><span class="p">:</span> <span class="nx">svc</span><span class="p">.</span><span class="nx">Attributes</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">,</span>
+<span class="ln">13</span>			<span class="p">}:</span> <span class="p">{}},</span>
+<span class="ln">14</span>			<span class="nx">Reason</span><span class="p">:</span> <span class="p">[]</span><span class="nx">model</span><span class="p">.</span><span class="nx">TriggerReason</span><span class="p">{</span><span class="nx">model</span><span class="p">.</span><span class="nx">ServiceUpdate</span><span class="p">},</span>
+<span class="ln">15</span>		<span class="p">}</span>
+<span class="ln">16</span>        <span class="c1">// 下发 xds
+</span><span class="ln">17</span><span class="c1"></span>		<span class="nx">s</span><span class="p">.</span><span class="nx">XDSServer</span><span class="p">.</span><span class="nf">ConfigUpdate</span><span class="p">(</span><span class="nx">pushReq</span><span class="p">)</span>
+<span class="ln">18</span>	<span class="p">}</span>
+<span class="ln">19</span>	<span class="nx">s</span><span class="p">.</span><span class="nf">ServiceController</span><span class="p">().</span><span class="nf">AppendServiceHandler</span><span class="p">(</span><span class="nx">serviceHandler</span><span class="p">)</span>
+<span class="ln">20</span>
+<span class="ln">21</span>    <span class="c1">// 前面初始化的配置对象（VirtualService、DestinationRule）
+</span><span class="ln">22</span><span class="c1"></span>    <span class="c1">// 这些配置的变化也会触发XDS的全量下发，所有与该配置有关的代理都会收到推送
+</span><span class="ln">23</span><span class="c1"></span>    <span class="c1">// 不过 ServiceEntry 和 WorkloadEntry 除外，这两个资源的配置是由 ServiceEntryStore 管理的
+</span><span class="ln">24</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">s</span><span class="p">.</span><span class="nx">configController</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">25</span>		<span class="nx">configHandler</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">old</span> <span class="nx">config</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span> <span class="nx">curr</span> <span class="nx">config</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span> <span class="nx">event</span> <span class="nx">model</span><span class="p">.</span><span class="nx">Event</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">26</span>			<span class="nx">pushReq</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">{</span>
+<span class="ln">27</span>				<span class="nx">Full</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+<span class="ln">28</span>				<span class="nx">ConfigsUpdated</span><span class="p">:</span> <span class="kd">map</span><span class="p">[</span><span class="nx">model</span><span class="p">.</span><span class="nx">ConfigKey</span><span class="p">]</span><span class="kd">struct</span><span class="p">{}{{</span>
+<span class="ln">29</span>					<span class="nx">Kind</span><span class="p">:</span>      <span class="nx">curr</span><span class="p">.</span><span class="nx">GroupVersionKind</span><span class="p">,</span>
+<span class="ln">30</span>					<span class="nx">Name</span><span class="p">:</span>      <span class="nx">curr</span><span class="p">.</span><span class="nx">Name</span><span class="p">,</span>
+<span class="ln">31</span>					<span class="nx">Namespace</span><span class="p">:</span> <span class="nx">curr</span><span class="p">.</span><span class="nx">Namespace</span><span class="p">,</span>
+<span class="ln">32</span>				<span class="p">}:</span> <span class="p">{}},</span>
+<span class="ln">33</span>				<span class="nx">Reason</span><span class="p">:</span> <span class="p">[]</span><span class="nx">model</span><span class="p">.</span><span class="nx">TriggerReason</span><span class="p">{</span><span class="nx">model</span><span class="p">.</span><span class="nx">ConfigUpdate</span><span class="p">},</span>
+<span class="ln">34</span>			<span class="p">}</span>
+<span class="ln">35</span>			<span class="nx">s</span><span class="p">.</span><span class="nx">XDSServer</span><span class="p">.</span><span class="nf">ConfigUpdate</span><span class="p">(</span><span class="nx">pushReq</span><span class="p">)</span>
+<span class="ln">36</span>			<span class="k">if</span> <span class="nx">event</span> <span class="o">!=</span> <span class="nx">model</span><span class="p">.</span><span class="nx">EventDelete</span> <span class="p">{</span>
+<span class="ln">37</span>				<span class="nx">s</span><span class="p">.</span><span class="nx">statusReporter</span><span class="p">.</span><span class="nf">AddInProgressResource</span><span class="p">(</span><span class="nx">curr</span><span class="p">)</span>
+<span class="ln">38</span>			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">39</span>				<span class="nx">s</span><span class="p">.</span><span class="nx">statusReporter</span><span class="p">.</span><span class="nf">DeleteInProgressResource</span><span class="p">(</span><span class="nx">curr</span><span class="p">)</span>
+<span class="ln">40</span>			<span class="p">}</span>
+<span class="ln">41</span>		<span class="p">}</span>
+<span class="ln">42</span>		<span class="nx">schemas</span> <span class="o">:=</span> <span class="nx">collections</span><span class="p">.</span><span class="nx">Pilot</span><span class="p">.</span><span class="nf">All</span><span class="p">()</span>
+<span class="ln">43</span>		<span class="k">if</span> <span class="nx">features</span><span class="p">.</span><span class="nx">EnableServiceApis</span> <span class="p">{</span>
+<span class="ln">44</span>			<span class="nx">schemas</span> <span class="p">=</span> <span class="nx">collections</span><span class="p">.</span><span class="nx">PilotServiceApi</span><span class="p">.</span><span class="nf">All</span><span class="p">()</span>
+<span class="ln">45</span>		<span class="p">}</span>
+<span class="ln">46</span>        <span class="c1">// 下面是跳过 ServiceEntry 和 WorkloadEntry 的逻辑
+</span><span class="ln">47</span><span class="c1"></span>		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">schema</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">schemas</span> <span class="p">{</span>
+<span class="ln">48</span>			<span class="c1">// This resource type was handled in external/servicediscovery.go, no need to rehandle here.
+</span><span class="ln">49</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">schema</span><span class="p">.</span><span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">()</span> <span class="o">==</span> <span class="nx">collections</span><span class="p">.</span><span class="nx">IstioNetworkingV1Alpha3Serviceentries</span><span class="p">.</span>
+<span class="ln">50</span>				<span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">51</span>				<span class="k">continue</span>
+<span class="ln">52</span>			<span class="p">}</span>
+<span class="ln">53</span>			<span class="k">if</span> <span class="nx">schema</span><span class="p">.</span><span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">()</span> <span class="o">==</span> <span class="nx">collections</span><span class="p">.</span><span class="nx">IstioNetworkingV1Alpha3Workloadentries</span><span class="p">.</span>
+<span class="ln">54</span>				<span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">55</span>				<span class="k">continue</span>
+<span class="ln">56</span>			<span class="p">}</span>
+<span class="ln">57</span>			<span class="k">if</span> <span class="nx">schema</span><span class="p">.</span><span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">()</span> <span class="o">==</span> <span class="nx">collections</span><span class="p">.</span><span class="nx">IstioNetworkingV1Alpha3Workloadgroups</span><span class="p">.</span>
+<span class="ln">58</span>				<span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">59</span>				<span class="k">continue</span>
+<span class="ln">60</span>			<span class="p">}</span>
+<span class="ln">61</span>
+<span class="ln">62</span>			<span class="nx">s</span><span class="p">.</span><span class="nx">configController</span><span class="p">.</span><span class="nf">RegisterEventHandler</span><span class="p">(</span><span class="nx">schema</span><span class="p">.</span><span class="nf">Resource</span><span class="p">().</span><span class="nf">GroupVersionKind</span><span class="p">(),</span> <span class="nx">configHandler</span><span class="p">)</span>
+<span class="ln">63</span>		<span class="p">}</span>
+<span class="ln">64</span>	<span class="p">}</span>
+<span class="ln">65</span><span class="p">}</span>
+</code></pre></div><h3 id="初始化discoveryservevice">初始化DiscoveryServevice</h3>
+<p>sidecar通过连接pilot-discovery中的discovery-service服务获取服务注册情况、流量控制策略等控制面的控制信息。</p>
+<p>具体初始化包括以下步骤：</p>
+<ul>
+<li>创建对外提供Rest协议的discovery service对象</li>
+<li>创建对外提供grpc协议的 envoy xds server</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initDiscoveryService</span><span class="p">(</span><span class="nx">args</span> <span class="o">*</span><span class="nx">PilotArgs</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>    <span class="o">...</span>
+<span class="ln"> 3</span>	<span class="nx">s</span><span class="p">.</span><span class="nf">addStartFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">stop</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 4</span>		<span class="nx">log</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Starting ADS server&#34;</span><span class="p">)</span>
+<span class="ln"> 5</span>    <span class="c1">// 注册 XDSServer.Start() 方法到 startFunc中
+</span><span class="ln"> 6</span><span class="c1"></span>		<span class="nx">s</span><span class="p">.</span><span class="nx">XDSServer</span><span class="p">.</span><span class="nf">Start</span><span class="p">(</span><span class="nx">stop</span><span class="p">)</span>
+<span class="ln"> 7</span>		<span class="k">return</span> <span class="kc">nil</span>
+<span class="ln"> 8</span>	<span class="p">})</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>    <span class="c1">// 初始化GRPC服务
+</span><span class="ln">11</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">initGrpcServer</span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">KeepaliveOptions</span><span class="p">)</span>
+<span class="ln">12</span>	<span class="o">...</span>
+<span class="ln">13</span>  <span class="c1">// 启动http服务
+</span><span class="ln">14</span><span class="c1"></span>  <span class="nx">err</span> <span class="o">:=</span> <span class="nx">m</span><span class="p">.</span><span class="nf">Serve</span><span class="p">()</span>
+<span class="ln">15</span><span class="p">}</span>
+</code></pre></div><h4 id="initgrpcserver">initGrpcServer</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span>
+<span class="ln"> 2</span><span class="c1">// 初始化 GRPC
+</span><span class="ln"> 3</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">initGrpcServer</span><span class="p">(</span><span class="nx">options</span> <span class="o">*</span><span class="nx">istiokeepalive</span><span class="p">.</span><span class="nx">Options</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 4</span>	<span class="nx">grpcOptions</span> <span class="o">:=</span> <span class="nx">s</span><span class="p">.</span><span class="nf">grpcServerOptions</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span>
+<span class="ln"> 5</span>	<span class="nx">s</span><span class="p">.</span><span class="nx">grpcServer</span> <span class="p">=</span> <span class="nx">grpc</span><span class="p">.</span><span class="nf">NewServer</span><span class="p">(</span><span class="nx">grpcOptions</span><span class="o">...</span><span class="p">)</span>
+<span class="ln"> 6</span>	<span class="nx">s</span><span class="p">.</span><span class="nx">XDSServer</span><span class="p">.</span><span class="nf">Register</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">grpcServer</span><span class="p">)</span>
+<span class="ln"> 7</span>	<span class="nx">reflection</span><span class="p">.</span><span class="nf">Register</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">grpcServer</span><span class="p">)</span>
+<span class="ln"> 8</span><span class="p">}</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span><span class="c1">// 注册 v3 到 server
+</span><span class="ln">11</span><span class="c1">// ADS 的 gRPC 服务包含两个流式方法，一个是全量推送，一个是增量推送。
+</span><span class="ln">12</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">Register</span><span class="p">(</span><span class="nx">rpcs</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">Server</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">13</span>	<span class="c1">// Register v3 server
+</span><span class="ln">14</span><span class="c1"></span>	<span class="nx">discovery</span><span class="p">.</span><span class="nf">RegisterAggregatedDiscoveryServiceServer</span><span class="p">(</span><span class="nx">rpcs</span><span class="p">,</span> <span class="nx">s</span><span class="p">)</span>
+<span class="ln">15</span><span class="p">}</span>
+<span class="ln">16</span>
+<span class="ln">17</span><span class="c1">// 调用 grpc 的实现
+</span><span class="ln">18</span><span class="c1"></span><span class="kd">func</span> <span class="nf">RegisterAggregatedDiscoveryServiceServer</span><span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">grpc</span><span class="p">.</span><span class="nx">Server</span><span class="p">,</span> <span class="nx">srv</span> <span class="nx">AggregatedDiscoveryServiceServer</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">19</span>	<span class="nx">s</span><span class="p">.</span><span class="nf">RegisterService</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">_AggregatedDiscoveryService_serviceDesc</span><span class="p">,</span> <span class="nx">srv</span><span class="p">)</span>
+<span class="ln">20</span><span class="p">}</span>
+<span class="ln">21</span>
+</code></pre></div><h4 id="start-方法">Start 方法</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">Start</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln">2</span>	<span class="k">go</span> <span class="nx">s</span><span class="p">.</span><span class="nx">WorkloadEntryController</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">3</span>  <span class="c1">// 处理收到的请求以及防抖
+</span><span class="ln">4</span><span class="c1"></span>	<span class="k">go</span> <span class="nx">s</span><span class="p">.</span><span class="nf">handleUpdates</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">5</span>	<span class="k">go</span> <span class="nx">s</span><span class="p">.</span><span class="nf">periodicRefreshMetrics</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">6</span>  <span class="c1">// 负责具体的推送
+</span><span class="ln">7</span><span class="c1"></span>	<span class="k">go</span> <span class="nx">s</span><span class="p">.</span><span class="nf">sendPushes</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">)</span>
+<span class="ln">8</span><span class="p">}</span>
+</code></pre></div><h4 id="handleupdates">handleUpdates</h4>
+<p>负责处理 pushChannel 中收到的推送请求及防抖</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">handleUpdates</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="nf">debounce</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">pushChannel</span><span class="p">,</span> <span class="nx">stopCh</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">debounceOptions</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">Push</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">CommittedUpdates</span><span class="p">)</span>
+<span class="ln"> 3</span><span class="p">}</span>
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="c1">// debounce 防抖，这个函数主要是处理防抖的
+</span><span class="ln"> 6</span><span class="c1"></span><span class="kd">func</span> <span class="nf">debounce</span><span class="p">(</span><span class="nx">ch</span> <span class="kd">chan</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">,</span> <span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{},</span> <span class="nx">opts</span> <span class="nx">debounceOptions</span><span class="p">,</span> <span class="nx">pushFn</span> <span class="kd">func</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">),</span> <span class="nx">updateSent</span> <span class="o">*</span><span class="nx">atomic</span><span class="p">.</span><span class="nx">Int64</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 7</span>	<span class="kd">var</span> <span class="nx">timeChan</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
+<span class="ln"> 8</span>	<span class="kd">var</span> <span class="nx">startDebounce</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
+<span class="ln"> 9</span>	<span class="kd">var</span> <span class="nx">lastConfigUpdateTime</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Time</span>
+<span class="ln">10</span>
+<span class="ln">11</span>	<span class="nx">pushCounter</span> <span class="o">:=</span> <span class="mi">0</span>
+<span class="ln">12</span>	<span class="nx">debouncedEvents</span> <span class="o">:=</span> <span class="mi">0</span>
+<span class="ln">13</span>
+<span class="ln">14</span>	<span class="c1">// Keeps track of the push requests. If updates are debounce they will be merged.
+</span><span class="ln">15</span><span class="c1"></span>	<span class="kd">var</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span>
+<span class="ln">16</span>
+<span class="ln">17</span>	<span class="nx">free</span> <span class="o">:=</span> <span class="kc">true</span>
+<span class="ln">18</span>	<span class="nx">freeCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{},</span> <span class="mi">1</span><span class="p">)</span>
+<span class="ln">19</span>
+<span class="ln">20</span>  <span class="c1">// push() 方法也是 debounce 方法中包装的一个过程函数，
+</span><span class="ln">21</span><span class="c1"></span>  <span class="c1">// 它会在真正的 pushFn() 完成后向 freeCh 发送消息表示这次防抖处理完成了，可以开始下一次防抖
+</span><span class="ln">22</span><span class="c1"></span>	<span class="nx">push</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">,</span> <span class="nx">debouncedEvents</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">23</span>		<span class="nf">pushFn</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span>
+<span class="ln">24</span>		<span class="nx">updateSent</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="nb">int64</span><span class="p">(</span><span class="nx">debouncedEvents</span><span class="p">))</span>
+<span class="ln">25</span>		<span class="nx">freeCh</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+<span class="ln">26</span>	<span class="p">}</span>
+<span class="ln">27</span>
+<span class="ln">28</span>  <span class="c1">// 防抖的判断逻辑
+</span><span class="ln">29</span><span class="c1"></span>  <span class="c1">// 当事件的延迟时间大于等于最大延迟时间或静默时间大于等于最小静默时间，才会执行 push() 方法。
+</span><span class="ln">30</span><span class="c1"></span>	<span class="nx">pushWorker</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">31</span>		<span class="nx">eventDelay</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Since</span><span class="p">(</span><span class="nx">startDebounce</span><span class="p">)</span>
+<span class="ln">32</span>		<span class="nx">quietTime</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Since</span><span class="p">(</span><span class="nx">lastConfigUpdateTime</span><span class="p">)</span>
+<span class="ln">33</span>		<span class="c1">// it has been too long or quiet enough
+</span><span class="ln">34</span><span class="c1"></span>		<span class="k">if</span> <span class="nx">eventDelay</span> <span class="o">&gt;=</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">debounceMax</span> <span class="o">||</span> <span class="nx">quietTime</span> <span class="o">&gt;=</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">debounceAfter</span> <span class="p">{</span>
+<span class="ln">35</span>			<span class="k">if</span> <span class="nx">req</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">36</span>				<span class="nx">pushCounter</span><span class="o">++</span>
+<span class="ln">37</span>				<span class="nx">adsLog</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Push debounce stable[%d] %d: %v since last change, %v since last push, full=%v&#34;</span><span class="p">,</span>
+<span class="ln">38</span>					<span class="nx">pushCounter</span><span class="p">,</span> <span class="nx">debouncedEvents</span><span class="p">,</span>
+<span class="ln">39</span>					<span class="nx">quietTime</span><span class="p">,</span> <span class="nx">eventDelay</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Full</span><span class="p">)</span>
+<span class="ln">40</span>
+<span class="ln">41</span>				<span class="nx">free</span> <span class="p">=</span> <span class="kc">false</span>
+<span class="ln">42</span>				<span class="k">go</span> <span class="nf">push</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">debouncedEvents</span><span class="p">)</span>
+<span class="ln">43</span>				<span class="nx">req</span> <span class="p">=</span> <span class="kc">nil</span>
+<span class="ln">44</span>				<span class="nx">debouncedEvents</span> <span class="p">=</span> <span class="mi">0</span>
+<span class="ln">45</span>			<span class="p">}</span>
+<span class="ln">46</span>		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<span class="ln">47</span>			<span class="nx">timeChan</span> <span class="p">=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">opts</span><span class="p">.</span><span class="nx">debounceAfter</span> <span class="o">-</span> <span class="nx">quietTime</span><span class="p">)</span>
+<span class="ln">48</span>		<span class="p">}</span>
+<span class="ln">49</span>	<span class="p">}</span>
+<span class="ln">50</span>
+<span class="ln">51</span>  <span class="c1">// 等待 channel 的处理逻辑
+</span><span class="ln">52</span><span class="c1"></span>	<span class="k">for</span> <span class="p">{</span>
+<span class="ln">53</span>		<span class="k">select</span> <span class="p">{</span>
+<span class="ln">54</span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">freeCh</span><span class="p">:</span>
+<span class="ln">55</span>			<span class="nx">free</span> <span class="p">=</span> <span class="kc">true</span>
+<span class="ln">56</span>			<span class="nf">pushWorker</span><span class="p">()</span>
+<span class="ln">57</span>    <span class="c1">// 收到 pushRequest请求
+</span><span class="ln">58</span><span class="c1"></span>		<span class="k">case</span> <span class="nx">r</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">ch</span><span class="p">:</span>
+<span class="ln">59</span>			<span class="c1">// If reason is not set, record it as an unknown reason
+</span><span class="ln">60</span><span class="c1"></span>			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Reason</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">61</span>				<span class="nx">r</span><span class="p">.</span><span class="nx">Reason</span> <span class="p">=</span> <span class="p">[]</span><span class="nx">model</span><span class="p">.</span><span class="nx">TriggerReason</span><span class="p">{</span><span class="nx">model</span><span class="p">.</span><span class="nx">UnknownTrigger</span><span class="p">}</span>
+<span class="ln">62</span>			<span class="p">}</span>
+<span class="ln">63</span>			<span class="k">if</span> <span class="p">!</span><span class="nx">opts</span><span class="p">.</span><span class="nx">enableEDSDebounce</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nx">r</span><span class="p">.</span><span class="nx">Full</span> <span class="p">{</span>
+<span class="ln">64</span>				<span class="c1">// trigger push now, just for EDS
+</span><span class="ln">65</span><span class="c1"></span>				<span class="k">go</span> <span class="nf">pushFn</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+<span class="ln">66</span>				<span class="k">continue</span>
+<span class="ln">67</span>			<span class="p">}</span>
+<span class="ln">68</span>      
+<span class="ln">69</span>			<span class="nx">lastConfigUpdateTime</span> <span class="p">=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">Now</span><span class="p">()</span>
+<span class="ln">70</span>      <span class="c1">// 收到第一个 pushRequest请求，延时一个最小静默时间
+</span><span class="ln">71</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">debouncedEvents</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">72</span>				<span class="nx">timeChan</span> <span class="p">=</span> <span class="nx">time</span><span class="p">.</span><span class="nf">After</span><span class="p">(</span><span class="nx">opts</span><span class="p">.</span><span class="nx">debounceAfter</span><span class="p">)</span>
+<span class="ln">73</span>				<span class="nx">startDebounce</span> <span class="p">=</span> <span class="nx">lastConfigUpdateTime</span>
+<span class="ln">74</span>			<span class="p">}</span>
+<span class="ln">75</span>      <span class="c1">// 累积防抖事件数
+</span><span class="ln">76</span><span class="c1"></span>			<span class="nx">debouncedEvents</span><span class="o">++</span>
+<span class="ln">77</span>      <span class="c1">// 收到的请求进行合并
+</span><span class="ln">78</span><span class="c1"></span>			<span class="nx">req</span> <span class="p">=</span> <span class="nx">req</span><span class="p">.</span><span class="nf">Merge</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+<span class="ln">79</span>    <span class="c1">// 最小静默时间结束
+</span><span class="ln">80</span><span class="c1"></span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">timeChan</span><span class="p">:</span>
+<span class="ln">81</span>      <span class="c1">// 判断是否有在进行防抖的操作
+</span><span class="ln">82</span><span class="c1"></span>			<span class="k">if</span> <span class="nx">free</span> <span class="p">{</span>
+<span class="ln">83</span>        <span class="c1">// 没有的话做一次防抖判断，看是否需要推送
+</span><span class="ln">84</span><span class="c1"></span>				<span class="nf">pushWorker</span><span class="p">()</span>
+<span class="ln">85</span>			<span class="p">}</span>
+<span class="ln">86</span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">stopCh</span><span class="p">:</span>
+<span class="ln">87</span>			<span class="k">return</span>
+<span class="ln">88</span>		<span class="p">}</span>
+<span class="ln">89</span>	<span class="p">}</span>
+<span class="ln">90</span><span class="p">}</span>
+</code></pre></div><h4 id="合并push请求函数">合并Push请求函数</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="c1">// pilot/pkg/model/push_context.go
+</span><span class="ln"> 2</span><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">first</span> <span class="o">*</span><span class="nx">PushRequest</span><span class="p">)</span> <span class="nf">Merge</span><span class="p">(</span><span class="nx">other</span> <span class="o">*</span><span class="nx">PushRequest</span><span class="p">)</span> <span class="o">*</span><span class="nx">PushRequest</span> <span class="p">{</span>
+<span class="ln"> 3</span>	<span class="k">if</span> <span class="nx">first</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 4</span>		<span class="k">return</span> <span class="nx">other</span>
+<span class="ln"> 5</span>	<span class="p">}</span>
+<span class="ln"> 6</span>	<span class="k">if</span> <span class="nx">other</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 7</span>		<span class="k">return</span> <span class="nx">first</span>
+<span class="ln"> 8</span>	<span class="p">}</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>	<span class="nx">reason</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="nx">TriggerReason</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">first</span><span class="p">.</span><span class="nx">Reason</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="nx">other</span><span class="p">.</span><span class="nx">Reason</span><span class="p">))</span>
+<span class="ln">11</span>	<span class="nx">reason</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">reason</span><span class="p">,</span> <span class="nx">first</span><span class="p">.</span><span class="nx">Reason</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">12</span>	<span class="nx">reason</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">reason</span><span class="p">,</span> <span class="nx">other</span><span class="p">.</span><span class="nx">Reason</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">13</span>  
+<span class="ln">14</span>	<span class="nx">merged</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">PushRequest</span><span class="p">{</span>
+<span class="ln">15</span>		<span class="c1">// Keep the first (older) start time
+</span><span class="ln">16</span><span class="c1"></span>    <span class="c1">// 保持最旧的请求的开始时间
+</span><span class="ln">17</span><span class="c1"></span>		<span class="nx">Start</span><span class="p">:</span> <span class="nx">first</span><span class="p">.</span><span class="nx">Start</span><span class="p">,</span>
+<span class="ln">18</span>
+<span class="ln">19</span>    <span class="c1">// 如果有一个是全量，合并后必须是全量
+</span><span class="ln">20</span><span class="c1"></span>		<span class="nx">Full</span><span class="p">:</span> <span class="nx">first</span><span class="p">.</span><span class="nx">Full</span> <span class="o">||</span> <span class="nx">other</span><span class="p">.</span><span class="nx">Full</span><span class="p">,</span>
+<span class="ln">21</span>
+<span class="ln">22</span>    <span class="c1">// context 信息使用最新请求的
+</span><span class="ln">23</span><span class="c1"></span>		<span class="nx">Push</span><span class="p">:</span> <span class="nx">other</span><span class="p">.</span><span class="nx">Push</span><span class="p">,</span>
+<span class="ln">24</span>
+<span class="ln">25</span>		<span class="c1">// Merge the two reasons. Note that we shouldn&#39;t deduplicate here, or we would under count
+</span><span class="ln">26</span><span class="c1"></span>    <span class="c1">// 触发推送请求的原因
+</span><span class="ln">27</span><span class="c1"></span>		<span class="nx">Reason</span><span class="p">:</span> <span class="nx">reason</span><span class="p">,</span>
+<span class="ln">28</span>	<span class="p">}</span>
+<span class="ln">29</span>
+<span class="ln">30</span>	<span class="c1">// Do not merge when any one is empty
+</span><span class="ln">31</span><span class="c1"></span>	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nx">first</span><span class="p">.</span><span class="nx">ConfigsUpdated</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">other</span><span class="p">.</span><span class="nx">ConfigsUpdated</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+<span class="ln">32</span>		<span class="nx">merged</span><span class="p">.</span><span class="nx">ConfigsUpdated</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="nx">ConfigKey</span><span class="p">]</span><span class="kd">struct</span><span class="p">{},</span> <span class="nb">len</span><span class="p">(</span><span class="nx">first</span><span class="p">.</span><span class="nx">ConfigsUpdated</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="nx">other</span><span class="p">.</span><span class="nx">ConfigsUpdated</span><span class="p">))</span>
+<span class="ln">33</span>		<span class="k">for</span> <span class="nx">conf</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">first</span><span class="p">.</span><span class="nx">ConfigsUpdated</span> <span class="p">{</span>
+<span class="ln">34</span>			<span class="nx">merged</span><span class="p">.</span><span class="nx">ConfigsUpdated</span><span class="p">[</span><span class="nx">conf</span><span class="p">]</span> <span class="p">=</span> <span class="kd">struct</span><span class="p">{}{}</span>
+<span class="ln">35</span>		<span class="p">}</span>
+<span class="ln">36</span>		<span class="k">for</span> <span class="nx">conf</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">other</span><span class="p">.</span><span class="nx">ConfigsUpdated</span> <span class="p">{</span>
+<span class="ln">37</span>			<span class="nx">merged</span><span class="p">.</span><span class="nx">ConfigsUpdated</span><span class="p">[</span><span class="nx">conf</span><span class="p">]</span> <span class="p">=</span> <span class="kd">struct</span><span class="p">{}{}</span>
+<span class="ln">38</span>		<span class="p">}</span>
+<span class="ln">39</span>	<span class="p">}</span>
+<span class="ln">40</span>
+<span class="ln">41</span>	<span class="k">return</span> <span class="nx">merged</span>
+<span class="ln">42</span><span class="p">}</span>
+</code></pre></div><h4 id="推送请求的原因">推送请求的原因</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">TriggerReason</span> <span class="kt">string</span>
+<span class="ln"> 2</span>
+<span class="ln"> 3</span><span class="kd">const</span> <span class="p">(</span>
+<span class="ln"> 4</span>	<span class="c1">// Describes a push triggered by an Endpoint change
+</span><span class="ln"> 5</span><span class="c1"></span>	<span class="nx">EndpointUpdate</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;endpoint&#34;</span>
+<span class="ln"> 6</span>	<span class="c1">// Describes a push triggered by a config (generally and Istio CRD) change.
+</span><span class="ln"> 7</span><span class="c1"></span>	<span class="nx">ConfigUpdate</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;config&#34;</span>
+<span class="ln"> 8</span>	<span class="c1">// Describes a push triggered by a Service change
+</span><span class="ln"> 9</span><span class="c1"></span>	<span class="nx">ServiceUpdate</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;service&#34;</span>
+<span class="ln">10</span>	<span class="c1">// Describes a push triggered by a change to an individual proxy (such as label change)
+</span><span class="ln">11</span><span class="c1"></span>	<span class="nx">ProxyUpdate</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;proxy&#34;</span>
+<span class="ln">12</span>	<span class="c1">// Describes a push triggered by a change to global config, such as mesh config
+</span><span class="ln">13</span><span class="c1"></span>	<span class="nx">GlobalUpdate</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;global&#34;</span>
+<span class="ln">14</span>	<span class="c1">// Describes a push triggered by an unknown reason
+</span><span class="ln">15</span><span class="c1"></span>	<span class="nx">UnknownTrigger</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;unknown&#34;</span>
+<span class="ln">16</span>	<span class="c1">// Describes a push triggered for debugging
+</span><span class="ln">17</span><span class="c1"></span>	<span class="nx">DebugTrigger</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;debug&#34;</span>
+<span class="ln">18</span>	<span class="c1">// Describes a push triggered for a Secret change
+</span><span class="ln">19</span><span class="c1"></span>	<span class="nx">SecretTrigger</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;secret&#34;</span>
+<span class="ln">20</span>	<span class="c1">// Describes a push triggered for Networks change
+</span><span class="ln">21</span><span class="c1"></span>	<span class="nx">NetworksTrigger</span> <span class="nx">TriggerReason</span> <span class="p">=</span> <span class="s">&#34;networks&#34;</span>
+<span class="ln">22</span><span class="p">)</span>
+</code></pre></div><h4 id="push方法">Push方法</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">Push</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="o">...</span>
+<span class="ln"> 3</span>  <span class="c1">// 调用 AdsPushAll，
+</span><span class="ln"> 4</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">AdsPushAll</span><span class="p">(</span><span class="nx">versionLocal</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+<span class="ln"> 5</span><span class="p">}</span>
+<span class="ln"> 6</span>
+<span class="ln"> 7</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">AdsPushAll</span><span class="p">(</span><span class="nx">version</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 8</span>	<span class="o">...</span>
+<span class="ln"> 9</span>  <span class="c1">// 调用 startPush, 将PushRequest重新放入队列
+</span><span class="ln">10</span><span class="c1"></span>	<span class="nx">s</span><span class="p">.</span><span class="nf">startPush</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span>
+<span class="ln">11</span><span class="p">}</span>
+<span class="ln">12</span>
+<span class="ln">13</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">startPush</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">14</span>	<span class="o">...</span>
+<span class="ln">15</span>	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">p</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">s</span><span class="p">.</span><span class="nf">AllClients</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">16</span>    <span class="c1">// 加入队列
+</span><span class="ln">17</span><span class="c1"></span>		<span class="nx">s</span><span class="p">.</span><span class="nx">pushQueue</span><span class="p">.</span><span class="nf">Enqueue</span><span class="p">(</span><span class="nx">p</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+<span class="ln">18</span>	<span class="p">}</span>
+<span class="ln">19</span><span class="p">}</span>
+</code></pre></div><h4 id="pushqueue">PushQueue</h4>
+<p>当所有的 PushRequest 经过防抖等一系列处理后，重新入队到 <code>pushQueue</code> ，这时在 <code>EnvoyXdsServer</code> 启动时创建的协程 <code>sendPushes</code> 就开始工作了。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">type</span> <span class="nx">PushQueue</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="nx">cond</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">Cond</span>
+<span class="ln"> 3</span>
+<span class="ln"> 4</span>  <span class="c1">// 保存了所有代理 grpc 的 PushRequest
+</span><span class="ln"> 5</span><span class="c1"></span>  <span class="c1">// 相同的的pushRequest入队列会被合并
+</span><span class="ln"> 6</span><span class="c1"></span>	<span class="nx">pending</span> <span class="kd">map</span><span class="p">[</span><span class="o">*</span><span class="nx">Connection</span><span class="p">]</span><span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span>
+<span class="ln"> 7</span>
+<span class="ln"> 8</span>	<span class="nx">queue</span> <span class="p">[]</span><span class="o">*</span><span class="nx">Connection</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>	<span class="c1">// processing stores all connections that have been Dequeue(), but not MarkDone().
+</span><span class="ln">11</span><span class="c1"></span>	<span class="c1">// The value stored will be initially be nil, but may be populated if the connection is Enqueue().
+</span><span class="ln">12</span><span class="c1"></span>	<span class="c1">// If model.PushRequest is not nil, it will be Enqueued again once MarkDone has been called.
+</span><span class="ln">13</span><span class="c1"></span>	<span class="nx">processing</span> <span class="kd">map</span><span class="p">[</span><span class="o">*</span><span class="nx">Connection</span><span class="p">]</span><span class="o">*</span><span class="nx">model</span><span class="p">.</span><span class="nx">PushRequest</span>
+<span class="ln">14</span>
+<span class="ln">15</span>	<span class="nx">shuttingDown</span> <span class="kt">bool</span>
+<span class="ln">16</span><span class="p">}</span>
+</code></pre></div><h4 id="sendpushes">sendPushes</h4>
+<p>负责具体的推送</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">sendPushes</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// 第二个参数用于节流，默认100
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nf">doSendPushes</span><span class="p">(</span><span class="nx">stopCh</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">concurrentPushLimit</span><span class="p">,</span> <span class="nx">s</span><span class="p">.</span><span class="nx">pushQueue</span><span class="p">)</span>
+<span class="ln"> 4</span><span class="p">}</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span><span class="kd">func</span> <span class="nf">doSendPushes</span><span class="p">(</span><span class="nx">stopCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{},</span> <span class="nx">semaphore</span> <span class="kd">chan</span> <span class="kd">struct</span><span class="p">{},</span> <span class="nx">queue</span> <span class="o">*</span><span class="nx">PushQueue</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 7</span>	<span class="k">for</span> <span class="p">{</span>
+<span class="ln"> 8</span>		<span class="k">select</span> <span class="p">{</span>
+<span class="ln"> 9</span>		<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">stopCh</span><span class="p">:</span>
+<span class="ln">10</span>			<span class="k">return</span>
+<span class="ln">11</span>		<span class="k">default</span><span class="p">:</span>
+<span class="ln">12</span>			<span class="c1">// We can send to it until it is full, then it will block until a pushes finishes and reads from it.
+</span><span class="ln">13</span><span class="c1"></span>			<span class="c1">// This limits the number of pushes that can happen concurrently
+</span><span class="ln">14</span><span class="c1"></span>			<span class="nx">semaphore</span> <span class="o">&lt;-</span> <span class="kd">struct</span><span class="p">{}{}</span>
+<span class="ln">15</span>
+<span class="ln">16</span>			<span class="c1">// Get the next proxy to push. This will block if there are no updates required.
+</span><span class="ln">17</span><span class="c1"></span>      <span class="c1">// 从 PushQueue 中取出 PushRequest
+</span><span class="ln">18</span><span class="c1"></span>			<span class="nx">client</span><span class="p">,</span> <span class="nx">push</span><span class="p">,</span> <span class="nx">shuttingdown</span> <span class="o">:=</span> <span class="nx">queue</span><span class="p">.</span><span class="nf">Dequeue</span><span class="p">()</span>
+<span class="ln">19</span>			<span class="k">if</span> <span class="nx">shuttingdown</span> <span class="p">{</span>
+<span class="ln">20</span>				<span class="k">return</span>
+<span class="ln">21</span>			<span class="p">}</span>
+<span class="ln">22</span>			<span class="nf">recordPushTriggers</span><span class="p">(</span><span class="nx">push</span><span class="p">.</span><span class="nx">Reason</span><span class="o">...</span><span class="p">)</span>
+<span class="ln">23</span>			<span class="c1">// Signals that a push is done by reading from the semaphore, allowing another send on it.
+</span><span class="ln">24</span><span class="c1"></span>			<span class="nx">doneFunc</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">25</span>				<span class="nx">queue</span><span class="p">.</span><span class="nf">MarkDone</span><span class="p">(</span><span class="nx">client</span><span class="p">)</span>
+<span class="ln">26</span>				<span class="o">&lt;-</span><span class="nx">semaphore</span>
+<span class="ln">27</span>			<span class="p">}</span>
+<span class="ln">28</span>
+<span class="ln">29</span>			<span class="nx">proxiesQueueTime</span><span class="p">.</span><span class="nf">Record</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nf">Since</span><span class="p">(</span><span class="nx">push</span><span class="p">.</span><span class="nx">Start</span><span class="p">).</span><span class="nf">Seconds</span><span class="p">())</span>
+<span class="ln">30</span>
+<span class="ln">31</span>			<span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">32</span>        <span class="c1">// 根据 PushRequest 生成 Event
+</span><span class="ln">33</span><span class="c1"></span>				<span class="nx">pushEv</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Event</span><span class="p">{</span>
+<span class="ln">34</span>					<span class="nx">pushRequest</span><span class="p">:</span> <span class="nx">push</span><span class="p">,</span>
+<span class="ln">35</span>					<span class="nx">done</span><span class="p">:</span>        <span class="nx">doneFunc</span><span class="p">,</span>
+<span class="ln">36</span>				<span class="p">}</span>
+<span class="ln">37</span>
+<span class="ln">38</span>				<span class="k">select</span> <span class="p">{</span>
+<span class="ln">39</span>        <span class="c1">// 将 Event 放入客户端的 PushChannel中，跟前面的 PushChannel 不是同一个（前面是服务端的）
+</span><span class="ln">40</span><span class="c1"></span>				<span class="k">case</span> <span class="nx">client</span><span class="p">.</span><span class="nx">pushChannel</span> <span class="o">&lt;-</span> <span class="nx">pushEv</span><span class="p">:</span>
+<span class="ln">41</span>					<span class="k">return</span>
+<span class="ln">42</span>        <span class="c1">// 如果客户端的消息处理完成了，标记 PushRequest 处理完成
+</span><span class="ln">43</span><span class="c1"></span>				<span class="k">case</span> <span class="o">&lt;-</span><span class="nx">client</span><span class="p">.</span><span class="nx">stream</span><span class="p">.</span><span class="nf">Context</span><span class="p">().</span><span class="nf">Done</span><span class="p">():</span> <span class="c1">// grpc stream was closed
+</span><span class="ln">44</span><span class="c1"></span>					<span class="nf">doneFunc</span><span class="p">()</span>
+<span class="ln">45</span>					<span class="nx">adsLog</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Client closed connection %v&#34;</span><span class="p">,</span> <span class="nx">client</span><span class="p">.</span><span class="nx">ConID</span><span class="p">)</span>
+<span class="ln">46</span>				<span class="p">}</span>
+<span class="ln">47</span>			<span class="p">}()</span>
+<span class="ln">48</span>		<span class="p">}</span>
+<span class="ln">49</span>	<span class="p">}</span>
+<span class="ln">50</span><span class="p">}</span>
+</code></pre></div><h3 id="注册kubeclientrunandwait">注册kubeClient.RunAndWait</h3>
+<p>将 <code>kubeClient.RunAndWait</code> 方法注册至 <code>startFuncs</code> 中， <code>RunAndWait</code> 启动后所有 <code>Informer</code> 将开始缓存，并等待它们同步完成。之所以在最后运行，可以保证所有的 <code>Informer</code> 都已经注册。</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="k">if</span> <span class="nx">s</span><span class="p">.</span><span class="nx">kubeClient</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln">2</span>    <span class="nx">s</span><span class="p">.</span><span class="nf">addStartFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">stop</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln">3</span>        <span class="nx">s</span><span class="p">.</span><span class="nx">kubeClient</span><span class="p">.</span><span class="nf">RunAndWait</span><span class="p">(</span><span class="nx">stop</span><span class="p">)</span>
+<span class="ln">4</span>        <span class="k">return</span> <span class="kc">nil</span>
+<span class="ln">5</span>    <span class="p">})</span>
+<span class="ln">6</span><span class="p">}</span>
+</code></pre></div><h3 id="server启动">Server启动</h3>
+<p>start函数顺序执行之前初始化过程中在server对象上注册的一系列startFunc函数</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">Server</span><span class="p">)</span> <span class="nf">Start</span><span class="p">(</span><span class="nx">stop</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kd">struct</span><span class="p">{})</span> <span class="kt">error</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="o">...</span>
+<span class="ln"> 3</span>  <span class="c1">// 前面注册了很多种startFuncs，在这里依次启动
+</span><span class="ln"> 4</span><span class="c1"></span>	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">fn</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">s</span><span class="p">.</span><span class="nx">startFuncs</span> <span class="p">{</span>
+<span class="ln"> 5</span>		<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">fn</span><span class="p">(</span><span class="nx">stop</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+<span class="ln"> 6</span>			<span class="k">return</span> <span class="nx">err</span>
+<span class="ln"> 7</span>		<span class="p">}</span>
+<span class="ln"> 8</span>	<span class="p">}</span>
+<span class="ln"> 9</span>
+<span class="ln">10</span>  <span class="c1">// 等待需要监听资源的 Informer 缓存完毕
+</span><span class="ln">11</span><span class="c1"></span>	<span class="k">if</span> <span class="p">!</span><span class="nx">s</span><span class="p">.</span><span class="nf">waitForCacheSync</span><span class="p">(</span><span class="nx">stop</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">12</span>		<span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;failed to sync cache&#34;</span><span class="p">)</span>
+<span class="ln">13</span>	<span class="p">}</span>
+<span class="ln">14</span>     <span class="c1">// 启动服务
+</span><span class="ln">15</span><span class="c1"></span>	<span class="o">...</span>
+<span class="ln">16</span><span class="p">}</span>
+</code></pre></div>
+  </article>
+<aside class="sidebar">
+  <section class="sidebar_inner">
+    <h2>kinnylee</h2>
+    <div>
+      码农, 技术爱好者, 喜欢研究源码、关注新技术, 篮球爱好者
+    </div>
+    <a href = 'https://kinnylee.github.io/about/' class="button mt-1" role="button">查看更多</a>
+    <h2 class="mt-4">Featured Posts</h2>
+    <ul>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/%E5%9B%BE%E8%A7%A3golang-channel%E6%BA%90%E7%A0%81/" class="nav-link">图解Golang channel源码</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%A7%A6%E5%8F%91%E8%B0%83%E5%BA%A6%E6%9C%BA%E5%88%B6/" class="nav-link">go触发调度机制</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E8%BF%9B%E7%A8%8B%E5%90%AF%E5%8A%A8%E5%88%86%E6%9E%90/" class="nav-link">go进程启动分析</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/golang%E8%B0%83%E5%BA%A6%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="nav-link">go协程原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%B8%89-%E6%A0%88%E5%B8%A7%E7%BB%93%E6%9E%84%E5%92%8C%E5%8E%9F%E7%90%86/" class="nav-link">dmp文件分析（三）- 栈帧结构和原理</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90%E4%BA%8C-symbol/" class="nav-link">dmp文件分析（二）- symbol</a>
+      </li>
+    
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/" class="nav-link">K8s基本入门</a>
+      </li>
+    
+    </ul>
+    <h2 class="mt-4">Recent Posts</h2>
+    <ul class="flex-column">
+      
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-wait/" class="nav-link">helm源码分析-storage</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" class="nav-link">argocd源码分析-基本介绍</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/" class="nav-link">helm源码分析-downloader</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-install%E5%91%BD%E4%BB%A4/" class="nav-link">helm源码分析-install命令</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-list%E5%91%BD%E4%BB%A4/" class="nav-link">helm源码分析-list命令</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-repo%E5%91%BD%E4%BB%A4/" class="nav-link">helm源码分析-repo命令</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/" class="nav-link">helm源码分析-storage</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" class="nav-link">helm源码分析-基本介绍</a>
+      </li>
+    </ul> 
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent">
+          云原生
+          <span class='button_tally'>14</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>13</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent">
+          JAVA
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>6</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
+          GO第三方库
+          <span class='button_tally'>4</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent">
+          MONGODB
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent">
+          PYTHON
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent">
+          REDIS
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent">
+          博客搭建
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">All categories</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/categories/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent" data-position=10>GO<span class='button_tally'>10</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=4>GO第三方库<span class='button_tally'>4</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/java/' class=" post_tag button button_translucent" data-position=6>JAVA<span class='button_tally'>6</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent" data-position=13>K8S<span class='button_tally'>13</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/mysql/' class=" post_tag button button_translucent" data-position=2>MYSQL<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent" data-position=14>云原生<span class='button_tally'>14</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/' class=" post_tag button button_translucent" data-position=1>博客搭建<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=6>源码分析<span class='button_tally'>6</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+        
+      </nav>
+    </div>
+    
+    <div>
+      <h2 class="mt-4 taxonomy" id="tags-section">tags</h2>
+      <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
+          源码分析
+          <span class='button_tally'>36</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
+          BREAKPAD
+          <span class='button_tally'>11</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent">
+          K8S
+          <span class='button_tally'>10</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent">
+          GO
+          <span class='button_tally'>9</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent">
+          GO基础入门
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/helm/' class=" post_tag button button_translucent">
+          HELM
+          <span class='button_tally'>8</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
+          JAVA基础
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/kubeapps/' class=" post_tag button button_translucent">
+          KUBEAPPS
+          <span class='button_tally'>5</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent">
+          C&#43;&#43;
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent">
+          CLIENT-GO
+          <span class='button_tally'>3</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent">
+          MYSQL
+          <span class='button_tally'>2</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent">
+          ANSIBLE
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/argocd/' class=" post_tag button button_translucent">
+          ARGOCD
+          <span class='button_tally'>1</span>
+        </a>
+        
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
+          <span class='button_tally'>1</span>
+        </a>
+        
+        
+        <br>
+        <div class="post_tags_toggle button">All tags</div>
+        <div class="post_tags">
+          <div class="tags_list">
+            
+            <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/argocd/' class=" post_tag button button_translucent" data-position=1>ARGOCD<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent" data-position=11>BREAKPAD<span class='button_tally'>11</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/c&#43;&#43;/' class=" post_tag button button_translucent" data-position=3>C&#43;&#43;<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/client-go/' class=" post_tag button button_translucent" data-position=3>CLIENT-GO<span class='button_tally'>3</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent" data-position=1>DOCKER<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go/' class=" post_tag button button_translucent" data-position=9>GO<span class='button_tally'>9</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/' class=" post_tag button button_translucent" data-position=8>GO基础入门<span class='button_tally'>8</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent" data-position=1>GO第三方库<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/helm/' class=" post_tag button button_translucent" data-position=8>HELM<span class='button_tally'>8</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/index/' class=" post_tag button button_translucent" data-position=1>INDEX<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent" data-position=5>JAVA基础<span class='button_tally'>5</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/jvm/' class=" post_tag button button_translucent" data-position=1>JVM<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/k8s/' class=" post_tag button button_translucent" data-position=10>K8S<span class='button_tally'>10</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/kubeapps/' class=" post_tag button button_translucent" data-position=5>KUBEAPPS<span class='button_tally'>5</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mongodb/' class=" post_tag button button_translucent" data-position=1>MONGODB<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/mysql/' class=" post_tag button button_translucent" data-position=2>MYSQL<span class='button_tally'>2</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/python/' class=" post_tag button button_translucent" data-position=1>PYTHON<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/redis/' class=" post_tag button button_translucent" data-position=1>REDIS<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/vscode/' class=" post_tag button button_translucent" data-position=1>VSCODE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=36>源码分析<span class='button_tally'>36</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86/' class=" post_tag button button_translucent" data-position=1>计算机原理<span class='button_tally'>1</span>
+            </a>
+            
+            <div class="tags_sort"><span title="sort alphabetically">[A~Z]</span><span title="sort by count">[0~9]</span>
+            </div>
+            <span class="tags_hide"><svg class="icon">
+            <use xlink:href="#closeme"></use>
+          </svg></span>
+          </div>
+        </div>
+        
+      </nav>
+    </div>
+    
+  </section>
+</aside>
+
+</div>
+    </main><svg width="0" height="0" class="hidden">
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter">
+    <path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68 0 0 1-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043 0-1.924.366-2.643 1.078a3.56 3.56 0 0 0-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846 0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47 0 .929.273 1.705.82 2.388a3.623 3.623 0 0 0 2.115 1.291c-.312.08-.641.118-.979.118-.312 0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652 0 0 0 2.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422 0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139 0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77 0 0 0 1.172-4.892v-.468a7.788 7.788 0 0 0 1.84-1.921 8.142 8.142 0 0 1-2.11.593z"
+      ></path>
+  </symbol>
+  <symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail">
+    <path  d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar">
+    <path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916 0 100v352c0 33.084 26.916 60 60 60h392c33.084 0 60-26.916 60-60V100c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028 0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028 0 20 8.972 20 20v48z"></path>
+    <path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"></path>
+  </symbol>
+  <symbol viewBox="-21 0 512 512" xmlns="http://www.w3.org/2000/svg" id="yank">
+    <path d="M410.668 405.332H165.332c-32.363 0-58.664-26.3-58.664-58.664v-288c0-32.363 26.3-58.668 58.664-58.668h181.504c21.059 0 41.687 8.535 56.555 23.445l42.496 42.496c15.125 15.125 23.445 35.223 23.445 56.575v224.152c0 32.363-26.3 58.664-58.664 58.664zM165.332 32c-14.7 0-26.664 11.969-26.664 26.668v288c0 14.7 11.965 26.664 26.664 26.664h245.336c14.7 0 26.664-11.965 26.664-26.664V122.516c0-12.82-4.992-24.871-14.059-33.942l-42.496-42.496C371.84 37.121 359.488 32 346.836 32zm0 0"></path>
+    <path d="M314.668 512h-256C26.305 512 0 485.695 0 453.332V112c0-32.363 26.305-58.668 58.668-58.668h10.664c8.832 0 16 7.168 16 16s-7.168 16-16 16H58.668C43.968 85.332 32 97.301 32 112v341.332C32 468.032 43.969 480 58.668 480h256c14.7 0 26.664-11.969 26.664-26.668v-10.664c0-8.832 7.168-16 16-16s16 7.168 16 16v10.664c0 32.363-26.3 58.668-58.664 58.668zM368 181.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+    <path d="M368 245.332H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 64H208c-8.832 0-16-7.168-16-16s7.168-16 16-16h160c8.832 0 16 7.168 16 16s-7.168 16-16 16zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github">
+    <path d="M255.968 5.329C114.624 5.329 0 120.401 0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384 0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008 0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992 0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584 0 34.368-.32 62.08-.32 70.496 0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"></path>
+  </symbol>
+  <symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss">
+    <circle cx="3.429" cy="20.571" r="3.429"></circle>
+    <path d="M11.429 24h4.57C15.999 15.179 8.821 8.001 0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"></path>
+    <path d="M24 24C24 10.766 13.234 0 0 0v4.571c10.714 0 19.43 8.714 19.43 19.429z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin">
+    <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h362c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow">
+    <path d="M604.501 440.509L325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298 0 36.323s26.223 10.024 36.222 0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221 0 9.999-10.023 9.999-26.298 0-36.323z"></path>
+  </symbol>
+  <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly">
+    <path d="M504.971 239.029L448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c19.851 0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002 0 0 0 400 320v108c0 19.851-16.149 36-36 36h-44c-13.255 0-24 10.745-24 24s10.745 24 24 24h44c46.318 0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568 0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255 0 24-10.745 24-24S205.255 0 192 0h-44c-46.318 0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568 0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255 0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851 0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002 0 0 0 112 192z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="copy">
+    <path d="M366.345 406.069H66.207c-9.751 0-17.655-7.904-17.655-17.655V17.655C48.552 7.904 56.456 0 66.207 0h300.138C376.096 0 384 7.904 384 17.655v370.759c0 9.751-7.904 17.655-17.655 17.655z" fill="#f1f4fb"></path>
+    <path d="M384 388.414v-76.992c-.907.322-1.869.494-2.751.882-6.307-6.593-14.733-11.025-24.111-11.964a40.49 40.49 0 0 0-8.448.039v-92.93c0-21.903-17.82-39.723-39.723-39.724a40.5 40.5 0 0 0-4.036.202c-20.012 2.004-35.689 19.916-35.689 40.781v101.773l-21.581 21.581c-15.241 15.241-21.393 36.866-16.456 57.847l3.802 16.16h131.338c9.75 0 17.655-7.905 17.655-17.655z"
+      fill="#d5dced"></path>
+    <circle cx="128" cy="105.931" r="26.483" fill="#b4e66e"></circle>
+    <circle cx="128" cy="203.034" r="26.483" fill="#dae169"></circle>
+    <circle cx="128" cy="300.138" r="26.483" fill="#ffdc64"></circle>
+    <path d="M331.034 229.517H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 194.207H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 326.621H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h141.241c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 291.31H189.793c-4.879 0-8.828-3.953-8.828-8.828s3.948-8.828 8.828-8.828h105.931c4.879 0 8.828 3.953 8.828 8.828s-3.948 8.828-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M331.034 132.414H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h141.241a8.826 8.826 0 0 1 8.828 8.828 8.826 8.826 0 0 1-8.828 8.828z" fill="#7f8499"></path>
+    <path d="M295.724 97.103H189.793a8.826 8.826 0 0 1-8.828-8.828 8.826 8.826 0 0 1 8.828-8.828h105.931a8.826 8.826 0 0 1 8.828 8.828 8.825 8.825 0 0 1-8.828 8.828z" fill="#5b5d6e"></path>
+    <path d="M443.656 335.563c-13.21-1.323-24.345 9.015-24.345 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954v-7.569c0-11.544-8.306-22.063-19.794-23.213-13.209-1.323-24.344 9.015-24.344 21.954V207.448c0-12.939-11.135-23.277-24.345-21.954-11.486 1.15-19.793 11.669-19.793 23.213v109.086l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h74.645c34.127 0 61.793-27.666 61.793-61.793v-91.431c-.001-11.544-8.306-22.063-19.793-23.213z"
+      fill="#f0c087"></path>
+    <path d="M339.862 361.377a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM384 370.205a8.829 8.829 0 0 0 8.828-8.828v-34.194c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zm44.138 8.827a8.829 8.829 0 0 0 8.828-8.828V336.01c-10.052 2.061-17.655 10.844-17.655 21.506v12.687a8.827 8.827 0 0 0 8.827 8.829zM288.885 464.36l-20.467-86.985a28.482 28.482 0 0 1 7.585-26.663l10.893-10.894v22.113a8.829 8.829 0 0 0 17.656 0V185.933c-10.344 2.173-17.655 11.972-17.655 22.773v109.087l-26.752 26.752a44.14 44.14 0 0 0-11.754 41.32l18.47 78.495c6.567 27.913 31.475 47.64 60.15 47.64h22.026c-28.677 0-53.584-19.727-60.152-47.64z"
+      fill="#e6af78"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme">
+    <path d="M284.286 256.002L506.143 34.144c7.811-7.811 7.811-20.475 0-28.285-7.811-7.81-20.475-7.811-28.285 0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285 0-7.81 7.811-7.811 20.475 0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475 0 28.285a19.938 19.938 0 0 0 14.143 5.857 19.94 19.94 0 0 0 14.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475 0-28.285L284.286 256.002z"></path>
+  </symbol>
+  <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu">
+    <path d="M492 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954 0 96s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h472c11.046 0 20-8.954 20-20s-8.954-20-20-20z"></path>
+  </symbol>
+</svg>
+<footer class = 'footer'>
+  <div class = 'footer_inner wrap pale'>
+    <img src = 'https://kinnylee.github.io/icons/apple-touch-icon.png' class = 'icon icon_2 transparent'>
+    <p>Copyright &copy;&nbsp;<span class = 'year'></span>&nbsp;KINNYLEE. All Rights Reserved</p>
+<a class='to_top' href="#documentTop">
+  <svg class="icon">
+    <use xlink:href="#arrow"></use>
+  </svg>
+</a>
+
+  </div>
+</footer>
+    <script type="text/javascript" src = "https://kinnylee.github.io/js/bundle.cc924be6a21a1d8e5a2606ace65fbbd1955525709f7db3cbbe7c2cf8b7b7132d0c6bc812aa1596f79f40d9c6bf506085c118bbf5e5c3e2c90483b950ec1e6e94.js" integrity=
+    "sha512-zJJL5qIaHY5aJgas5l&#43;70ZVVJXCffbPLvnws&#43;Le3Ey0Ma8gSqhWW959A2ca/UGCFwRi79eXD4skEg7lQ7B5ulA==" crossorigin="anonymous"></script>
+  </body>
+</html>

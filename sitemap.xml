@@ -4,16 +4,51 @@
   
   <url>
     <loc>https://kinnylee.github.io/</loc>
-    <lastmod>2021-03-21T00:00:00+00:00</lastmod>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/categories/</loc>
-    <lastmod>2021-03-21T00:00:00+00:00</lastmod>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://kinnylee.github.io/tags/helm/</loc>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-wait/</loc>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/</loc>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/</loc>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/</loc>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
+    <lastmod>2021-03-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/tags/argocd/</loc>
+    <lastmod>2021-03-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</loc>
     <lastmod>2021-03-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -39,26 +74,6 @@
   
   <url>
     <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</loc>
-    <lastmod>2021-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/post/</loc>
-    <lastmod>2021-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/tags/</loc>
-    <lastmod>2021-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/</loc>
-    <lastmod>2021-03-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/</loc>
     <lastmod>2021-03-21T00:00:00+00:00</lastmod>
   </url>
   
@@ -529,10 +544,6 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</loc>
-  </url>
-  
-  <url>
     <loc>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/gc/</loc>
   </url>
   
@@ -569,6 +580,10 @@
   </url>
   
   <url>
+    <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-viper/</loc>
+  </url>
+  
+  <url>
     <loc>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/orm/xorm/</loc>
   </url>
   
@@ -601,7 +616,39 @@
   </url>
   
   <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-argocd-application-controller/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/envoy-grpc/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</loc>
+  </url>
+  
+  <url>
     <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/gitops/flux/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/grpc/grpc/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-agent/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-discovery/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%90%AF%E5%8A%A8%E5%91%BD%E4%BB%A4/</loc>
+  </url>
+  
+  <url>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/xds/</loc>
   </url>
   
   <url>
@@ -613,11 +660,11 @@
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/pipeline/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</loc>
   </url>
   
   <url>
-    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</loc>
+    <loc>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/pipeline/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</loc>
   </url>
   
   <url>

@@ -155,7 +155,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 2831 字</span>，阅读约<span class="more-meta"> 6 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 2908 字</span>，阅读约<span class="more-meta"> 6 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" title="Copy Link" class="link link_yank">
@@ -381,15 +381,15 @@
 <span class="ln"> 4</span>├── chart // chart对象和相关操作的包（比如加载文件为Chart对象）
 <span class="ln"> 5</span>├── chartutil
 <span class="ln"> 6</span>├── cli
-<span class="ln"> 7</span>├── downloader
+<span class="ln"> 7</span>├── downloader // 下载chart包相关代码
 <span class="ln"> 8</span>├── engine // 模板渲染相关代码，将给定的配置和模板渲染成最终的资源文件
 <span class="ln"> 9</span>├── gates
 <span class="ln">10</span>├── getter
 <span class="ln">11</span>├── helmpath
 <span class="ln">12</span>├── kube
 <span class="ln">13</span>├── lint
-<span class="ln">14</span>├── plugin
-<span class="ln">15</span>├── postrender
+<span class="ln">14</span>├── plugin // helm plugin 相关代码，注册的插件会自动添加到cobra命令中
+<span class="ln">15</span>├── postrender // helm有生命周期管理，这里是在渲染完成模板后加入的一些钩子（hook）
 <span class="ln">16</span>├── provenance
 <span class="ln">17</span>├── release // release等数据结构和操作的包
 <span class="ln">18</span>├── releaseutil
@@ -456,6 +456,12 @@
     <ul class="flex-column">
       
       <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-wait/" class="nav-link">helm源码分析-storage</a>
+      </li>
+      <li>
+        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" class="nav-link">argocd源码分析-基本介绍</a>
+      </li>
+      <li>
         <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-downloader/" class="nav-link">helm源码分析-downloader</a>
       </li>
       <li>
@@ -470,25 +476,19 @@
       <li>
         <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/" class="nav-link">helm源码分析-storage</a>
       </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E6%A0%B8%E5%BF%83%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="nav-link">helm源码分析-核心数据结构</a>
-      </li>
-      <li>
-        <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/kubeapps/kubeapps%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-kubeops/" class="nav-link">kubeapps源码分析-kubeops</a>
-      </li>
     </ul> 
     
     <div>
       <h2 class="mt-4 taxonomy" id="categories-section">categories</h2>
       <nav class="tags_nav">
+        <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent">
+          云原生
+          <span class='button_tally'>14</span>
+        </a>
+        
         <a href='https://kinnylee.github.io/categories/k8s/' class=" post_tag button button_translucent">
           K8S
           <span class='button_tally'>13</span>
-        </a>
-        
-        <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent">
-          云原生
-          <span class='button_tally'>12</span>
         </a>
         
         <a href='https://kinnylee.github.io/categories/go/' class=" post_tag button button_translucent">
@@ -601,7 +601,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent" data-position=12>云原生<span class='button_tally'>12</span>
+            <a href='https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/' class=" post_tag button button_translucent" data-position=14>云原生<span class='button_tally'>14</span>
             </a>
             
             
@@ -632,7 +632,7 @@
       <nav class="tags_nav">
         <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent">
           源码分析
-          <span class='button_tally'>34</span>
+          <span class='button_tally'>36</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/breakpad/' class=" post_tag button button_translucent">
@@ -657,7 +657,7 @@
         
         <a href='https://kinnylee.github.io/tags/helm/' class=" post_tag button button_translucent">
           HELM
-          <span class='button_tally'>7</span>
+          <span class='button_tally'>8</span>
         </a>
         
         <a href='https://kinnylee.github.io/tags/java%E5%9F%BA%E7%A1%80/' class=" post_tag button button_translucent">
@@ -690,13 +690,13 @@
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
-          DOCKER
+        <a href='https://kinnylee.github.io/tags/argocd/' class=" post_tag button button_translucent">
+          ARGOCD
           <span class='button_tally'>1</span>
         </a>
         
-        <a href='https://kinnylee.github.io/tags/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/' class=" post_tag button button_translucent">
-          GO第三方库
+        <a href='https://kinnylee.github.io/tags/docker/' class=" post_tag button button_translucent">
+          DOCKER
           <span class='button_tally'>1</span>
         </a>
         
@@ -707,6 +707,10 @@
           <div class="tags_list">
             
             <a href='https://kinnylee.github.io/tags/ansible/' class=" post_tag button button_translucent" data-position=1>ANSIBLE<span class='button_tally'>1</span>
+            </a>
+            
+            
+            <a href='https://kinnylee.github.io/tags/argocd/' class=" post_tag button button_translucent" data-position=1>ARGOCD<span class='button_tally'>1</span>
             </a>
             
             
@@ -738,7 +742,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/helm/' class=" post_tag button button_translucent" data-position=7>HELM<span class='button_tally'>7</span>
+            <a href='https://kinnylee.github.io/tags/helm/' class=" post_tag button button_translucent" data-position=8>HELM<span class='button_tally'>8</span>
             </a>
             
             
@@ -782,7 +786,7 @@
             </a>
             
             
-            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=34>源码分析<span class='button_tally'>34</span>
+            <a href='https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/' class=" post_tag button button_translucent" data-position=36>源码分析<span class='button_tally'>36</span>
             </a>
             
             

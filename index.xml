@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Sun, 21 Mar 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 24 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>helm源码分析-storage</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-wait/</link>
+      <pubDate>Wed, 24 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-wait/</guid>
+      <description>helm源码分析-wait 概述 wait模块主要用于安装</description>
+    </item>
+    
+    <item>
+      <title>argocd源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>helm源码分析-基本介绍 概述 argocd是一个基于k8s的声明式的、GitOps工具 为什么应该使用argocd 应用程序定义、配置、环境应该</description>
+    </item>
     
     <item>
       <title>helm源码分析-downloader</title>
@@ -54,7 +72,7 @@
       <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</guid>
-      <description>helm源码分析-storage storage模块主要用于管理和操作发布的release信息，当我们通过helm list等命令查询relea</description>
+      <description>helm源码分析-storage storage模块主要用于管理和操作发布的release信息，当我们通过`helm list、helm hist</description>
     </item>
     
     <item>
@@ -617,15 +635,6 @@
     
     <item>
       <title></title>
-      <link>https://kinnylee.github.io/post/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://kinnylee.github.io/post/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid>
-      <description>环境准备 mac vscode 环境配置 下载代码 1git clone https://github.com/envoyproxy/envoy.git 安装bazel等环境 1cd ci 2./mac_ci_setup.sh 3 编译代码 1bazel build //source/exe:envoy-static 2bazel build -c opt //source/exe:envoy-static vscode调试配置 1touch .vscode/launch.json 文本内容 1{ 2 // Use IntelliSense to learn about possible attributes. 3</description>
-    </item>
-    
-    <item>
-      <title></title>
       <link>https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/gc/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -707,6 +716,15 @@
     
     <item>
       <title></title>
+      <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-viper/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/go%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-viper/</guid>
+      <description>go第三方库-viper 使用 1go get github.com/spf13/viper 概述 viper是一个完整的go语言配置框架，能处理多种配置类型和文件格式，支持以下功能： 设置默认值 支持js</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://kinnylee.github.io/post/go/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93/orm/xorm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -779,11 +797,83 @@
     
     <item>
       <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-argocd-application-controller/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-argocd-application-controller/</guid>
+      <description>argocd源码分析-argocd-application-controller 概述 cluster存放在secret中 缓存支持两种：redi</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/envoy-grpc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/envoy-grpc/</guid>
+      <description>envoy-grpc AggregatedDiscoveryService 代码路径：api/envoy/service/discovery/v3/ads.proto 请求： DiscoveryRequest DeltaDiscoveryRequest 响应： DiscoveryRespon</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/%E8%B0%83%E8%AF%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid>
+      <description>环境准备 mac vscode 环境配置 下载代码 1git clone https://github.com/envoyproxy/envoy.git 安装bazel等环境 1cd ci 2./mac_ci_setup.sh 3 编译代码 1bazel build //source/exe:envoy-static 2bazel build -c opt //source/exe:envoy-static vscode调试配置 1touch .vscode/launch.json 文本内容 1{ 2 // Use IntelliSense to learn about possible attributes. 3</description>
+    </item>
+    
+    <item>
+      <title></title>
       <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/gitops/flux/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/gitops/flux/</guid>
       <description>1sudo &amp;#34;GITHUB_TOKEN=$GITHUB_TOKEN&amp;#34; flux bootstrap github \ 2 --owner=kinnylee \ 3 --repository=fleet-infra \ 4 --branch=main \ 5 --path=./clusters/my-cluster \ 6 --personal 配置镜像自动升级功能 1sudo &amp;#34;GITHUB_TOKEN=$GITHUB_TOKEN&amp;#34; flux bootstrap github \ 2 --components-extra=image-reflector-controller,image-automation-controller \ 3 --owner=$GITHUB_USER \ 4 --repository=fleet-infra \ 5 --branch=main \ 6 --path=clusters/image-update-cluster \ 7 --token-auth \ 8 --personal</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/grpc/grpc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/grpc/grpc/</guid>
+      <description>Grpc 概述 grpc是一个高性能的、开源的通用rpc框架</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-agent/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-agent/</guid>
+      <description>pilot-agent源码分析 组件概述 sidercar容器的镜像为proxy，支持v2 api的sidecar容器的镜像为proxyv2，镜像</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-discovery/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-discovery/</guid>
+      <description>Istio源码分析-pilot-discovery 概述 pilot-discovery扮演服务注册中心、istio控制平面到Envoy之间的桥</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%90%AF%E5%8A%A8%E5%91%BD%E4%BB%A4/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%90%AF%E5%8A%A8%E5%91%BD%E4%BB%A4/</guid>
+      <description>istio源码分析-启动命令 概述 源码分析 代码入口 istoctl/cmd/istioctl/main.go 1func init() { 2 // 设置viper的值 3 viper.SetDefault(&amp;#34;istioNamespace&amp;#34;, controller.IstioNamespace) 4 viper.SetDefault(&amp;#34;xds-port&amp;#34;, 15012) 5} 6... 7func main() { 8 // 配置和环境变量处理 9 if err := cmd.ConfigAndEnvProcessing(); err != nil {</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/xds/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/xds/</guid>
+      <description>xds 源码 pilot/pkg/xds/ads.go 1func (s *DiscoveryServer) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error { 2 return s.Stream(stream) 3} 4 5func (s *DiscoveryServer) Stream(stream DiscoveryStream) error { 6 ... 7 // 建立新的连接 8 con := newConnection(peerAddr, stream) 9 ... 10 // 创建一个接受请求的channel 11 reqChannel := make(chan *discovery.DiscoveryRequest, 1) 12 // 处理客户</description>
     </item>
     
     <item>
@@ -806,19 +896,19 @@
     
     <item>
       <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/pipeline/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/pipeline/argo/argo%E5%88%9D%E4%BD%93%E9%AA%8C/</guid>
       <description>简介 Argo Workflows 是一个开源的容器原生的工作流引擎，可在 Kubernetes 上编排并行作业。Argo Workflows 实现为 Kubernetes CRD。 快速入门 1kubectl create ns argo 2kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo/stable/manifests/install.yaml</description>
     </item>
     
     <item>
       <title></title>
-      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</link>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/pipeline/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/%E6%B5%81%E6%B0%B4%E7%BA%BF/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</guid>
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/pipeline/jenkins/jenkins%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/</guid>
       <description>概述 jenkins在ci、cd领域如此火热，独霸一方，得益于丰富的插件生态。而作为开发者你的，是否好奇jenkins的插件机制是如何实现的 开</description>
     </item>
     

@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>Copyright © 2020; all rights reserved.</copyright>
-    <lastBuildDate>Sun, 21 Mar 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 24 Mar 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://kinnylee.github.io/categories/%E4%BA%91%E5%8E%9F%E7%94%9F/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>helm源码分析-storage</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-wait/</link>
+      <pubDate>Wed, 24 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-wait/</guid>
+      <description>helm源码分析-wait 概述 wait模块主要用于安装</description>
+    </item>
+    
+    <item>
+      <title>argocd源码分析-基本介绍</title>
+      <link>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/argocd/argocd%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</guid>
+      <description>helm源码分析-基本介绍 概述 argocd是一个基于k8s的声明式的、GitOps工具 为什么应该使用argocd 应用程序定义、配置、环境应该</description>
+    </item>
     
     <item>
       <title>helm源码分析-downloader</title>
@@ -54,7 +72,7 @@
       <pubDate>Sun, 21 Mar 2021 00:00:00 +0000</pubDate>
       
       <guid>https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/helm/helm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-storage/</guid>
-      <description>helm源码分析-storage storage模块主要用于管理和操作发布的release信息，当我们通过helm list等命令查询relea</description>
+      <description>helm源码分析-storage storage模块主要用于管理和操作发布的release信息，当我们通过`helm list、helm hist</description>
     </item>
     
     <item>
