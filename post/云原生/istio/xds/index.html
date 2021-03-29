@@ -14,13 +14,13 @@
 </script>
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="xds 源码 pilot/pkg/xds/ads.go 1func (s *DiscoveryServer) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) …">
+<meta name="description" content="xds 概述 DS协议是Envoy获取配置信息的传输协议，也是Istio与Envoy连接的桥梁。 Envoy动态的发现服务以及相关资源的API就是指x">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
 <meta name = "twitter:title" content = "" />
 <meta property = "og:url" content = "https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/xds/" />
 <meta property = "og:title" content = "" />
-<meta property = "og:description" content = "xds 源码 pilot/pkg/xds/ads.go 1func (s *DiscoveryServer) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) …" />
+<meta property = "og:description" content = "xds 概述 DS协议是Envoy获取配置信息的传输协议，也是Istio与Envoy连接的桥梁。 Envoy动态的发现服务以及相关资源的API就是指x" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -150,7 +150,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 491 字</span>，阅读约<span class="more-meta"> 1 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 935 字</span>，阅读约<span class="more-meta"> 2 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/xds/" title="Copy Link" class="link link_yank">
@@ -162,6 +162,25 @@
 
     
     <h1 id="xds">xds</h1>
+<h2 id="概述">概述</h2>
+<ul>
+<li><strong>DS协议是Envoy获取配置信息的传输协议</strong>，也是Istio与Envoy连接的桥梁。</li>
+<li>Envoy动态的发现服务以及相关资源的API就是指xDS</li>
+<li><strong>xDS可以通过两种方式承载： gRPC、 REST</strong>，这两种方式都是通过xDS-API发送<strong>DiscoveryRequest</strong>请求，然后资源通过<strong>DiscoveryResponse</strong>下发</li>
+</ul>
+<h3 id="ads">ADS</h3>
+<p>ADS是一种xDS的实现, 它基于gRPC长连接。 gRPC的实现是承载在HTTP/2之上。</p>
+<h4 id="为什么需要ads">为什么需要ADS</h4>
+<p>Istio 0.8以前， Pilot提供的的单一资源的DS</p>
+<p>每种资源需要一条单独的连接
+Istio高可用环境下，可能部署多个Pilot
+带来的挑战：</p>
+<p>没办法保证配置资源更新的顺序
+多Pilot配置资源的一致性没法保证
+综合以上两个问题，很容易出现配置更新过程中网络流量丢失带来网络错误（ 虚假的）</p>
+<p>ADS允许通过一条连接（ gRPC的同一stream），发送多种资源的请求和响应。</p>
+<p>能够保证请求一定落在同一Pilot上，解决多个管理服务器配置不一致的问题
+通过顺序的配置分发，轻松解决资源更新顺序的问题</p>
 <h2 id="源码">源码</h2>
 <p>pilot/pkg/xds/ads.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span><span class="nx">DiscoveryServer</span><span class="p">)</span> <span class="nf">StreamAggregatedResources</span><span class="p">(</span><span class="nx">stream</span> <span class="nx">discovery</span><span class="p">.</span><span class="nx">AggregatedDiscoveryService_StreamAggregatedResourcesServer</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>

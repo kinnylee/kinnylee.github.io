@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" data-figures="">
-  <head>  <title>Posts | kinnylee</title>
+<html lang="en" data-figures="" class="page">
+  <head>  <title>kinnylee</title>
   <meta charset='utf-8'>
   <meta name="generator" content="Hugo 0.75.0-DEV" />
   <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
@@ -12,16 +12,15 @@
   gtag('js', new Date());
   gtag('config', 'XXXXXXXXXX');
 </script>
-  
 <meta property = "og:locale" content = "en_US" />
 <meta property="og:type" content="article">
-<meta name="description" content="">
+<meta name="description" content="Envoy介绍 本文摘自 这里，记录的学习笔记，如果阅读，建议阅读原始文稿。 Envoy是什么 对比nginx nginx缺乏有效的热变更机制 ngin">
 <meta name = "twitter:card" content = "summary" />
 <meta name = "twitter:creator" content = "@janedoe">
-<meta name = "twitter:title" content = "Posts" />
-<meta property = "og:url" content = "https://kinnylee.github.io/post/" />
-<meta property = "og:title" content = "Posts" />
-<meta property = "og:description" content = "" />
+<meta name = "twitter:title" content = "" />
+<meta property = "og:url" content = "https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/envoy%E5%85%A5%E9%97%A8%E4%BB%8B%E7%BB%8D/" />
+<meta property = "og:title" content = "" />
+<meta property = "og:description" content = "Envoy介绍 本文摘自 这里，记录的学习笔记，如果阅读，建议阅读原始文稿。 Envoy是什么 对比nginx nginx缺乏有效的热变更机制 ngin" />
 <meta property = "og:image" content = "https://kinnylee.github.io/images/thumbnail.png" />
 <link rel='apple-touch-icon' sizes='180x180' href='https://kinnylee.github.io/icons/apple-touch-icon.png'>
 <link rel='icon' type='image/png' sizes='32x32' href='https://kinnylee.github.io/icons/favicon-32x32.png'>
@@ -31,7 +30,7 @@
 <meta name="msapplication-TileColor" content="#002538">
 <meta name="theme-color" content="#002538">
 
-  <link rel='canonical' href='https://kinnylee.github.io/post/'>
+  <link rel='canonical' href='https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/envoy%E5%85%A5%E9%97%A8%E4%BB%8B%E7%BB%8D/'>
   <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     
 
@@ -139,363 +138,159 @@
 </header>
 
     <main>
-
-<div class='grid-inverse wrap content'>
-  <ul class='posts' id = 'posts'>
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/'>dmp文件读取（四）- Exception</a>
-      </h3>
-      <div class = 'post_meta'>
+  
+<div class = 'grid-inverse wrap content'>
+  <article class='post_content' id= 'post_content'>
+    <h1 class='post_title'></h1><div class = 'post_meta'>
   <svg class="icon">
     <use xlink:href="#calendar"></use>
   </svg>
   <span class="post_date">
-    Aug 15, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
+    Jan 1, 0001</span>
+</div>
+<br/>
+    <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
+       阅读 </span></span>|<span class="post-date"> 共 2121 字</span>，阅读约<span class="more-meta"> 5 分钟</span>
+    <div class='post_share'>
+  | 复制链接:
+  <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/envoy/envoy%E5%85%A5%E9%97%A8%E4%BB%8B%E7%BB%8D/" title="Copy Link" class="link link_yank">
+    <svg class="icon">
+      <use xlink:href="#yank"></use>
+    </svg>
   </a>
 </div>
 
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（四） 前面两篇文章，已经把分析dmp所需要的准备工作：线程信息、模块信息的读取都分析完了。今天该崩溃的主角出场：异常(Exce</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E5%9B%9B-exception/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/'>代码是如何编译成可执行文件的</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 15, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8E%9F%E7%90%86' class = 'post_tag button button_translucent'>计算机原理
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>工程师应该怎么学习 1. 阅读书籍 2. 信息源 github trending follow优秀工程师 关注优秀社区 参加技术会议和公开课 3. 多做总结 建立自己的博客 建立自己的代码库 建立自</p>
-          <a href='https://kinnylee.github.io/post/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BB%A3%E7%A0%81%E6%98%AF%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91%E6%88%90%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E7%9A%84/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/'>动态链接库与静态链接库</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 15, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/c&#43;&#43;' class = 'post_tag button button_translucent'>C&#43;&#43;
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>概述 静态链接库 windows: .lib文件 linux：.a文件 动态链接库 windows：.dll文件 linux：.so文件</p>
-          <a href='https://kinnylee.github.io/post/c&#43;&#43;/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93%E4%B8%8E%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/'>dmp文件读取（三）- Moduel</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 14, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件读取（三） 第二章主要介绍了dmp中线程stream的读取，线程信息包括进程运行时的所有线程，每个线程包括线程id、优先级、调用栈、</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%89-moduel/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/'>dmp文件读取（二）- Thread</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 13, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件解析 dmp文件读取（二） 前面的章节一直提到，dmp中有很多中不同的stream，分别代表不同维度的信息，比如：操作系统信息、线程信</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%BA%8C-thread/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/'>dmp文件读取（一）- 概述</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 10, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/breakpad' class = 'post_tag button button_translucent'>breakpad
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/google.jpg'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>dmp文件解析 dmp读取源码分析（一） 1. 入口文件： src/processor/minidump_stackwalk.cc 文件 main函数 1int main(int argc, char **argv) { 2 ... 3 // 解析参数 4 ... 5 // dmp分析的核心函数 6 PrintMinidumpProcess(...) 7 ... 8} 2. 总体</p>
-          <a href='https://kinnylee.github.io/post/breakpad/dmp%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/java/jvm/'>jvm</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Aug 9, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/jvm' class = 'post_tag button button_translucent'>jvm
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>jvm原理</p>
-          <a href='https://kinnylee.github.io/post/java/jvm/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B8%80-%E6%A6%82%E8%BF%B0/'>go高级编程（一）- 概述</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Jul 10, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/go' class = 'post_tag button button_translucent'>go
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/go.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>go高级编程（一）- 概述 纵观这几年发展，go语言已经成为云计算、云存储时代最重要的基础编程语言 go语言的诞生 google的三位大咖于2007</p>
-          <a href='https://kinnylee.github.io/post/go/%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/go%E9%AB%98%E7%BA%A7%E7%BC%96%E7%A8%8B%E4%B8%80-%E6%A6%82%E8%BF%B0/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/'>Ansible部署核心代码解析</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Jun 28, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/ansible' class = 'post_tag button button_translucent'>ansible
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/python' class = 'post_tag button button_translucent'>python
-  </a>
-  <a href = 'https://kinnylee.github.io/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90' class = 'post_tag button button_translucent'>源码分析
-  </a>
-</div>
-
-    </div>
-    <div class = 'excerpt_footer partition'>
-      <div class = 'excerpt_thumbnail'>
-      <img src = 'https://kinnylee.github.io/images/ansible.png'>
-      </div>
-      
-        <div>
-          <p class = 'pale'>Ansible部署核心代码解析 playbook_executor.py 1def run(self): 2 # 遍历所有的 playbook 3 for playbook_path in self._playbooks: 4 # 执行单个 playbook 逻辑 5 pb = Playbook.load(...) 6 # 触发 playbook start 的回调函数 7 self._tmq.send_callback(&#39;v2_playbook_on_start&#39;, pb) 8 # 遍历单个 playbook 下所有的 p</p>
-          <a href='https://kinnylee.github.io/post/ansible/ansible-%E9%83%A8%E7%BD%B2%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E8%A7%A3%E6%9E%90/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-      
-<li class = 'post_item'>
-  <div class = 'excerpt'>
-    <div class = 'excerpt_header'>
-      <h3 class = 'post_link'>
-        <a href='https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/'>K8s基本入门</a>
-      </h3>
-      <div class = 'post_meta'>
-  <svg class="icon">
-    <use xlink:href="#calendar"></use>
-  </svg>
-  <span class="post_date">
-    Jun 28, 2020</span>
-  <a href = 'https://kinnylee.github.io/tags/k8s' class = 'post_tag button button_translucent'>k8s
-  </a>
-</div>
-
-    </div>
-      <div class = 'excerpt_footer'>
-        <div>
-          <p class = 'pale'>分享的内容包括 k8s demo部署示例 k8s基本架构和原理 k8s资源对象 k8s网络模型 总结 k8s就像图中的货船，管理各种集装箱（容器） 一. k8s dem</p>
-          <a href='https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/k8s/%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86/k8s%E5%9F%BA%E6%9C%AC%E5%85%A5%E9%97%A8/' class='excerpt_more button'>阅读原文</a>
-        </div>
-      </div>
-    </div>
-  </li>
-  
-    <li>
-<ul class="pagination">
-  <li class="page-item">
-    <a href="/post/" class="page-link" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
-  </li>
-  <li class="page-item">
-    <a href="/post/page/5/" class="page-link" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/">1</a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/page/2/">2</a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/page/3/">3</a>
-  </li>
-  <li class="page-item disabled">
-    <span aria-hidden="true">&nbsp;&hellip;&nbsp;</span>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/page/5/">5</a>
-  </li>
-  <li class="page-item active">
-    <a class="page-link" href="/post/page/6/">6</a>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/page/7/">7</a>
-  </li>
-  <li class="page-item disabled">
-    <span aria-hidden="true">&nbsp;&hellip;&nbsp;</span>
-  </li>
-  <li class="page-item">
-    <a class="page-link" href="/post/page/11/">11</a>
-  </li>
-  <li class="page-item">
-    <a href="/post/page/7/" class="page-link" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
-  </li>
-  <li class="page-item">
-    <a href="/post/page/11/" class="page-link" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
-  </li>
+    
+    <h1 id="envoy介绍">Envoy介绍</h1>
+<p>本文摘自 <a href="https://cloudnative.to/envoy/intro/what_is_envoy.html">这里</a>，记录的学习笔记，如果阅读，建议阅读原始文稿。</p>
+<h2 id="envoy是什么">Envoy是什么</h2>
+<h3 id="对比nginx">对比nginx</h3>
+<ul>
+<li>nginx缺乏有效的热变更机制</li>
+<li>nginx缺乏很好的可观察性</li>
+<li>nginx很多微服务功能需要买 nginx plus 才有</li>
 </ul>
+<h3 id="核心功能">核心功能</h3>
+<ul>
+<li>非侵入式架构</li>
+<li>C++11实现，性能优越</li>
+<li>L3/L4过滤器架构</li>
+<li>http L7过滤器架构</li>
+<li>http2作为一等公民</li>
+<li>gRPC支持</li>
+<li>服务发现</li>
+<li>健康检查</li>
+<li>高级负载均衡</li>
+<li>追踪</li>
+<li>统计监控</li>
+<li>动态配置</li>
+</ul>
+<h2 id="架构概览">架构概览</h2>
+<h3 id="介绍">介绍</h3>
+<h4 id="术语">术语</h4>
+<ul>
+<li>主机（Host）：能够进行网络通信的实体，是一个逻辑概念，一块物理硬件可能包括多个主机，只要他们是可独立寻址的。</li>
+<li>下游（Downstream）：下游主机连接到envoy，发送请求并接受响应</li>
+<li>上游（Upstream）：上游主机接收来自envoy的连接和请求，并返回响应</li>
+<li>监听器（Listener）：被命名的网络地址（如端口、套接字等），它可以被下游客户端连接。envoy 给下游客户端暴露多个监听器来连接</li>
+<li>集群（Cluster）：指envoy连接到的逻辑上相同的一组上游主机。envoy通过服务发现来发现集群的成员，通过负载均衡决定将请求路由到哪个集群成员</li>
+<li>网格（Mesh）：一组协调提供一致网络拓扑的主机。envoy网格是一组envoy代理，构成分布式消息传递的基础</li>
+<li>运行时配置（Runtime configuration）：外置实时配置系统与envoy一起部署。可以更改配置设置来影响运行，而无需重启envoy</li>
+</ul>
+<h4 id="线程模型">线程模型</h4>
+<p>envoy使用单进程，多线程架构。主线程协调任务，多个worker线程处理监听、过滤、转发。一个连接的生命周期被绑定在一个worker线程上，使得enovy类似于单线程</p>
+<h3 id="监听器">监听器</h3>
+<h4 id="监听器-1">监听器</h4>
+<p>envoy支持单个进程中配置任意数量的监听器。envoy同时支持tcp和udp监听器</p>
+<h5 id="tcp监听器">TCP监听器：</h5>
+<ul>
+<li>每个监听器都独立配置了多个过滤器链，根据匹配条件选择某个过滤器链。</li>
+<li>过滤器链由多个网络过滤器组成</li>
+<li>监听器还可以配置一些监听过滤器，这些过滤器在网络过滤器之前处理</li>
+<li>还可以通过监听器服务发现（LDS）动态获取监听器</li>
+</ul>
+<h5 id="udp监听器">UDP监听器：</h5>
+<ul>
+<li>Envoy 还支持 UDP 监听器和 UDP 监听过滤器</li>
+<li>每个工作线程都会实例化一次 UDP 监听过滤器，并且 UDP 监听过滤器对于工作线程来讲是全局可见的</li>
+<li>每个工作线程监听端口接收到的 UDP 数据报文由监听过滤器处理</li>
+</ul>
+<h4 id="监听器过滤器">监听器过滤器</h4>
+<ul>
+<li>
+<p>监听器过滤器可以用于操作元数据，主要目的是更加方便的添加系统集成功能，而无需更改envoy的核心功能，并使彼此之间交互更明确。</p>
+</li>
+<li>
+<p>这些过滤器是在新接收的套接字上操作的。可停止链中的过滤器并继续执行后续的过滤器。它允许去运作更复杂的业务场景，例如调用 限速服务]等</p>
+</li>
+</ul>
+<h4 id="网络过滤器">网络过滤器</h4>
+<p>网络层（L3/L4）过滤器构成了envoy连接处理的核心，过滤器允许混合不同的过滤器组合，并匹配和附加到给定的监听器。包括三种不同的网络过滤器：</p>
+<ul>
+<li>读取：当envoy从下游连接接收数据时，会调用读取过滤器</li>
+<li>写入：当envoy向下游发送数据时，会调用写入过滤器</li>
+<li>读取/写入：上述两种情况</li>
+</ul>
+<p>过滤器最终会对原始字节和少量连接事件进行操作（比如 TLS 握手完成、本地或远程断开连接）。</p>
+<h4 id="tcp代理">TCP代理</h4>
+<p>由于 Envoy 本质上是一个 L3/L4 服务器，因此它很容易实现基本的 L3/L4 网络代理功能。 TCP 代理过滤器可以在下游客户端和上游集群之间进行最基本的 1:1 网络连接代理。</p>
+<h4 id="udp代理">UDP代理</h4>
+<p>Envoy 通过 UDP 代理监听器 filter支持 UDP 代理。</p>
+<h3 id="http">HTTP</h3>
+<h4 id="http连接管理">Http连接管理</h4>
+<p>envoy内置了一个叫 http管理器的网络层过滤器，此过滤器功能如下：</p>
+<ul>
+<li>将原始字节转换为http协议的消息和事件</li>
+<li>处理http连接和请求的通用功能：访问日志、请求id生成与追踪、请求响应头操作、统计</li>
+</ul>
+<h4 id="http过滤器">Http过滤器</h4>
+<p>envoy支持连接管理器中的http层过滤器，可以开发过滤器处理http层的消息，http过滤器有3种类型：</p>
+<ul>
+<li>解码器：用于链接管理器解码部分请求流</li>
+<li>编码器：用于链接管理器编码部分响应流</li>
+<li>解码器/编码器：上述两种情况</li>
+</ul>
+<h4 id="http路由">Http路由</h4>
+<p>envoy包含一个用来执行高级路由任务的 HTTP 路由过滤器</p>
+<h4 id="http升级">Http升级</h4>
+<h4 id="http动态转发代理">Http动态转发代理</h4>
+<h3 id="上游集群">上游集群</h3>
+<h4 id="集群管理器">集群管理器</h4>
+<ul>
+<li>Envoy集群管理器管理所有配置的上游集群，可以任意数量的、独立配置的上游集群</li>
+<li>获取集群的方式可以是静态配置，也可以是动态配置（通过集群发现服务CDS api动态获取）</li>
+<li>动态集群获取允许将更多配置存储在中央配置服务器中，这样就可以减少重启 Envoy 和重新分配配置的次数。</li>
+</ul>
+<h4 id="服务发现">服务发现</h4>
+<p>在envoy配置中定义了一个上游集群时，envoy需要知道如何解析集群的成员，这被称为服务发现。</p>
+<p>动态的服务发现机制：EDS（endpoint discovery service)，是一个基于grpc或restful json的xDS管理服务器。</p>
+<h3 id="可观察性">可观察性</h3>
+<h4 id="统计">统计</h4>
+<p>envoy的主要目标之一是使网络易于理解，envoy根据不同配置生成大量统计数据，包括三类：</p>
+<ul>
+<li>Downstream：传入的连接、请求</li>
+<li>Upstream：传出的连接、请求</li>
+<li>Server：envoy服务器实例工作方式相关，如运行时间、分配内存等</li>
+</ul>
+<h4 id="日志">日志</h4>
+<h4 id="追踪">追踪</h4>
+<p>envoy支持三个系统范围内的追踪的特性：</p>
+<ul>
+<li>生成 Request ID：填充 x-request-id 的 http 请求头</li>
+<li>客户端跟踪id连接：x-client-trace-id</li>
+<li>集成外部跟踪服务：
+<ul>
+<li>基于代码级别的外部跟踪服务：zipkin、jaeger、datadog</li>
+<li>外部跟踪服务作为第三方插件</li>
+</ul>
+</li>
+</ul>
+<h3 id="安全">安全</h3>
+<h3 id="操作与配置">操作与配置</h3>
+<h2 id="请求的生命周期">请求的生命周期</h2>
+<h2 id="部署类型">部署类型</h2>
 
-
-    </li>
-  </ul>
+  </article>
 <aside class="sidebar">
   <section class="sidebar_inner">
     <h2>kinnylee</h2>
@@ -894,8 +689,6 @@
 </aside>
 
 </div>
-
-
     </main><svg width="0" height="0" class="hidden">
   <symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook">
     <path d="M437 0H75C33.648 0 0 33.648 0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352 0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"></path>

@@ -150,7 +150,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 1784 字</span>，阅读约<span class="more-meta"> 4 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 2040 字</span>，阅读约<span class="more-meta"> 5 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-pilot-agent/" title="Copy Link" class="link link_yank">
@@ -311,8 +311,7 @@
 <h3 id="envoy启动流程">Envoy启动流程</h3>
 <h2 id="源码分析">源码分析</h2>
 <h3 id="启动入口">启动入口</h3>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span>
-</code></pre></div><h4 id="支持的子命令">支持的子命令</h4>
+<h4 id="支持的子命令">支持的子命令</h4>
 <ul>
 <li>proxy</li>
 <li>istio-iptables</li>
@@ -322,95 +321,33 @@
 </ul>
 <h4 id="proxy命令">proxy命令</h4>
 <p>pilot/cmd/pilot-agent/main.go</p>
-<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="nx">proxy</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">initProxy</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span>
-<span class="ln"> 2</span><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln"> 3</span>    <span class="k">return</span> <span class="nx">err</span>
-<span class="ln"> 4</span><span class="p">}</span>
-<span class="ln"> 5</span><span class="nx">proxyConfig</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">config</span><span class="p">.</span><span class="nf">ConstructProxyConfig</span><span class="p">(</span><span class="nx">meshConfigFile</span><span class="p">,</span> <span class="nx">serviceCluster</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">ProxyConfigEnv</span><span class="p">,</span> <span class="nx">concurrency</span><span class="p">,</span> <span class="nx">proxy</span><span class="p">)</span>
-<span class="ln"> 6</span><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln"> 7</span>    <span class="k">return</span> <span class="nx">fmt</span><span class="p">.</span><span class="nf">Errorf</span><span class="p">(</span><span class="s">&#34;failed to get proxy config: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-<span class="ln"> 8</span><span class="p">}</span>
-<span class="ln"> 9</span><span class="k">if</span> <span class="nx">out</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">gogoprotomarshal</span><span class="p">.</span><span class="nf">ToYAML</span><span class="p">(</span><span class="nx">proxyConfig</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">10</span>    <span class="nx">log</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Failed to serialize to YAML: %v&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-<span class="ln">11</span><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-<span class="ln">12</span>    <span class="nx">log</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Effective config: %s&#34;</span><span class="p">,</span> <span class="nx">out</span><span class="p">)</span>
-<span class="ln">13</span><span class="p">}</span>
-<span class="ln">14</span>
-<span class="ln">15</span><span class="nx">secOpts</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">options</span><span class="p">.</span><span class="nf">NewSecurityOptions</span><span class="p">(</span><span class="nx">proxyConfig</span><span class="p">,</span> <span class="nx">stsPort</span><span class="p">,</span> <span class="nx">tokenManagerPlugin</span><span class="p">)</span>
-<span class="ln">16</span><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">17</span>    <span class="k">return</span> <span class="nx">err</span>
-<span class="ln">18</span><span class="p">}</span>
-<span class="ln">19</span>
-<span class="ln">20</span><span class="c1">// If security token service (STS) port is not zero, start STS server and
-</span><span class="ln">21</span><span class="c1">// listen on STS port for STS requests. For STS, see
-</span><span class="ln">22</span><span class="c1">// https://tools.ietf.org/html/draft-ietf-oauth-token-exchange-16.
-</span><span class="ln">23</span><span class="c1">// STS is used for stackdriver or other Envoy services using google gRPC.
-</span><span class="ln">24</span><span class="c1"></span><span class="k">if</span> <span class="nx">stsPort</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-<span class="ln">25</span>    <span class="nx">stsServer</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">initStsServer</span><span class="p">(</span><span class="nx">proxy</span><span class="p">,</span> <span class="nx">secOpts</span><span class="p">.</span><span class="nx">TokenManager</span><span class="p">)</span>
-<span class="ln">26</span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">27</span>        <span class="k">return</span> <span class="nx">err</span>
-<span class="ln">28</span>    <span class="p">}</span>
-<span class="ln">29</span>    <span class="k">defer</span> <span class="nx">stsServer</span><span class="p">.</span><span class="nf">Stop</span><span class="p">()</span>
-<span class="ln">30</span><span class="p">}</span>
-<span class="ln">31</span>
-<span class="ln">32</span><span class="nx">agentOptions</span> <span class="o">:=</span> <span class="nx">options</span><span class="p">.</span><span class="nf">NewAgentOptions</span><span class="p">(</span><span class="nx">proxy</span><span class="p">)</span>
-<span class="ln">33</span><span class="kd">var</span> <span class="nx">pilotSAN</span> <span class="p">[]</span><span class="kt">string</span>
-<span class="ln">34</span><span class="k">if</span> <span class="nx">proxyConfig</span><span class="p">.</span><span class="nx">ControlPlaneAuthPolicy</span> <span class="o">==</span> <span class="nx">meshconfig</span><span class="p">.</span><span class="nx">AuthenticationPolicy_MUTUAL_TLS</span> <span class="p">{</span>
-<span class="ln">35</span>    <span class="c1">// Obtain Pilot SAN, using DNS.
-</span><span class="ln">36</span><span class="c1"></span>    <span class="nx">pilotSAN</span> <span class="p">=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="nx">config</span><span class="p">.</span><span class="nf">GetPilotSan</span><span class="p">(</span><span class="nx">proxyConfig</span><span class="p">.</span><span class="nx">DiscoveryAddress</span><span class="p">)}</span>
-<span class="ln">37</span><span class="p">}</span>
-<span class="ln">38</span><span class="nx">log</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Pilot SAN: %v&#34;</span><span class="p">,</span> <span class="nx">pilotSAN</span><span class="p">)</span>
-<span class="ln">39</span>
-<span class="ln">40</span><span class="nx">agent</span> <span class="o">:=</span> <span class="nx">istio_agent</span><span class="p">.</span><span class="nf">NewAgent</span><span class="p">(</span><span class="nx">proxyConfig</span><span class="p">,</span> <span class="nx">agentOptions</span><span class="p">,</span> <span class="nx">secOpts</span><span class="p">)</span>
-<span class="ln">41</span><span class="c1">// Start in process SDS.
-</span><span class="ln">42</span><span class="c1"></span><span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">agent</span><span class="p">.</span><span class="nf">Start</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">43</span>    <span class="nx">log</span><span class="p">.</span><span class="nf">Fatala</span><span class="p">(</span><span class="s">&#34;Failed to start in-process SDS&#34;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
-<span class="ln">44</span><span class="p">}</span>
-<span class="ln">45</span>
-<span class="ln">46</span><span class="c1">// If we are using a custom template file (for control plane proxy, for example), configure this.
-</span><span class="ln">47</span><span class="c1"></span><span class="k">if</span> <span class="nx">templateFile</span> <span class="o">!=</span> <span class="s">&#34;&#34;</span> <span class="o">&amp;&amp;</span> <span class="nx">proxyConfig</span><span class="p">.</span><span class="nx">CustomConfigFile</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
-<span class="ln">48</span>    <span class="nx">proxyConfig</span><span class="p">.</span><span class="nx">ProxyBootstrapTemplatePath</span> <span class="p">=</span> <span class="nx">templateFile</span>
-<span class="ln">49</span><span class="p">}</span>
-<span class="ln">50</span>
-<span class="ln">51</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">cancel</span> <span class="o">:=</span> <span class="nx">context</span><span class="p">.</span><span class="nf">WithCancel</span><span class="p">(</span><span class="nx">context</span><span class="p">.</span><span class="nf">Background</span><span class="p">())</span>
-<span class="ln">52</span><span class="k">defer</span> <span class="nf">cancel</span><span class="p">()</span>
-<span class="ln">53</span>
-<span class="ln">54</span><span class="c1">// If a status port was provided, start handling status probes.
-</span><span class="ln">55</span><span class="c1"></span><span class="k">if</span> <span class="nx">proxyConfig</span><span class="p">.</span><span class="nx">StatusPort</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-<span class="ln">56</span>    <span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nf">initStatusServer</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">proxy</span><span class="p">,</span> <span class="nx">proxyConfig</span><span class="p">);</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
-<span class="ln">57</span>        <span class="k">return</span> <span class="nx">err</span>
-<span class="ln">58</span>    <span class="p">}</span>
-<span class="ln">59</span><span class="p">}</span>
-<span class="ln">60</span>
-<span class="ln">61</span><span class="nx">provCert</span> <span class="o">:=</span> <span class="nx">agent</span><span class="p">.</span><span class="nf">FindRootCAForXDS</span><span class="p">()</span>
-<span class="ln">62</span><span class="k">if</span> <span class="nx">provCert</span> <span class="o">==</span> <span class="s">&#34;&#34;</span> <span class="p">{</span>
-<span class="ln">63</span>    <span class="c1">// Envoy only supports load from file. If we want to use system certs, use best guess
-</span><span class="ln">64</span><span class="c1"></span>    <span class="c1">// To be more correct this could lookup all the &#34;well known&#34; paths but this is extremely \
-</span><span class="ln">65</span><span class="c1"></span>    <span class="c1">// unlikely to run on a non-debian based machine, and if it is it can be explicitly configured
-</span><span class="ln">66</span><span class="c1"></span>    <span class="nx">provCert</span> <span class="p">=</span> <span class="s">&#34;/etc/ssl/certs/ca-certificates.crt&#34;</span>
-<span class="ln">67</span><span class="p">}</span>
-<span class="ln">68</span><span class="nx">envoyProxy</span> <span class="o">:=</span> <span class="nx">envoy</span><span class="p">.</span><span class="nf">NewProxy</span><span class="p">(</span><span class="nx">envoy</span><span class="p">.</span><span class="nx">ProxyConfig</span><span class="p">{</span>
-<span class="ln">69</span>    <span class="nx">Config</span><span class="p">:</span>              <span class="nx">proxyConfig</span><span class="p">,</span>
-<span class="ln">70</span>    <span class="nx">Node</span><span class="p">:</span>                <span class="nx">proxy</span><span class="p">.</span><span class="nf">ServiceNode</span><span class="p">(),</span>
-<span class="ln">71</span>    <span class="nx">LogLevel</span><span class="p">:</span>            <span class="nx">proxyLogLevel</span><span class="p">,</span>
-<span class="ln">72</span>    <span class="nx">ComponentLogLevel</span><span class="p">:</span>   <span class="nx">proxyComponentLogLevel</span><span class="p">,</span>
-<span class="ln">73</span>    <span class="nx">LogAsJSON</span><span class="p">:</span>           <span class="nx">loggingOptions</span><span class="p">.</span><span class="nx">JSONEncoding</span><span class="p">,</span>
-<span class="ln">74</span>    <span class="nx">PilotSubjectAltName</span><span class="p">:</span> <span class="nx">pilotSAN</span><span class="p">,</span>
-<span class="ln">75</span>    <span class="nx">NodeIPs</span><span class="p">:</span>             <span class="nx">proxy</span><span class="p">.</span><span class="nx">IPAddresses</span><span class="p">,</span>
-<span class="ln">76</span>    <span class="nx">STSPort</span><span class="p">:</span>             <span class="nx">stsPort</span><span class="p">,</span>
-<span class="ln">77</span>    <span class="nx">OutlierLogPath</span><span class="p">:</span>      <span class="nx">outlierLogPath</span><span class="p">,</span>
-<span class="ln">78</span>    <span class="nx">PilotCertProvider</span><span class="p">:</span>   <span class="nx">secOpts</span><span class="p">.</span><span class="nx">PilotCertProvider</span><span class="p">,</span>
-<span class="ln">79</span>    <span class="nx">ProvCert</span><span class="p">:</span>            <span class="nx">provCert</span><span class="p">,</span>
-<span class="ln">80</span>    <span class="nx">Sidecar</span><span class="p">:</span>             <span class="nx">proxy</span><span class="p">.</span><span class="nx">Type</span> <span class="o">==</span> <span class="nx">model</span><span class="p">.</span><span class="nx">SidecarProxy</span><span class="p">,</span>
-<span class="ln">81</span>    <span class="nx">ProxyViaAgent</span><span class="p">:</span>       <span class="nx">agentOptions</span><span class="p">.</span><span class="nx">ProxyXDSViaAgent</span><span class="p">,</span>
-<span class="ln">82</span><span class="p">})</span>
-<span class="ln">83</span>
-<span class="ln">84</span><span class="nx">drainDuration</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">types</span><span class="p">.</span><span class="nf">DurationFromProto</span><span class="p">(</span><span class="nx">proxyConfig</span><span class="p">.</span><span class="nx">TerminationDrainDuration</span><span class="p">)</span>
-<span class="ln">85</span><span class="nx">envoyAgent</span> <span class="o">:=</span> <span class="nx">envoy</span><span class="p">.</span><span class="nf">NewAgent</span><span class="p">(</span><span class="nx">envoyProxy</span><span class="p">,</span> <span class="nx">drainDuration</span><span class="p">)</span>
-<span class="ln">86</span><span class="c1">// On SIGINT or SIGTERM, cancel the context, triggering a graceful shutdown
-</span><span class="ln">87</span><span class="c1"></span><span class="k">go</span> <span class="nx">cmd</span><span class="p">.</span><span class="nf">WaitSignalFunc</span><span class="p">(</span><span class="nx">cancel</span><span class="p">)</span>
-<span class="ln">88</span>
-<span class="ln">89</span><span class="k">return</span> <span class="nx">envoyAgent</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="c1">// 初始化 proxy 实例，包括配置、启动参数等
+</span><span class="ln"> 2</span><span class="c1"></span><span class="nx">envoyProxy</span> <span class="o">:=</span> <span class="nx">envoy</span><span class="p">.</span><span class="nf">NewProxy</span><span class="p">(</span><span class="nx">envoy</span><span class="p">.</span><span class="nx">ProxyConfig</span><span class="p">{</span>
+<span class="ln"> 3</span>    <span class="nx">Config</span><span class="p">:</span>              <span class="nx">proxyConfig</span><span class="p">,</span>
+<span class="ln"> 4</span>    <span class="nx">Node</span><span class="p">:</span>                <span class="nx">proxy</span><span class="p">.</span><span class="nf">ServiceNode</span><span class="p">(),</span>
+<span class="ln"> 5</span>    <span class="nx">LogLevel</span><span class="p">:</span>            <span class="nx">proxyLogLevel</span><span class="p">,</span>
+<span class="ln"> 6</span>    <span class="nx">ComponentLogLevel</span><span class="p">:</span>   <span class="nx">proxyComponentLogLevel</span><span class="p">,</span>
+<span class="ln"> 7</span>    <span class="nx">LogAsJSON</span><span class="p">:</span>           <span class="nx">loggingOptions</span><span class="p">.</span><span class="nx">JSONEncoding</span><span class="p">,</span>
+<span class="ln"> 8</span>    <span class="nx">PilotSubjectAltName</span><span class="p">:</span> <span class="nx">pilotSAN</span><span class="p">,</span>
+<span class="ln"> 9</span>    <span class="nx">NodeIPs</span><span class="p">:</span>             <span class="nx">proxy</span><span class="p">.</span><span class="nx">IPAddresses</span><span class="p">,</span>
+<span class="ln">10</span>    <span class="nx">STSPort</span><span class="p">:</span>             <span class="nx">stsPort</span><span class="p">,</span>
+<span class="ln">11</span>    <span class="nx">OutlierLogPath</span><span class="p">:</span>      <span class="nx">outlierLogPath</span><span class="p">,</span>
+<span class="ln">12</span>    <span class="nx">PilotCertProvider</span><span class="p">:</span>   <span class="nx">secOpts</span><span class="p">.</span><span class="nx">PilotCertProvider</span><span class="p">,</span>
+<span class="ln">13</span>    <span class="nx">ProvCert</span><span class="p">:</span>            <span class="nx">provCert</span><span class="p">,</span>
+<span class="ln">14</span>    <span class="nx">Sidecar</span><span class="p">:</span>             <span class="nx">proxy</span><span class="p">.</span><span class="nx">Type</span> <span class="o">==</span> <span class="nx">model</span><span class="p">.</span><span class="nx">SidecarProxy</span><span class="p">,</span>
+<span class="ln">15</span>    <span class="nx">ProxyViaAgent</span><span class="p">:</span>       <span class="nx">agentOptions</span><span class="p">.</span><span class="nx">ProxyXDSViaAgent</span><span class="p">,</span>
+<span class="ln">16</span><span class="p">})</span>
+<span class="ln">17</span>
+<span class="ln">18</span><span class="c1">// 通过 proxy 构造 agent 实例
+</span><span class="ln">19</span><span class="c1"></span><span class="nx">envoyAgent</span> <span class="o">:=</span> <span class="nx">envoy</span><span class="p">.</span><span class="nf">NewAgent</span><span class="p">(</span><span class="nx">envoyProxy</span><span class="p">,</span> <span class="nx">drainDuration</span><span class="p">)</span>
+<span class="ln">20</span><span class="c1">// 构造 watcher 实例
+</span><span class="ln">21</span><span class="c1"></span><span class="nx">watcher</span> <span class="o">:=</span> <span class="nx">envoy</span><span class="p">.</span><span class="nf">NewWatcher</span><span class="p">(</span><span class="nx">agent</span><span class="p">.</span><span class="nx">Restart</span><span class="p">)</span>
+<span class="ln">22</span><span class="c1">// 启动 watcher
+</span><span class="ln">23</span><span class="c1"></span><span class="k">go</span> <span class="nx">watcher</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
+<span class="ln">24</span><span class="c1">// 优雅退出
+</span><span class="ln">25</span><span class="c1"></span><span class="k">go</span> <span class="nx">cmd</span><span class="p">.</span><span class="nf">WaitSignalFunc</span><span class="p">(</span><span class="nx">cancel</span><span class="p">)</span>
+<span class="ln">26</span><span class="c1">// 运行 proxy 实例
+</span><span class="ln">27</span><span class="c1"></span><span class="k">return</span> <span class="nx">envoyAgent</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span>
 </code></pre></div><h4 id="istio-iptables子命令">istio-iptables子命令</h4>
 <p>tools/istio-iptables/pkg/cmd/root.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="nx">cfg</span> <span class="o">:=</span> <span class="nf">constructConfig</span><span class="p">()</span>
@@ -441,6 +378,108 @@
 <p>tools/istio-clean-iptables/pkg/cmd/root.go</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="nx">cfg</span> <span class="o">:=</span> <span class="nf">constructConfig</span><span class="p">()</span>
 <span class="ln">2</span><span class="nf">cleanup</span><span class="p">(</span><span class="nx">cfg</span><span class="p">)</span>
+</code></pre></div><h3 id="agent">Agent</h3>
+<h4 id="agent初始化">Agent初始化</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="nf">NewAgent</span><span class="p">(</span><span class="nx">proxy</span> <span class="nx">Proxy</span><span class="p">,</span> <span class="nx">terminationDrainDuration</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="nx">Agent</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">agent</span><span class="p">{</span>
+<span class="ln"> 3</span>		<span class="nx">proxy</span><span class="p">:</span>                    <span class="nx">proxy</span><span class="p">,</span>
+<span class="ln"> 4</span>    <span class="c1">// 管理 envoy 状态的 channel，监视进程状态
+</span><span class="ln"> 5</span><span class="c1"></span>		<span class="nx">statusCh</span><span class="p">:</span>                 <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="nx">exitStatus</span><span class="p">),</span>
+<span class="ln"> 6</span>    <span class="c1">// 活跃的 epoch 集合
+</span><span class="ln"> 7</span><span class="c1"></span>		<span class="nx">activeEpochs</span><span class="p">:</span>             <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="kd">chan</span> <span class="kt">error</span><span class="p">{},</span>
+<span class="ln"> 8</span>		<span class="nx">terminationDrainDuration</span><span class="p">:</span> <span class="nx">terminationDrainDuration</span><span class="p">,</span>
+<span class="ln"> 9</span>    <span class="c1">// 当前的 epoch
+</span><span class="ln">10</span><span class="c1"></span>		<span class="nx">currentEpoch</span><span class="p">:</span>             <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+<span class="ln">11</span>	<span class="p">}</span>
+<span class="ln">12</span><span class="p">}</span>
+</code></pre></div><h4 id="agent启动">agent启动</h4>
+<h4 id="agent重启">agent重启</h4>
+<p>Restart方法注册到watcher中的update中，便于后续watcher调用</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="o">*</span><span class="nx">agent</span><span class="p">)</span> <span class="nf">Restart</span><span class="p">(</span><span class="nx">config</span> <span class="kd">interface</span><span class="p">{})</span> <span class="p">{</span>
+<span class="ln"> 2</span>	<span class="c1">// Only allow one restart to execute at a time.
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nx">a</span><span class="p">.</span><span class="nx">restartMutex</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+<span class="ln"> 4</span>	<span class="k">defer</span> <span class="nx">a</span><span class="p">.</span><span class="nx">restartMutex</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+<span class="ln"> 5</span>
+<span class="ln"> 6</span>	<span class="c1">// Protect access to internal state.
+</span><span class="ln"> 7</span><span class="c1"></span>	<span class="nx">a</span><span class="p">.</span><span class="nx">mutex</span><span class="p">.</span><span class="nf">Lock</span><span class="p">()</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span>  <span class="c1">// 校验传入的参数是否有变更
+</span><span class="ln">10</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">reflect</span><span class="p">.</span><span class="nf">DeepEqual</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">currentConfig</span><span class="p">,</span> <span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">11</span>		<span class="c1">// Same configuration - nothing to do.
+</span><span class="ln">12</span><span class="c1"></span>		<span class="nx">a</span><span class="p">.</span><span class="nx">mutex</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+<span class="ln">13</span>		<span class="k">return</span>
+<span class="ln">14</span>	<span class="p">}</span>
+<span class="ln">15</span>
+<span class="ln">16</span>  <span class="c1">// 活跃的 epoch
+</span><span class="ln">17</span><span class="c1"></span>	<span class="nx">hasActiveEpoch</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">activeEpochs</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span>
+<span class="ln">18</span>  <span class="c1">// 获取当前的 epoch
+</span><span class="ln">19</span><span class="c1"></span>	<span class="nx">activeEpoch</span> <span class="o">:=</span> <span class="nx">a</span><span class="p">.</span><span class="nx">currentEpoch</span>
+<span class="ln">20</span>
+<span class="ln">21</span>	<span class="c1">// Increment the latest running epoch
+</span><span class="ln">22</span><span class="c1"></span>  <span class="c1">// 配置变化了，epoch + 1
+</span><span class="ln">23</span><span class="c1"></span>	<span class="nx">epoch</span> <span class="o">:=</span> <span class="nx">a</span><span class="p">.</span><span class="nx">currentEpoch</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="ln">24</span>	<span class="nx">log</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Received new config, creating new Envoy epoch %d&#34;</span><span class="p">,</span> <span class="nx">epoch</span><span class="p">)</span>
+<span class="ln">25</span>
+<span class="ln">26</span>  <span class="c1">// 更新当前的 epoch 及配置
+</span><span class="ln">27</span><span class="c1"></span>	<span class="nx">a</span><span class="p">.</span><span class="nx">currentEpoch</span> <span class="p">=</span> <span class="nx">epoch</span>
+<span class="ln">28</span>	<span class="nx">a</span><span class="p">.</span><span class="nx">currentConfig</span> <span class="p">=</span> <span class="nx">config</span>
+<span class="ln">29</span>
+<span class="ln">30</span>	<span class="c1">// Add the new epoch to the map.
+</span><span class="ln">31</span><span class="c1"></span>	<span class="nx">abortCh</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">error</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="ln">32</span>	<span class="nx">a</span><span class="p">.</span><span class="nx">activeEpochs</span><span class="p">[</span><span class="nx">a</span><span class="p">.</span><span class="nx">currentEpoch</span><span class="p">]</span> <span class="p">=</span> <span class="nx">abortCh</span>
+<span class="ln">33</span>
+<span class="ln">34</span>	<span class="c1">// Unlock before the wait to avoid delaying envoy exit logic.
+</span><span class="ln">35</span><span class="c1"></span>	<span class="nx">a</span><span class="p">.</span><span class="nx">mutex</span><span class="p">.</span><span class="nf">Unlock</span><span class="p">()</span>
+<span class="ln">36</span>
+<span class="ln">37</span>	<span class="c1">// Wait for previous epoch to go live (if one exists) before performing a hot restart.
+</span><span class="ln">38</span><span class="c1"></span>	<span class="k">if</span> <span class="nx">hasActiveEpoch</span> <span class="p">{</span>
+<span class="ln">39</span>		<span class="nx">a</span><span class="p">.</span><span class="nf">waitUntilLive</span><span class="p">(</span><span class="nx">activeEpoch</span><span class="p">)</span>
+<span class="ln">40</span>	<span class="p">}</span>
+<span class="ln">41</span>  <span class="c1">// 启动 envoy
+</span><span class="ln">42</span><span class="c1"></span>	<span class="k">go</span> <span class="nx">a</span><span class="p">.</span><span class="nf">runWait</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">epoch</span><span class="p">,</span> <span class="nx">abortCh</span><span class="p">)</span>
+<span class="ln">43</span><span class="p">}</span>
+</code></pre></div><h3 id="watcher">Watcher</h3>
+<h4 id="watcher初始化">Watcher初始化</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">func</span> <span class="nf">NewWatcher</span><span class="p">(</span><span class="nx">updates</span> <span class="kd">func</span><span class="p">(</span><span class="kd">interface</span><span class="p">{}))</span> <span class="nx">Watcher</span> <span class="p">{</span>
+<span class="ln">2</span>	<span class="k">return</span> <span class="o">&amp;</span><span class="nx">watcher</span><span class="p">{</span>
+<span class="ln">3</span>		<span class="nx">updates</span><span class="p">:</span> <span class="nx">updates</span><span class="p">,</span>
+<span class="ln">4</span>	<span class="p">}</span>
+<span class="ln">5</span><span class="p">}</span>
+<span class="ln">6</span>
+<span class="ln">7</span><span class="kd">type</span> <span class="nx">watcher</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">8</span>	<span class="nx">updates</span> <span class="kd">func</span><span class="p">(</span><span class="kd">interface</span><span class="p">{})</span>
+<span class="ln">9</span><span class="p">}</span>
+</code></pre></div><h4 id="watcher启动">Watcher启动</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">watcher</span><span class="p">)</span> <span class="nf">Run</span><span class="p">(</span><span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln"> 2</span>  <span class="c1">// Run 中主要是调用 SendConfig 函数
+</span><span class="ln"> 3</span><span class="c1"></span>	<span class="nx">w</span><span class="p">.</span><span class="nf">SendConfig</span><span class="p">()</span>
+<span class="ln"> 4</span>
+<span class="ln"> 5</span>	<span class="o">&lt;-</span><span class="nx">ctx</span><span class="p">.</span><span class="nf">Done</span><span class="p">()</span>
+<span class="ln"> 6</span>	<span class="nx">log</span><span class="p">.</span><span class="nf">Info</span><span class="p">(</span><span class="s">&#34;Watcher has successfully terminated&#34;</span><span class="p">)</span>
+<span class="ln"> 7</span><span class="p">}</span>
+<span class="ln"> 8</span>
+<span class="ln"> 9</span><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">watcher</span><span class="p">)</span> <span class="nf">SendConfig</span><span class="p">()</span> <span class="p">{</span>
+<span class="ln">10</span>	<span class="nx">h</span> <span class="o">:=</span> <span class="nx">sha256</span><span class="p">.</span><span class="nf">New</span><span class="p">()</span>
+<span class="ln">11</span>  <span class="c1">// 调用前面 newWatcher 时传入的回调函数updates，
+</span><span class="ln">12</span><span class="c1"></span>  <span class="c1">// watcher := envoy.NewWatcher(agent.Restart), 也就是 agent.Restart 方法
+</span><span class="ln">13</span><span class="c1"></span>	<span class="nx">w</span><span class="p">.</span><span class="nf">updates</span><span class="p">(</span><span class="nx">h</span><span class="p">.</span><span class="nf">Sum</span><span class="p">(</span><span class="kc">nil</span><span class="p">))</span>
+<span class="ln">14</span><span class="p">}</span>
+</code></pre></div><h3 id="envoy">Envoy</h3>
+<h4 id="启动envoy">启动envoy</h4>
+<p>runWait方法用于启动envoy</p>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">func</span> <span class="p">(</span><span class="nx">a</span> <span class="o">*</span><span class="nx">agent</span><span class="p">)</span> <span class="nf">runWait</span><span class="p">(</span><span class="nx">config</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">epoch</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">abortCh</span> <span class="o">&lt;-</span><span class="kd">chan</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+<span class="ln">2</span>	<span class="nx">log</span><span class="p">.</span><span class="nf">Infof</span><span class="p">(</span><span class="s">&#34;Epoch %d starting&#34;</span><span class="p">,</span> <span class="nx">epoch</span><span class="p">)</span>
+<span class="ln">3</span>  <span class="c1">// 启动 envoy
+</span><span class="ln">4</span><span class="c1"></span>	<span class="nx">err</span> <span class="o">:=</span> <span class="nx">a</span><span class="p">.</span><span class="nx">proxy</span><span class="p">.</span><span class="nf">Run</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">epoch</span><span class="p">,</span> <span class="nx">abortCh</span><span class="p">)</span>
+<span class="ln">5</span>  <span class="c1">// 删除 epoch 对应的配置文件
+</span><span class="ln">6</span><span class="c1"></span>	<span class="nx">a</span><span class="p">.</span><span class="nx">proxy</span><span class="p">.</span><span class="nf">Cleanup</span><span class="p">(</span><span class="nx">epoch</span><span class="p">)</span>
+<span class="ln">7</span>	<span class="nx">a</span><span class="p">.</span><span class="nx">statusCh</span> <span class="o">&lt;-</span> <span class="nx">exitStatus</span><span class="p">{</span><span class="nx">epoch</span><span class="p">:</span> <span class="nx">epoch</span><span class="p">,</span> <span class="nx">err</span><span class="p">:</span> <span class="nx">err</span><span class="p">}</span>
+<span class="ln">8</span><span class="p">}</span>
+</code></pre></div><h4 id="envoy对象">envoy对象</h4>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">envoy</span> <span class="kd">struct</span> <span class="p">{</span>
+<span class="ln">2</span>	<span class="nx">ProxyConfig</span>
+<span class="ln">3</span>	<span class="nx">extraArgs</span> <span class="p">[]</span><span class="kt">string</span>
+<span class="ln">4</span><span class="p">}</span>
 </code></pre></div>
   </article>
 <aside class="sidebar">

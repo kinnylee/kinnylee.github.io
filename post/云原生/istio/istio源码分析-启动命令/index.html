@@ -150,7 +150,7 @@
 </div>
 <br/>
     <span id="busuanzi_container_page_pv">| <span id="busuanzi_value_page_pv"></span><span>
-       阅读 </span></span>|<span class="post-date"> 共 4626 字</span>，阅读约<span class="more-meta"> 10 分钟</span>
+       阅读 </span></span>|<span class="post-date"> 共 4712 字</span>，阅读约<span class="more-meta"> 10 分钟</span>
     <div class='post_share'>
   | 复制链接:
   <a href="https://kinnylee.github.io/post/%E4%BA%91%E5%8E%9F%E7%94%9F/istio/istio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90-%E5%90%AF%E5%8A%A8%E5%91%BD%E4%BB%A4/" title="Copy Link" class="link link_yank">
@@ -396,6 +396,7 @@
 <span class="ln">23</span><span class="p">}</span>
 </code></pre></div><h3 id="discoveryserverenvoyxdsserver">DiscoveryServer（EnvoyXdsServer）</h3>
 <p>EnvoyXdsServer主要负责pilot中xDS协议的生成和下发，接收并处理configController和serviceController推送的PushRequest，与集群中所有的数据面代理进行grpc通讯，并处理请求。</p>
+<p>DiscoveryServer实际上实现了AggregatedDiscoveryServiceServer接口</p>
 <div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln"> 1</span><span class="c1">// pilot server
 </span><span class="ln"> 2</span><span class="c1"></span><span class="kd">type</span> <span class="nx">Server</span> <span class="kd">struct</span> <span class="p">{</span>
 <span class="ln"> 3</span>	<span class="nx">XDSServer</span> <span class="o">*</span><span class="nx">xds</span><span class="p">.</span><span class="nx">DiscoveryServer</span>
@@ -416,6 +417,14 @@
 </span><span class="ln">18</span><span class="c1"></span>	<span class="nx">adsClients</span>      <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="nx">Connection</span>
 <span class="ln">19</span>	<span class="o">...</span>
 <span class="ln">20</span><span class="p">}</span>
+</code></pre></div><h3 id="aggregateddiscoveryserviceserver-接口">AggregatedDiscoveryServiceServer 接口</h3>
+<div class="highlight"><pre class="chroma"><code class="language-go" data-lang="go"><span class="ln">1</span><span class="kd">type</span> <span class="nx">AggregatedDiscoveryServiceServer</span> <span class="kd">interface</span> <span class="p">{</span>
+<span class="ln">2</span>	 <span class="c1">// 全量 ADS Stream 接口
+</span><span class="ln">3</span><span class="c1"></span>	<span class="nf">StreamAggregatedResources</span><span class="p">(</span><span class="nx">AggregatedDiscoveryService_StreamAggregatedResourcesServer</span><span class="p">)</span> <span class="kt">error</span>
+<span class="ln">4</span>	<span class="c1">// 增量 ADS Stream 接口
+</span><span class="ln">5</span><span class="c1"></span>	<span class="nf">DeltaAggregatedResources</span><span class="p">(</span><span class="nx">AggregatedDiscoveryService_DeltaAggregatedResourcesServer</span><span class="p">)</span> <span class="kt">error</span>
+<span class="ln">6</span><span class="p">}</span>
+<span class="ln">7</span>
 </code></pre></div><h3 id="cds">CDS</h3>
 <ul>
 <li>cds 即 Cluster Discovery Service，是pilot-discovery为Envoy动态提供cluster相关信息的协议</li>
